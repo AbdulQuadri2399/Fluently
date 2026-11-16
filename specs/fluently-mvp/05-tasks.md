@@ -30,7 +30,7 @@ You'll be able to see: the sign-in page, sign-up with the invite-list rule, and 
   Done when: CI run on the branch is green (link in slice report).
 - [x] T0.9 [P] `e2e/helpers/shoot.ts` (screenshot helper at 1280 and 390 widths, light and dark) and `e2e/helpers/auth.ts` (sign-in as seeded admin/member) — S — Refs: 03b — Depends on: T0.2
   Done when: `e2e/smoke.spec.ts` saves `e2e/screenshots/SCR1-default.png` in both themes.
-- [ ] T0.10 `CLAUDE.md` (product line, pointer to `specs/fluently-mvp/`, stack branch and 04 link, commands, rules per tech-spec-planner §6); `.env.example` from 04 §10; Sentry init (DSN optional locally) — S — Refs: 04 §10 — Depends on: T0.1
+- [x] T0.10 `CLAUDE.md` (product line, pointer to `specs/fluently-mvp/`, stack branch and 04 link, commands, rules per tech-spec-planner §6); `.env.example` from 04 §10; Sentry init (DSN optional locally) — S — Refs: 04 §10 — Depends on: T0.1
   Done when: file exists with every command in 04 §11; `pnpm build` passes with no Sentry DSN set.
 - [ ] T0.11 Vercel project linked, preview deploy per branch, env vars set (needs user: Vercel + Supabase cloud project) — S — Refs: 04 §2 — Depends on: T0.6
   Done when: preview URL shows SCR1 and sign-in works against the Supabase dev project.

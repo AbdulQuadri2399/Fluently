@@ -244,7 +244,7 @@ Every job: checks `stage_runs.status` for cancellation before each AI call; chec
 - Email + password with verification (Supabase Auth); sessions in cookies via `@supabase/ssr`, refreshed in `middleware.ts`; protected route group `(app)` redirects signed-out users to `/sign-in?next=…` (AC1.6).
 - Roles: **admin** (all member rights + allowlist, members, settings, toolkit upload, enrichment decisions, project delete, raise cost cap); **member** (all project work, read toolkit, read usage).
 - Deactivated members: `active = false` makes `is_member()` false (RLS denies immediately) and the middleware signs them out on next request (AC3.4 within 5 min is met by token refresh interval ≤ 5 min).
-- `BOOTSTRAP_ADMIN_EMAIL` env var used by `is_email_allowed` / trigger for the very first account (AC1.7).
+- `BOOTSTRAP_ADMIN_EMAIL` env var is copied into `private.app_config` by `scripts/set-bootstrap-admin.ts` (triggers can't read env vars); `is_email_allowed` and the auth trigger read it there for the very first account (AC1.7).
 
 ## 7. Client state and data flow
 
