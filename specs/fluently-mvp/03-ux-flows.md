@@ -1,0 +1,416 @@
+# 03: UX flows
+
+*Plain English: every screen, what it shows in each situation, how people move through it, what happens when things go wrong, and the exact words on screen.*
+
+Feature: Fluently MVP | Platform: web app | Version: 1 | Date: 2026-11-16 | Status: draft
+
+---
+
+## 1. Navigation map
+
+```mermaid
+flowchart LR
+  SCR1[SCR1 Sign in / Sign up / Reset] --> SCR2[SCR2 Onboarding]
+  SCR1 --> SCR3[SCR3 Projects]
+  SCR2 --> SCR3
+  SCR3 --> SCR4[SCR4 New project dialog]
+  SCR4 --> SCR6[SCR6 Intake]
+  SCR3 --> SCR5[SCR5 Project canvas]
+  SCR6 -->|Approve objectives| SCR5
+  SCR5 --- SCR7[SCR7 Inspector panel]
+  SCR5 --- SCR8[SCR8 Checkpoint panel]
+  SCR5 --> SCR9[SCR9 Audit Report]
+  SCR5 --> SCR10[SCR10 Lo-fi preview]
+  SCR5 --> SCR6
+  SCR3 --> SCR11[SCR11 Toolkit]
+  SCR3 --> SCR12[SCR12 Workspace settings]
+```
+
+Global top bar (all signed-in screens): Fluently logo (→ SCR3), *Projects*, *Toolkit*, *Settings*, help menu (*How Fluently works* → SCR2), account menu (*Sign out*). Inside a project, a project header adds: project name, mode · channel, toolkit version, cost so far, tabs *Canvas* / *Intake* / *Report*.
+
+## 2. Screen inventory
+
+| SCR | Screen | Purpose | Entry points | Main action | Stories |
+|---|---|---|---|---|---|
+| SCR1 | Sign in / Sign up / Reset password | Get allowlisted members in | Any URL while signed out | Sign in | US1 |
+| SCR2 | Onboarding (3 steps, modal over SCR3) | Explain tree, checkpoints, trace | First sign-in; help menu | *Start my first project* | US2 |
+| SCR3 | Projects | See and open all team projects | Sign-in; logo | *New project* | US7, US25 |
+| SCR4 | New project (dialog) | Name, mode, channel | SCR3 | *Create project* | US7 |
+| SCR5 | Project canvas | The OST: watch, edit, trace, decide | SCR3; after SCR6 approval | Depends on stage (SCR8) | US9–US26 |
+| SCR6 | Intake | Brief, objectives with coaching, assets | SCR4; *Intake* tab | *Approve objectives* | US8, US9, US10 |
+| SCR7 | Inspector (right panel on SCR5) | Full node content, sources, history, actions | Select a node | Edit / Regenerate / Trace | US12, US16, US22–US24, US26 |
+| SCR8 | Checkpoint panel (bottom panel on SCR5) | Say what's done and what to decide | Stage completes; stage running | Approve / Send back | US14, US17, US20, US21, US25 |
+| SCR9 | Audit Report | Readable report from the graph | *Report* tab | Read; (Should) Export | US15, US12 |
+| SCR10 | Lo-fi preview (full screen) | Inspect a variant with pins | Open a lo-fi node | Click a pin → trace | US18–US20, US23 |
+| SCR11 | Toolkit | Upload versions; browse; candidates; enrichments | Top bar | *Upload new version* (admin) | US4–US6, AC12.9 |
+| SCR12 | Workspace settings | Allowlist, members, models, cost, usage, services, sector lists | Top bar | Save | US3, US27, US28, AC10.4, AC13.3 |
+
+## 3. State matrix per screen
+
+Copy keys in `[brackets]` are written out in §7.
+
+### SCR1 Sign in / Sign up / Reset
+| State | User sees | Can do |
+|---|---|---|
+| Default | Email, password, *Sign in*; links *Create account*, *Forgot password* | Sign in |
+| Loading | Button shows spinner, label "Signing in…", fields disabled | Wait |
+| Error: wrong credentials | `[auth.wrongCredentials]` above form | Retry |
+| Error: not allowlisted (sign-up) | `[auth.notAllowed]` | Use another email |
+| Success: sign-up | `[auth.checkEmail]` | Open email |
+| Reset sent | `[auth.resetSent]` | Back to sign in |
+| Error: link expired | `[auth.linkExpired]` with *Send a new link* | Resend |
+| Offline | `[common.offline]` banner; submit disabled | Wait |
+
+### SCR2 Onboarding
+| State | User sees | Can do |
+|---|---|---|
+| Step 1 "One tree, from brief to wireframe" | Diagram of the 7 columns | *Next*, *Skip* |
+| Step 2 "You decide at every checkpoint" | Approve / Edit / Send back explained | *Back*, *Next*, *Skip* |
+| Step 3 "Everything traces back" | A pin, highlighted path to evidence and objectives | *Back*, *Start my first project* (→ SCR4) |
+
+### SCR3 Projects
+| State | User sees | Can do |
+|---|---|---|
+| Loading | 5 skeleton rows | — |
+| Empty (first use) | `[projects.emptyTitle]`, `[projects.emptyBody]`, *New project* | Create |
+| Default | Table: name, mode · channel, stage, status chip, last edited by · when; filter *Active* / *Archived*; search | Open, archive, create |
+| Empty (no results) | `[projects.noResults]` with *Clear search* | Clear |
+| Error | `[common.loadFailed]` with *Try again* | Retry |
+| No toolkit yet (admin) | Banner `[toolkit.noneYet]` with *Upload toolkit* | Go to SCR11 |
+| No toolkit yet (member) | Banner `[toolkit.noneYetMember]` | — |
+
+### SCR4 New project dialog
+| State | User sees | Can do |
+|---|---|---|
+| Default | Name; Mode radio (*Create something new* / *Optimise something that exists*); Channel radio (*Screens and flows* / *Email*); Client label (optional) | Create, cancel |
+| Invalid | Inline `[project.nameInvalid]` | Fix |
+| Saving | Button spinner "Creating…" | Wait |
+| Error | `[common.saveFailed]` | Retry |
+
+### SCR5 Project canvas
+| State | User sees | Can do |
+|---|---|---|
+| Loading | Column headers + skeleton nodes | — |
+| Intake not approved | Objectives column with placeholder `[canvas.intakeFirst]` and *Go to intake* | Go to SCR6 |
+| Ethics running | Ethics node with spinner "Checking the brief against our ethics rules…" | Wait |
+| Ethics flagged | Ethics node flagged; SCR8 shows reasons | Edit brief, override |
+| Ready to research | SCR8 `[checkpoint.readyResearch]` | *Start research* |
+| Stage running | Column header progress (`Academic papers · 12 found`), nodes appear live; *Cancel* in SCR8 | Watch, inspect finished nodes, cancel |
+| Stage partially failed | SCR8 `[stage.partialFail]` listing failed steps | *Retry failed steps*, continue |
+| Stage failed | SCR8 `[stage.failed]` | *Retry*, *Get help* (copies error ID) |
+| Checkpoint waiting | SCR8 with decision content | Approve, edit, send back |
+| Stale nodes present | Stale marker on nodes; toolbar *Regenerate stale (n)* | Regenerate, ignore |
+| Trace mode | Path highlighted, others dimmed at 30% opacity | Escape to clear |
+| Cost near cap | Header chip `[cost.nearCap]` | — |
+| Cost at cap | SCR8 `[cost.atCap]` | Confirm continue / admin raises cap |
+| Narrow window (< 1024 px) | `[canvas.needsWiderScreen]` + links to Report and lo-fi previews | Open read-only views |
+| Offline | `[common.offline]` banner; edits disabled | Wait |
+| Session expired | `[common.sessionExpired]` modal | Sign in (returns here) |
+| List view (accessibility toggle) | Nodes as nested lists by column with the same actions | Everything the canvas allows |
+| Complete | Header chip "Complete"; SCR8 `[checkpoint.complete]` | Edit anything, rate (NFR12) |
+
+### SCR6 Intake
+| State | User sees | Can do |
+|---|---|---|
+| Default (new mode) | Fields per AC8.1 except assets; helper text under each | Type, upload |
+| Default (optimise mode) | Plus *Current assets* section (screens: images + Figma link; email: paste HTML / upload `.html` `.eml` / images) | Upload |
+| Coaching loading | Under the field: "Looking for a sharper version…" with spinner | Keep typing |
+| Coaching suggestion | Card: suggestion, "Why: …", *Use suggestion* / *Edit suggestion* / *Keep mine* | Choose |
+| Coaching unavailable | `[intake.coachUnavailable]` | Continue |
+| Low specificity kept | Field chip `Low specificity` + `[intake.lowSpecificityNote]` | Edit later |
+| Upload in progress | File row with progress bar | Cancel upload |
+| Upload rejected | File row `[upload.typeOrSize]` | Remove, retry |
+| Autosave | "Saving…" / "Saved just now" / `[common.saveFailed]` with *Try again* | — |
+| Ready | *Approve objectives* enabled | Approve |
+| Missing objective | *Approve objectives* disabled, `[intake.needsObjectives]` | Fill |
+| Approved | Read-only summary with *Edit intake* (warns `[intake.editWarnsStale]` if later stages exist) | Edit |
+| Ethics result: flagged | Panel listing reasons, *Edit brief*, *Override with a reason* | Edit, override |
+| Ethics result: refused sector | `[ethics.refusedSector]`; no override | Archive project |
+| Ethics check failed | `[ethics.checkFailed]` + *Try again* | Retry |
+
+### SCR7 Inspector
+| State | User sees | Can do |
+|---|---|---|
+| Default | Type, title, body, markers, sources list, principle(s), linked objectives, provenance, model used, history | Edit, Regenerate, Trace, Delete, Merge (multi-select), Override (if flagged) |
+| Editing | Fields editable; *Save* / *Cancel* | Save |
+| Saving | "Saving…" | — |
+| Save conflict | `[canvas.editConflict]` + *See latest*; your text kept | Compare, re-apply |
+| Locked (stage running) | `[canvas.lockedWhileRunning]`; edit controls disabled | Read |
+| Regenerating | Spinner on node and inspector "Regenerating…" | Wait |
+| Regenerate failed | `[node.regenerateFailed]` + *Try again* | Retry |
+| Flagged | Flag reason + *Override with a reason* | Override |
+| Override form | Reason textarea (≥ 20 chars), counter, *Record override* | Submit |
+| Multi-select | "n nodes selected" + *Merge* (same type only) / *Delete* | Merge |
+
+### SCR8 Checkpoint panel
+| State | User sees | Can do |
+|---|---|---|
+| Ready to research | `[checkpoint.readyResearch]` | *Start research* |
+| Running | Stage name, step list with ✓ / spinner / ✕, elapsed time, cost so far | *Cancel* |
+| Research checkpoint | "Choose the opportunities to pursue", list with checkboxes, confidence, gaps count | Approve, send back |
+| Nothing selected | Button disabled + `[checkpoint.selectAtLeastOne]` | Select |
+| Solutions checkpoint | Recommendations by opportunity, select/edit/add | Approve, send back |
+| Lo-fi checkpoint | Variants side by side, approve per variant | Approve, send back |
+| Test plan checkpoint | Plan summary; if needed, baseline inputs `[testplan.needsBaseline]` | Approve |
+| Send back form | Feedback (≥ 10 chars), checkbox *Also replace nodes people added or edited* (off) | *Send back* |
+| Partial failure / failed / cancelled | `[stage.partialFail]` / `[stage.failed]` / `[stage.cancelled]` | Retry |
+| Complete | `[checkpoint.complete]` + rating 1–5 (once) | Rate, close |
+| Collapsed | One line: next action | Expand |
+
+### SCR9 Audit Report
+| State | User sees | Can do |
+|---|---|---|
+| Loading | Skeleton paragraphs | — |
+| Not yet | `[report.notYet]` | Back to canvas |
+| Default | Sections per AC15.1, citation markers `[1]` linking to a source list; `AI inference` labels; low-confidence and low-specificity labels | Read, open citation, trace |
+| Stale content | Banner `[report.hasStale]` | Go to canvas |
+| Citation check | Table of every citation with record and link | Open links |
+| Exporting (Should) | "Preparing your file…" | Wait |
+| Export failed (Should) | `[report.exportFailed]` | Retry |
+
+### SCR10 Lo-fi preview
+| State | User sees | Can do |
+|---|---|---|
+| Loading | Grey frame with spinner | — |
+| Default | Variant in a frame (390 px; toggle 1280 px; email 600 px with subject and preview text above), numbered pins; annotation list on the right | Click pin, switch variant |
+| Pin selected | Annotation card (What, Principle, Evidence, → objectives, Ethics) + *Trace* | Trace (→ SCR5 trace mode) |
+| Render failed | `[lofi.renderFailed]` + *Regenerate* | Regenerate |
+| Same principle warning | `[lofi.samePrinciple]` | Regenerate one |
+| Flagged | Ethics flag banner + *Override with a reason* | Override |
+
+### SCR11 Toolkit
+| State | User sees | Can do |
+|---|---|---|
+| Empty (admin) | `[toolkit.emptyAdmin]` + *Upload toolkit* | Upload |
+| Empty (member) | `[toolkit.noneYetMember]` | — |
+| Default | Versions list (number, date, uploader, principles, evidence-level counts, *Default* chip); browser (Should); *Toolkit candidates* tab; *Enrichments* tab (Should) | Browse, upload (admin) |
+| Validating | "Checking your file…" | Wait |
+| Preview valid | Counts, warnings list, *Save as version n* | Confirm |
+| Preview invalid | Errors by row `[toolkit.errorMissingId]` etc.; *Choose another file* | Re-upload |
+| Saving | "Saving version n…" | — |
+| Saved | Toast `[toolkit.saved]` | — |
+
+### SCR12 Workspace settings
+| State | User sees | Can do |
+|---|---|---|
+| Default (admin) | Sections: Allowlist; Members; Models per stage; Cost cap and GBP rate; Agency services; Sector lists (flag / refuse); Usage (per project, per stage) | Edit, save |
+| Default (member) | Usage read-only | — |
+| Invalid entry | `[settings.invalidAllowEntry]` | Fix |
+| Last admin | `[settings.lastAdmin]` | — |
+| Saved | Toast `[common.saved]` | — |
+| Save failed | `[common.saveFailed]` | Retry |
+
+## 4. Flows
+
+Format: user action → system response → resulting state (ACs).
+
+### FL1 First sign-in and onboarding (JS1, JS2)
+1. Person opens Fluently → SCR1 → *Create account*, enters allowlisted email + password → verification email sent, `[auth.checkEmail]` (AC1.1).
+2. Clicks link → verified, signed in → SCR2 step 1 (AC2.1).
+3. *Next* ×2 → *Start my first project* → SCR4 (AC2.2).
+
+### FL2 Intake to research ready (JS1, JS6)
+1. In SCR4, enters name, mode, channel → *Create project* → SCR6 (AC7.1).
+2. Types behavioural objective, leaves field → "Looking for a sharper version…" → suggestion card (AC8.2).
+3. *Use suggestion* → field updated, Saved (AC8.3, AC8.9).
+4. Repeats for business objective, audience, constraints; uploads client reviews CSV (AC8.8). Optimise mode: uploads screenshots (AC8.6).
+5. *Approve objectives* → objective nodes created; ethics node "Checking…" on SCR5 (AC9.2, AC10.1).
+6. Ethics passes → SCR8 `[checkpoint.readyResearch]` (AC10.2).
+
+### FL3 Research to Audit Report (JS2, JS3)
+1. *Start research* → stage `running`; SCR8 lists steps (AC11.1).
+2. Source and finding nodes appear in columns as each step completes (AC11.2). Member may close the tab (AC11.3).
+3. Synthesis → theme, opportunity and gap nodes appear (AC12.5, AC13.1); confidence computed (AC12.6).
+4. SCR8 research checkpoint opens; project shows `waiting for you` (AC14.1, AC25.4).
+5. Member opens *Report* tab → SCR9 (AC15.1). Opens a citation → source record (AC15.2).
+6. Selects 2 opportunities → *Approve and generate solutions* (AC14.3).
+
+### FL4 Recommendations (JS3)
+1. Solutions stage runs; recommendation nodes appear per opportunity (AC16.1).
+2. Checkpoint: member edits one (provenance → Edited, AC24.1), adds one with a principle from the picker (AC17.2), deselects one.
+3. *Approve and make wireframes* (AC17.4).
+
+### FL5 Lo-fi (JS4)
+1. Lo-fi stage runs; variant nodes appear with thumbnails (AC18.1).
+2. Member opens a variant → SCR10; clicks pin 3 → annotation card (AC18.3); *Trace* → SCR5 trace mode with path highlighted (AC23.1).
+3. Checkpoint: approves one variant per recommendation (AC20.2).
+
+### FL6 Test plan and completion (JS5)
+1. Test plan stage runs → test plan node (AC21.1). If baseline missing, SCR8 asks for it (AC21.2).
+2. Member enters baseline 12% → sample size computed → *Approve plan* → project `complete`, rating prompt (AC21.3, NFR12).
+
+### FL7 Toolkit upload (admin) (JS3)
+1. SCR11 → *Upload new version* → selects CSV → "Checking your file…" (AC4.1).
+2. Preview: 214 principles, 3 warnings (unknown columns ignored; 2 related principles not found) (AC4.4, AC4.7).
+3. *Save as version 2* → saved; default for new projects; existing projects stay pinned (AC4.5, AC7.4).
+
+### Alternate flows
+- **ALT1 Returning member:** sign-in → SCR3 directly (AC1.3).
+- **ALT2 Keep mine:** member keeps vague objective → `Low specificity` chip carried to all outputs (AC8.5).
+- **ALT3 Send back:** at any checkpoint, *Send back with feedback* → stage re-runs with feedback, people's nodes kept (AC25.2).
+- **ALT4 Edit upstream later:** member edits an approved objective → `[intake.editWarnsStale]` → confirm → downstream nodes stale, intake checkpoint re-opens (AC9.3, AC24.4).
+- **ALT5 Email project:** FL5 produces email variants with subject and preview text (AC19.1–AC19.2).
+- **ALT6 Optimise mode:** intake requires current assets; lo-fi annotates changes vs current (AC8.6, AC18.6).
+- **ALT7 Member (not admin) on SCR12:** sees usage only (AC3.6).
+
+### Failure flows
+
+| FF | Trigger | System behaviour | User feedback | Recovery | Can continue? |
+|---|---|---|---|---|---|
+| FF1 | Sign-up with non-allowlisted email; or expired verification link | No account / link refused | `[auth.notAllowed]` / `[auth.linkExpired]` | Ask an admin; *Send a new link* | Partly |
+| FF2 | Coaching call fails or > 20 s | Keeps text (AC8.4) | `[intake.coachUnavailable]` | Continue without suggestion | Yes |
+| FF3 | Upload wrong type / too big / > file limit | Reject that file (AC8.7) | `[upload.typeOrSize]` / `[upload.tooMany]` | Choose another file | Yes |
+| FF4 | Ethics flag; or ethics check fails | Block research (AC10.3, AC10.5) | Reasons list / `[ethics.checkFailed]` | Edit brief, override with reason, or retry | Partly |
+| FF5 | Research step fails after 2 retries (e.g. Semantic Scholar rate limit) | Step `failed`, others continue, confidence lowered (AC11.4–AC11.5) | `[stage.partialFail]` | *Retry failed steps* or continue | Yes |
+| FF6 | Synthesis fails; job > 30 min; worker crash | Stage `failed`, partial nodes kept (AC11.6, NFR8) | `[stage.failed]` | *Retry synthesis* | Yes after retry |
+| FF7 | Recommendation without valid principle after 1 retry | Not shown; logged (AC16.2) | If an opportunity ends with 0 recommendations: `[rec.noneValid]` on that opportunity | *Regenerate* or add one by hand | Yes |
+| FF8 | Lo-fi variant fails to render / too big / no valid annotations | Variant `failed`, others kept (AC18.4, AC18.8) | `[lofi.renderFailed]` | *Regenerate* | Yes |
+| FF9 | Toolkit file invalid | Nothing saved (AC4.2–AC4.3) | Row-level errors | Fix file, re-upload | Yes |
+| FF10 | Edit conflict | Save refused, text kept (AC24.7) | `[canvas.editConflict]` | *See latest*, re-apply | Yes |
+| FF11 | Delete with dependents | Confirm, then delete + stale, Undo 10 s (AC24.5) | `[canvas.deleteConfirm]`, `[canvas.deleted]` | *Undo* | Yes |
+| FF12 | Cost cap reached | Pause before next AI call (AC27.4) | `[cost.atCap]` | Member confirms or admin raises cap | Partly |
+| FF13 | Network lost while editing | Edits queued in the editor, not lost; save retried on reconnect | `[common.offline]`, then `[common.saveFailed]` if retry fails | *Try again* | Partly |
+| FF14 | Session expires mid-edit | Unsaved text kept in the editor | `[common.sessionExpired]` | Sign in in a modal; save resumes | Yes |
+| FF15 | Lo-fi tries to load external resources | Blocked by sandbox (NFR6) | Missing image shows grey placeholder | None needed | Yes |
+
+## 5. Edge cases
+
+| EC | Situation | Expected behaviour | AC |
+|---|---|---|---|
+| EC1 | New toolkit version uploaded while a project is mid-way | Project stays on its pinned version; header shows "Toolkit v1 (newer v2 available)" | AC7.4 |
+| EC2 | No toolkit uploaded yet | Projects can be created and intake done; research blocked with `[toolkit.noneYet]` | AC4.9 |
+| EC3 | Academic search returns 0 relevant papers | Step completes with "0 papers found"; confidence reflects fewer source types; gaps more likely | AC11.4, AC12.6 |
+| EC4 | All opportunities are Low confidence | All remain selectable, labelled; SCR8 notes `[checkpoint.allLow]` | AC13.4 |
+| EC5 | Sources contradict (e.g. reviews praise speed, analytics shows drop-off) | Confidence Low; gap node states the contradiction | AC12.6, AC13.1 |
+| EC6 | Two members edit the same node | Second save refused | AC24.7 |
+| EC7 | Objective edited after lo-fi exists | All downstream nodes stale; nothing deleted | AC9.3, AC24.4 |
+| EC8 | Member deactivated while their stage runs | Job continues; output attributed to them; others can act at checkpoints | AC3.4 |
+| EC9 | Sector on refuse list | Project blocked, no override | AC10.4 |
+| EC10 | Screenshot contains a real customer's personal data | Privacy hint at upload; data kept private; deleted with project | NFR7 |
+| EC11 | Model cites principle ID that doesn't exist (e.g. "P-999") | Rejected by code check | AC16.2, AC18.4 |
+| EC12 | Two variants use the same principle | Regenerate once, else warn | AC18.5 |
+| EC13 | Send back while people have edited/added nodes | Their nodes kept unless they tick "Also replace…" | AC25.2 |
+| EC14 | Very large project (> 1,000 nodes) | Canvas still usable; list view available; trace ≤ 300 ms target at 1,000 | NFR2, AC23.2 |
+| EC15 | Test plan with unknown baseline | Ask; never invent | AC21.2 |
+| EC16 | Merge themes linked to different findings | Merged theme keeps the union of links | AC24.6 |
+| EC17 | Research surfaces a principle not in the toolkit | Shown as external principle; listed as toolkit candidate | AC12.9 |
+| EC18 | Member closes the tab during a run | Job continues; state shown on return | AC11.3 |
+| EC19 | Paper found but no abstract available | Listed as a source; not used for findings unless its full text is fetched | AC12.2 |
+| EC20 | Brief or sources not in English | `[Assumption]` v1 outputs in English; non-English sources summarised in English and marked "(translated)" | AC12.2 |
+| EC21 | Same opportunity has a Low confidence label and a low-specificity objective | Both labels shown, each once | AC16.5 |
+| EC22 | Member tries to delete an objective node | Refused; points to intake | AC24.8 |
+
+## 6. Interactions and validation
+
+| Input | Required | Format / limits | Validated | Error copy |
+|---|---|---|---|---|
+| Email (SCR1) | Yes | Valid email, ≤ 254 chars | On submit | `[auth.invalidEmail]` |
+| Password (SCR1 sign-up) | Yes | ≥ 12 chars | On leaving field and submit | `[auth.passwordShort]` |
+| Project name (SCR4) | Yes | 1–80 chars | On submit | `[project.nameInvalid]` |
+| Business objective (SCR6) | Yes to approve | 10–500 chars | Coach on leaving field; required on approve | `[intake.needsObjectives]` |
+| Behavioural objective (SCR6) | Yes to approve | 10–500 chars | As above | `[intake.needsObjectives]` |
+| Audience and context | No | ≤ 1,500 chars | Coach on leaving field | — |
+| Constraints | No | ≤ 1,500 chars | Coach on leaving field | — |
+| Sector | Yes to approve | Pick from list or "Other" + text | On approve | `[intake.needsSector]` |
+| Current assets (optimise) | Yes to approve | Per AC8.6 | On upload; required on approve | `[upload.typeOrSize]`, `[intake.needsAssets]` |
+| Figma link | No | `https://www.figma.com/…` | On leaving field | `[intake.figmaLinkInvalid]` |
+| Client data | No | Per AC8.8 | On upload | `[upload.typeOrSize]`, `[upload.tooMany]` |
+| Override reason | Yes | ≥ 20 chars | On type (counter) | `[ethics.reasonTooShort]` |
+| Send-back feedback | Yes | ≥ 10 chars | On type | `[checkpoint.feedbackShort]` |
+| Recommendation (added) | Yes | Idea 10–400 chars; ≥ 1 principle | On save | `[rec.needsPrinciple]` |
+| Allowlist entry | Yes | Email or `@domain.tld` | On add | `[settings.invalidAllowEntry]` |
+| Cost cap | Yes | £1–£500 | On save | `[settings.capInvalid]` |
+| Variants per recommendation | Yes | 1–3 | On change | — (stepper) |
+| Baseline rate (test plan) | When asked | 0.1–99.9 % | On submit | `[testplan.baselineInvalid]` |
+
+## 7. Microcopy
+
+| Key | Copy |
+|---|---|
+| auth.notAllowed | "This email isn't on Fluently's invite list. Ask your Fluently admin to add you." |
+| auth.wrongCredentials | "That email and password don't match. Check them and try again." |
+| auth.resetSent | "If that email has a Fluently account, a reset link is on its way." |
+| auth.checkEmail | "Check your inbox. We've sent a link to confirm your email." |
+| auth.linkExpired | "This link has expired. We can send you a new one." |
+| auth.invalidEmail | "Enter an email address like name@company.com." |
+| auth.passwordShort | "Use at least 12 characters." |
+| common.offline | "You're offline. Changes will save when you reconnect." |
+| common.saveFailed | "Couldn't save. Check your connection and try again." |
+| common.saved | "Saved." |
+| common.loadFailed | "Couldn't load this. Try again in a moment." |
+| common.sessionExpired | "You've been signed out. Sign in again to keep working; nothing you typed is lost." |
+| projects.emptyTitle | "No projects yet" |
+| projects.emptyBody | "Start with a brief. Fluently will help you sharpen the objectives, then research, recommend and wireframe, with every step traced to evidence." |
+| projects.noResults | "No projects match that search." |
+| project.nameInvalid | "Give the project a name of up to 80 characters." |
+| toolkit.noneYet | "Upload the Behavioural Design Toolkit before running research. Fluently cites every principle from it." |
+| toolkit.noneYetMember | "Research is waiting for the toolkit. Ask your Fluently admin to upload it." |
+| toolkit.emptyAdmin | "No toolkit yet. Upload a CSV or JSON export of the Behavioural Design Toolkit. Each upload becomes a read-only version." |
+| toolkit.errorMissingId | "Row {row}: the ID is empty. Every principle needs a stable ID." |
+| toolkit.errorDuplicateId | "Rows {rows}: the ID \"{id}\" is used more than once. IDs must be unique." |
+| toolkit.errorMissingColumns | "This file is missing required columns: {columns}." |
+| toolkit.saved | "Toolkit version {n} saved. New projects will use it." |
+| intake.coachUnavailable | "Suggestions aren't available right now. Your text is saved, and you can carry on." |
+| intake.lowSpecificityNote | "Kept as written. It'll be marked 'low specificity' on everything that uses it." |
+| intake.needsObjectives | "Add both a business objective and a behavioural objective to continue." |
+| intake.needsSector | "Choose the client's sector so we can check it against our ethics rules." |
+| intake.needsAssets | "Add at least one current screen or email so Fluently knows what to optimise." |
+| intake.figmaLinkInvalid | "That doesn't look like a Figma link. It should start with https://www.figma.com/." |
+| intake.editWarnsStale | "Changing the intake will mark everything built from it as out of date. You can regenerate those parts afterwards." |
+| intake.uploadPrivacyHint | "Remove names, emails and other personal details before uploading. Uploads stay inside your workspace." |
+| upload.typeOrSize | "\"{file}\" can't be added. Use {types} up to {size}." |
+| upload.tooMany | "You can add up to {n} files here." |
+| ethics.refusedSector | "Fluently doesn't take on work in this sector. Talk to your Fluently admin if you think this is wrong." |
+| ethics.checkFailed | "The ethics check didn't run. Research stays paused until it does." |
+| ethics.reasonTooShort | "Explain your reason in at least 20 characters. It's recorded on the canvas." |
+| checkpoint.readyResearch | "Objectives approved and the ethics check passed. Next: research. It runs in the background and usually takes 10–20 minutes." |
+| checkpoint.selectAtLeastOne | "Choose at least one opportunity to continue." |
+| checkpoint.allLow | "Every opportunity has low confidence. You can still go ahead; the labels will carry through." |
+| checkpoint.feedbackShort | "Tell Fluently what to change, in at least 10 characters." |
+| checkpoint.complete | "Test plan approved. This project is complete, and you can still edit any part of it." |
+| stage.partialFail | "Research finished, but {steps} didn't work. Confidence is lower where those sources are missing." |
+| stage.failed | "{stage} stopped before it finished. Everything made so far is kept." |
+| stage.cancelled | "{stage} was cancelled. Everything made so far is kept." |
+| canvas.intakeFirst | "Start with the intake. Your objectives will appear here." |
+| canvas.lockedWhileRunning | "This is being worked on right now. You can edit it once {stage} finishes." |
+| canvas.needsWiderScreen | "The canvas needs a wider screen. You can read the Audit Report and wireframes here." |
+| canvas.deleteConfirm | "Delete this {type}? {n} items built from it will be marked out of date." |
+| canvas.deleted | "{type} deleted." (with *Undo*) |
+| canvas.editConflict | "{name} changed this while you were editing. Your text is still here; see the latest version before saving." |
+| canvas.cantDeleteObjective | "Objectives can't be deleted. Change them in the intake instead." |
+| node.regenerateFailed | "Couldn't regenerate this. The previous version is unchanged." |
+| rec.needsPrinciple | "Choose at least one principle. Every recommendation needs one." |
+| rec.noneValid | "No recommendation for this opportunity passed the principle check. Regenerate, or add one yourself." |
+| lofi.renderFailed | "This wireframe didn't render. The other variants are fine." |
+| lofi.samePrinciple | "These two variants rest on the same principle. Regenerate one for a real comparison." |
+| report.notYet | "The Audit Report appears once research finishes." |
+| report.hasStale | "Some parts of this report are out of date. Regenerate them on the canvas." |
+| report.exportFailed | "Export didn't work. Try again." |
+| testplan.needsBaseline | "What's the current rate for {metric}? Fluently needs it to size the test, and won't guess." |
+| testplan.baselineInvalid | "Enter a percentage between 0.1 and 99.9." |
+| cost.nearCap | "This project has used {spent} of its {cap} AI budget." |
+| cost.atCap | "This project has reached its {cap} AI budget. Continue anyway, or ask an admin to raise it." |
+| settings.invalidAllowEntry | "Enter an email (name@company.com) or a domain (@company.com)." |
+| settings.lastAdmin | "Fluently needs at least one admin. Make someone else an admin first." |
+| settings.capInvalid | "Set a budget between £1 and £500." |
+
+**Turning things off and undoing:** deactivating a member, removing an allowlist entry, cancelling a stage, and undoing a delete all use `[common.saveFailed]` if they fail, and leave the previous state unchanged.
+
+## 8. Behavioural design notes (for Fluently's own interface)
+
+- **Next action always visible (SCR8):** reduces the memory load of a 7-stage pipeline; supports LEMES memorability.
+- **Coaching after the person drafts, not before:** they commit to their own wording first (effort and ownership), then see a sharper version with a reason (learning by feedback). *Keep mine* keeps autonomy; the low-specificity label adds a gentle, persistent cost to vagueness instead of a hard block.
+- **No pre-selection of opportunities (AC14.1):** avoids default bias pushing people to accept everything the AI produced.
+- **Override needs a written reason:** a small, deliberate friction at the moment it matters, and accountability through visibility on the canvas.
+- **Provenance badges:** make AI vs human authorship salient so trust is calibrated.
+- **Stale, not deleted:** loss aversion; people keep their work and choose when to regenerate.
+- **Confidence on everything built from weak evidence:** prevents the "laundering" of weak evidence through later stages.
+
+## 9. Platform notes (web app)
+
+- **Responsive:** desktop-first. ≥ 1024 px: full app. < 1024 px: SCR1–SCR4, SCR9, SCR10 (read-only) and SCR12 usage; canvas and intake editing show `[canvas.needsWiderScreen]`.
+- **Keyboard:** all actions reachable by keyboard; canvas arrow-key navigation; `Esc` clears trace and closes panels; `?` shows shortcuts.
+- **Screen readers:** list view of the canvas (NFR3); live region announces stage progress ("Academic papers: done, 12 found").
+- **Refresh and back button:** every screen has its own URL (project, tab, selected node via `?node=`), so refresh and back restore the same view; unsaved inspector text is kept in the editor across refresh where possible, otherwise the page warns before leaving.
+- **Deep links:** links to a project, a node, and a lo-fi variant are shareable inside the workspace; a signed-out person is sent to sign-in and then back.
+- **Long jobs:** run on the server; closing the tab doesn't stop them.
