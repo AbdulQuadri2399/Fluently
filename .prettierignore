@@ -1,0 +1,10 @@
+.next
+node_modules
+pnpm-lock.yaml
+drizzle
+supabase/.temp
+specs
+docs
+e2e/screenshots
+playwright-report
+test-results

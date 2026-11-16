@@ -14,8 +14,8 @@ Versions checked on npm on 2026-11-16; pin exact versions at scaffold (T0.1) and
 
 | Layer | Choice | Version |
 |---|---|---|
-| Framework | Next.js App Router, React, TypeScript strict | next 16.4.x, react 19.3.x, typescript 7.0.x |
-| UI | Tailwind CSS v4 + shadcn/ui (CLI 4.x), Lucide icons | tailwindcss 4.3.x |
+| Framework | Next.js App Router, React, TypeScript strict | next 16.4.6, react 19.3.0, typescript 5.9.3 (create-next-app pins TS 5; TS 7 not yet supported by Next's tooling) |
+| UI | Tailwind CSS v4 + shadcn/ui (CLI 4.x), Lucide icons | tailwindcss 4.3.3 |
 | Canvas | React Flow (`@xyflow/react`) | 13.0.x |
 | Forms / validation | React Hook Form + Zod | zod 4.x |
 | Backend | Supabase: Postgres 17, Auth (`@supabase/ssr`), Storage, Realtime | supabase-js 2.119.x, @supabase/ssr 0.12.x, CLI 3.2.x |
@@ -55,6 +55,7 @@ Versions checked on npm on 2026-11-16; pin exact versions at scaffold (T0.1) and
 | D17 | Web research uses Claude's server tools `web_search` and `web_fetch` (`*_20260209` on Sonnet/Opus; the basic variants on models that don't support those). Literature uses Semantic Scholar first, OpenAlex as fallback, with a 15 s timeout per call | PRD: no scraping, no paid social APIs | Third-party search APIs |
 | D18 | Uploaded images and PDFs are passed to Claude as base64 `image` / `document` blocks; CSV/XLSX/TXT are converted to text server-side; `.eml` parsed to HTML + subject | AC8.6, AC8.8, AC19.3 | Files API (adds lifecycle to manage) |
 | D19 | Report export (Should) with `@react-pdf/renderer` for PDF and a Markdown serialiser over the same report model | Same content as SCR9 (AC15.4); runs in a serverless function | Headless Chromium on Vercel (heavy) |
+| D21 | `cacheComponents` and `partialPrefetching` are **off** in `next.config.ts`; Next 16 middleware is `proxy.ts` | Every page is per-user and dynamic; the static-shell model would force Suspense around every session read for no benefit in an internal tool | Keeping Cache Components on |
 | D20 | Email + password sign-in only (Supabase Auth) with email verification; local email captured by the Supabase stack's mail catcher | US1 | Magic links, SSO (later) |
 
 ## 3. Architecture

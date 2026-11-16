@@ -12,7 +12,7 @@ Conventions: sizes S (≤ half a day) / M (≤ 1.5 days). `[P]` = can run in par
 Goal: the app runs locally and on a Vercel preview, CI is green, and an allowlisted person can sign up, verify, sign in and sign out.
 You'll be able to see: the sign-in page, sign-up with the invite-list rule, and an empty "Projects" page after signing in.
 
-- [ ] T0.1 Scaffold Next.js (App Router, TS strict, Tailwind v4, ESLint, Prettier, pnpm), pin versions in `package.json`, update 04 §2 versions — S — Refs: 04 §2 — Depends on: —
+- [x] T0.1 Scaffold Next.js (App Router, TS strict, Tailwind v4, ESLint, Prettier, pnpm), pin versions in `package.json`, update 04 §2 versions — S — Refs: 04 §2 — Depends on: —
   Done when: `pnpm lint && pnpm typecheck && pnpm build` exit 0.
 - [ ] T0.2 Vitest + Testing Library + Playwright set up; `tests/` and `e2e/` folders; scripts `test`, `test:int`, `test:e2e` — S — Refs: 04 §11 — Depends on: T0.1
   Done when: `pnpm test` runs `tests/unit/smoke.test.ts` (passes) and `pnpm test:e2e -- --trace off` runs `e2e/smoke.spec.ts` (home page responds 200) and passes.
