@@ -149,3 +149,33 @@ Plain name first, technical name in brackets.
 - **Wireframe frame** with a size label (390 / 1280 / Email 600).
 - **Ethics flag and override note** (with the reason and who recorded it).
 - **Cost meter**: spent of budget for the project.
+
+---
+
+## Round 2 (16 Nov 2026): calmer direction A
+
+*Plain English: the user picked A as the closest but found it cluttered. This round looked only at calm, minimal tools that do similar jobs, guided by the user's own taste skills (minimalist-ui, design-taste-frontend).*
+
+**What the user's taste skills ask for:** warm monochrome (off-white, warm grey, charcoal text), black for the main button, pale pastel tags only for meaning, hairline borders, almost no shadows, lots of space, a characterful sans-serif instead of Inter (Geist), Phosphor icons, no decorative dots or chips.
+
+**Searches:** research tool themes boards; minimal card whiteboards with a side panel; minimal workspace home pages; opportunity-tree style connected cards.
+
+**Key references**
+- [Cofounder: staged plan](https://mobbin.com/screens/f0cd27fc-87c3-49e8-95d7-b9dc0661c0a5): stages as quiet columns with mono headers, each card a title plus one line in words ("Needs your input", "Needs approval"), later steps faded. The closest match to Fluently's tree.
+- [Deel](https://mobbin.com/screens/ea912de7-941e-4e5c-94d3-3429ff65d029) and [Square](https://mobbin.com/screens/5650b601-9f43-470f-b4a5-cf1d074c6965): white cards on light grey, one tiny pastel tag, a black main button.
+- [Dovetail](https://mobbin.com/screens/9dafd5dd-e6dc-4748-8ec7-ab0a73e9b1b7): themes as columns of plain text cards, one tag per card.
+- [Maze](https://mobbin.com/screens/c58328ab-b12d-41d1-a3ef-30350a2c9f97): themes with counts ("3 highlights, 2/2 sessions"), evidence opened on demand.
+- [TheyDo](https://mobbin.com/screens/340e726e-f049-4cbb-b664-474e14a3baf4): details as a property list (label, value) with tabs for evidence and opportunities.
+- [Contractbook](https://mobbin.com/screens/c402174b-230f-4474-a556-3c45777b91b7), [Plane](https://mobbin.com/screens/42a0573c-e9b5-4dd0-9e6c-38dbc35c6b22), [Trello](https://mobbin.com/screens/cc220e6a-c344-4a1e-a91d-b609c367a3c0): home pages that lead with what needs you.
+- Avoid: [Optimal Workshop](https://mobbin.com/screens/23e6b1ca-27ff-43a3-ac09-530eb3300b19)'s many coloured tags, [hilos](https://mobbin.com/screens/0bbf6572-0644-43d0-bbee-30f8beab4543)'s bright pastel tiles.
+
+**Decluttering rules that came out of it**
+1. One line per card: title plus one status in words. Tags only for exceptions (weak evidence, flagged).
+2. Stages not reached yet are faded.
+3. Sources fold into one Evidence card with a count.
+4. Grey everything; black only for the action that moves work forward; pastels only for meaning.
+5. Details as a quiet property list; extra sections folded.
+6. Home leads with decisions waiting, then running work, then recent projects.
+7. No dot grid on the canvas; flat warm grey.
+
+Shown as four real desktop screens: https://claude.ai/artifact/ATKfnWkvsdEywWAo6q1BE1 (private to the user).
