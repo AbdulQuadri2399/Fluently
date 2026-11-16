@@ -19,7 +19,7 @@ Fluently is an internal web app that runs an AI-powered **Opportunity Solution T
 | `02-requirements.md` | User stories US1… with pass/fail acceptance criteria (EARS), non-functional requirements NFR1…, analytics events, traceability table. |
 | `03-ux-flows.md` | Screens SCR1…, navigation, state matrix per screen, flows FL1…, failure flows FF1…, edge cases EC1…, validation, microcopy, behavioural notes, web platform notes. |
 | `03b-design-direction.md` | Look, motion and feel: tokens (colour, type, spacing, motion) as values, per-screen and per-component direction, micro-interactions MI1…. |
-| `inputs/` | Not used: the only input is the concept brief, kept at `docs/concept-brief.md`. |
+| `inputs/` | Research inputs: `inputs/mobbin-research.md` (Mobbin UI research and the three design directions). The concept brief stays at `docs/concept-brief.md`. |
 | `04-tech-spec.md` | *Added by Claude Code (tech-spec-planner):* stack, architecture, data model, operations. |
 | `05-tasks.md` | *Added by Claude Code (tech-spec-planner):* the build as vertical slices with runnable checks. |
 
@@ -27,6 +27,7 @@ Fluently is an internal web app that runs an AI-powered **Opportunity Solution T
 
 | Input | What it contributed |
 |---|---|
+| `inputs/mobbin-research.md` (Mobbin UI research, 16 Nov 2026) | Screen-by-screen patterns from about 90 real web apps, three design directions (A Quiet Workbench, B Research Notebook, C Colour-coded Pipeline) and the parts list. The chosen direction will be written into 03b. |
 | `docs/concept-brief.md` (Fluently.ai concept brief, agreed pre-PRD) | Everything: the pipeline and checkpoints, the evidence and principle rules, ethics rules, toolkit columns and import rules, the canvas concept, users and access, releases, MVP success criteria, open items. Where this pack goes further than the brief, it is marked `[Assumption]`. |
 
 ## How to build from this

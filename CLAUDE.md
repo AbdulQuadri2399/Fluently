@@ -23,6 +23,15 @@ Next.js 16 App Router (`proxy.ts` replaces middleware; Cache Components off, D21
 - Bootstrap admin for a new environment: `pnpm tsx scripts/set-bootstrap-admin.ts`
 - Seeded accounts: `admin@fluently.test` / `member@fluently.test`, password `password-dev-123`
 
+## Talking to the user
+
+The user is a behavioural designer, not a developer. In every message to them:
+
+- Lead with plain, descriptive words; put the technical term in brackets after, e.g. "a thin working piece of the app (a slice)".
+- Name spec files by what they are, not just their number: "the screens and wording file (03)", "the design direction file (03b)", "the requirements file (02)", "the tech plan (04)", "the task list (05)".
+- Don't use the § sign; write "section 7".
+- Explain any ID the first time it appears in a message (e.g. "the sign-up check AC1.2").
+
 ## Rules
 
 - Work slice by slice from `specs/fluently-mvp/05-tasks.md`; tick a task only when its `Done when` check passes, and show the command output.
