@@ -12,12 +12,22 @@
     "format:check": "prettier --check .",
     "test": "vitest run --project unit",
     "test:int": "vitest run --project int",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "db:start": "SUPABASE_INTERNAL_IMAGE_REGISTRY=docker.io supabase start -x studio,edge-runtime,logflare,vector,imgproxy,supavisor,postgres-meta",
+    "db:reset": "supabase db reset && pnpm db:types",
+    "db:generate": "drizzle-kit generate",
+    "db:types": "supabase gen types typescript > lib/supabase/database.types.ts"
   },
   "dependencies": {
+    "@supabase/ssr": "0.12.7",
+    "@supabase/supabase-js": "2.119.0",
+    "drizzle-orm": "0.45.4",
     "next": "16.4.6",
+    "postgres": "4.1.1",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "server-only": "0.0.1",
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "@playwright/test": "1.63.0",
@@ -31,13 +41,15 @@
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "6.3.0",
     "dotenv": "^18.0.10",
+    "drizzle-kit": "0.31.11",
     "eslint": "^9",
     "eslint-config-next": "16.4.6",
     "jsdom": "31.0.1",
     "prettier": "^3.10.1",
+    "supabase": "3.2.0",
     "tailwindcss": "4.3.3",
+    "tsx": "4.23.15",
     "typescript": "5.9.3",
-    "vite-tsconfig-paths": "6.1.1",
     "vitest": "5.1.0"
   },
   "packageManager": "pnpm@10.28.0"
