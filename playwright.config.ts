@@ -1,4 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
+import { config } from "dotenv";
+
+config({ path: ".env.local" });
 
 const PORT = Number(process.env.E2E_PORT ?? 3100);
 
@@ -17,7 +20,7 @@ export default defineConfig({
   ],
   webServer: {
     command: `pnpm build && pnpm start -p ${PORT}`,
-    url: `http://localhost:${PORT}/projects`,
+    url: `http://localhost:${PORT}/sign-in`,
     reuseExistingServer: !process.env.CI,
     timeout: 240_000,
   },

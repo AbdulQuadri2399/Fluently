@@ -394,6 +394,36 @@ Format: user action → system response → resulting state (ACs).
 | settings.lastAdmin | "Fluently needs at least one admin. Make someone else an admin first." |
 | settings.capInvalid | "Set a budget between £1 and £500." |
 
+**Added during the build (Slice 0): please confirm this wording**
+
+| Key | Copy |
+|---|---|
+| auth.signInTitle | "Sign in to Fluently" |
+| auth.signUpTitle | "Create your Fluently account" |
+| auth.resetTitle | "Reset your password" |
+| auth.resetUpdateTitle | "Choose a new password" |
+| auth.emailLabel | "Email" |
+| auth.passwordLabel | "Password" |
+| auth.newPasswordLabel | "New password" |
+| auth.signIn | "Sign in" |
+| auth.signingIn | "Signing in…" |
+| auth.createAccount | "Create account" |
+| auth.creatingAccount | "Creating account…" |
+| auth.forgotPassword | "Forgot password" |
+| auth.sendResetLink | "Send reset link" |
+| auth.sendNewLink | "Send a new link" |
+| auth.sending | "Sending…" |
+| auth.saveNewPassword | "Save new password" |
+| auth.saving | "Saving…" |
+| auth.backToSignIn | "Back to sign in" |
+| auth.haveAccount | "Already have an account? Sign in" |
+| auth.signOut | "Sign out" |
+| nav.projects | "Projects" |
+| nav.toolkit | "Toolkit" |
+| nav.settings | "Settings" |
+| nav.account | "Account" (accessible name of the account menu button) |
+| nav.main | "Main" (accessible name of the top navigation) |
+
 **Turning things off and undoing:** deactivating a member, removing an allowlist entry, cancelling a stage, and undoing a delete all use `[common.saveFailed]` if they fail, and leave the previous state unchanged.
 
 ## 8. Behavioural design notes (for Fluently's own interface)
