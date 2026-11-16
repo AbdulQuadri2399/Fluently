@@ -14,7 +14,7 @@ You'll be able to see: the sign-in page, sign-up with the invite-list rule, and 
 
 - [x] T0.1 Scaffold Next.js (App Router, TS strict, Tailwind v4, ESLint, Prettier, pnpm), pin versions in `package.json`, update 04 §2 versions — S — Refs: 04 §2 — Depends on: —
   Done when: `pnpm lint && pnpm typecheck && pnpm build` exit 0.
-- [ ] T0.2 Vitest + Testing Library + Playwright set up; `tests/` and `e2e/` folders; scripts `test`, `test:int`, `test:e2e` — S — Refs: 04 §11 — Depends on: T0.1
+- [x] T0.2 Vitest + Testing Library + Playwright set up; `tests/` and `e2e/` folders; scripts `test`, `test:int`, `test:e2e` — S — Refs: 04 §11 — Depends on: T0.1
   Done when: `pnpm test` runs `tests/unit/smoke.test.ts` (passes) and `pnpm test:e2e -- --trace off` runs `e2e/smoke.spec.ts` (home page responds 200) and passes.
 - [ ] T0.3 Supabase local (`supabase init`, `supabase start`), Drizzle config, first migration: `workspaces`, `members`, `allowlist_entries`, `events` with RLS enabled + policies + `is_member`/`is_admin`/`is_email_allowed` + `updated_at` trigger; `pnpm db:reset` script; generated types committed — M — Refs: 04 §4, NFR5 — Depends on: T0.1
   Done when: `pnpm db:reset` applies migrations + seed with no errors; `tests/rls/members.test.ts` passes: member A sees own workspace, signed-out client gets 0 rows.

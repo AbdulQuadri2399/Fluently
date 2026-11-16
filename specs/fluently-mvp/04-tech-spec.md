@@ -26,7 +26,7 @@ Versions checked on npm on 2026-11-16; pin exact versions at scaffold (T0.1) and
 | CSV | papaparse | latest |
 | HTML sanitising (lo-fi) | sanitize-html | latest |
 | PDF export (Should) | @react-pdf/renderer | 4.9.x |
-| Tests | Vitest + Testing Library; Playwright | vitest 5.1.x, @playwright/test 1.65.x |
+| Tests | Vitest + Testing Library; Playwright | vitest 5.1.0, @playwright/test 1.63.0 (matches the preinstalled browser) |
 | Quality | ESLint, Prettier, `tsc --noEmit`, GitHub Actions | — |
 | Hosting | Vercel (app), Supabase cloud, Inngest cloud | — |
 | Errors | Sentry (`@sentry/nextjs`) | 11.x |
