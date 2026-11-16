@@ -8,3 +8,4 @@ docs
 e2e/screenshots
 playwright-report
 test-results
+lib/supabase/database.types.ts
