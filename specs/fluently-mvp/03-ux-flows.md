@@ -103,7 +103,6 @@ Copy keys in `[brackets]` are written out in §7.
 | Trace mode | Path highlighted, others dimmed at 30% opacity | Escape to clear |
 | Cost near cap | Header chip `[cost.nearCap]` | — |
 | Cost at cap | SCR8 `[cost.atCap]` | Confirm continue / admin raises cap |
-| Narrow window (< 1024 px) | `[canvas.needsWiderScreen]` + links to Report and lo-fi previews | Open read-only views |
 | Offline | `[common.offline]` banner; edits disabled | Wait |
 | Session expired | `[common.sessionExpired]` modal | Sign in (returns here) |
 | List view (accessibility toggle) | Nodes as nested lists by column with the same actions | Everything the canvas allows |
@@ -373,7 +372,7 @@ Format: user action → system response → resulting state (ACs).
 | stage.cancelled | "{stage} was cancelled. Everything made so far is kept." |
 | canvas.intakeFirst | "Start with the intake. Your objectives will appear here." |
 | canvas.lockedWhileRunning | "This is being worked on right now. You can edit it once {stage} finishes." |
-| canvas.needsWiderScreen | "The canvas needs a wider screen. You can read the Audit Report and wireframes here." |
+| app.desktopOnly | "Fluently works on laptop and desktop screens. Open it on a computer, or make this window wider." *(added 2026-11-16, please confirm)* |
 | canvas.deleteConfirm | "Delete this {type}? {n} items built from it will be marked out of date." |
 | canvas.deleted | "{type} deleted." (with *Undo*) |
 | canvas.editConflict | "{name} changed this while you were editing. Your text is still here; see the latest version before saving." |
@@ -438,7 +437,7 @@ Format: user action → system response → resulting state (ACs).
 
 ## 9. Platform notes (web app)
 
-- **Responsive:** desktop-first. ≥ 1024 px: full app. < 1024 px: SCR1–SCR4, SCR9, SCR10 (read-only) and SCR12 usage; canvas and intake editing show `[canvas.needsWiderScreen]`.
+- **Screen sizes:** desktop only (user decision, 2026-11-16). Designed at 1280–1440 px, supported from 1024 px. Below 1024 px, every signed-in screen shows `[app.desktopOnly]` instead of its content (AC22.6). Sign-in, sign-up and password reset (SCR1) work at any width, because people often open email links on a phone. No phone or tablet layouts are designed.
 - **Keyboard:** all actions reachable by keyboard; canvas arrow-key navigation; `Esc` clears trace and closes panels; `?` shows shortcuts.
 - **Screen readers:** list view of the canvas (NFR3); live region announces stage progress ("Academic papers: done, 12 found").
 - **Refresh and back button:** every screen has its own URL (project, tab, selected node via `?node=`), so refresh and back restore the same view; unsaved inspector text is kept in the editor across refresh where possible, otherwise the page warns before leaving.

@@ -11,7 +11,7 @@ Feature: Fluently MVP | Platform: web app | Version: 1 | Date: 2026-11-16 | Stat
 
 Fluently is an internal web app that takes a comms brief (app/web screens and flows, or emails) through an AI-run Opportunity Solution Tree: intake and objectives → ethics gate → research and Behavioural Audit Report → recommendations → annotated lo-fi wireframes → test plan. Every output traces to a principle from the company's Behavioural Design Toolkit, its evidence and both objectives, and is shown on a node canvas where any annotation can be traced back to its sources. People approve, edit or send back the work at each checkpoint.
 
-- **Platform:** web app, desktop-first (the canvas needs a large screen). `[Assumption]` Phone and tablet widths get read-only access to the report and a message that editing needs a wider screen.
+- **Platform:** web app for **desktop only** (laptop and desktop screens, 1024 px wide and up), decided by the user on 2026-11-16. Below 1024 px, signed-in screens show a message asking for a wider screen; sign-in, sign-up and password reset still work at any width so email links can be opened on a phone.
 - **Status:** draft. **Owner:** product owner of Fluently (the team lead). **Date:** 2026-11-16.
 - **Recommendation:** *Build, with the riskiest assumptions tested inside the MVP* (confidence: medium). The concept is internal, the team is both user and client, and the MVP success test (2–3 past briefs) is itself the cheap test. The biggest risk is AI quality and citation trust, so the MVP builds trust checks in code (principle IDs and source records) rather than relying on prompts alone.
 
@@ -162,7 +162,7 @@ Fluently is an internal web app that takes a comms brief (app/web screens and fl
 
 | Assumption | Where | Confidence | How to test |
 |---|---|---|---|
-| Desktop-first; phone gets read-only | §1 | High | Ask the team |
+| ~~Desktop-first; phone gets read-only~~ Resolved: desktop only (user, 2026-11-16) | §1 | — | — |
 | By-hand baseline is 3–5 days per brief | §4 | Low | Time logs from past briefs (OQ8) |
 | Figma links are stored, not fetched, in v1 | §6 | Med | OQ10 |
 | One shared workspace for the whole team in v1 | US3 | High | — |

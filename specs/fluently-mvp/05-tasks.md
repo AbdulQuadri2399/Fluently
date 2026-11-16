@@ -28,7 +28,7 @@ You'll be able to see: the sign-in page, sign-up with the invite-list rule, and 
   Done when: `e2e/smoke.spec.ts` 'signed-in user sees top bar and can sign out' passes.
 - [ ] T0.8 GitHub Actions CI: install, lint, typecheck, unit/component tests, `supabase start` + `db:reset` + `test:int`, Playwright e2e, `gitleaks`, `scripts/check-toolkit-fixture.sh` (NFR9) — M — Refs: NFR5, NFR9 — Depends on: T0.2, T0.3
   Done when: CI run on the branch is green (link in slice report).
-- [x] T0.9 [P] `e2e/helpers/shoot.ts` (screenshot helper at 1280 and 390 widths, light and dark) and `e2e/helpers/auth.ts` (sign-in as seeded admin/member) — S — Refs: 03b — Depends on: T0.2
+- [x] T0.9 [P] `e2e/helpers/shoot.ts` (screenshot helper at 1280 and 1024 widths, light and dark; widths changed from 1280/390 on 2026-11-16 for desktop only) and `e2e/helpers/auth.ts` (sign-in as seeded admin/member) — S — Refs: 03b — Depends on: T0.2
   Done when: `e2e/smoke.spec.ts` saves `e2e/screenshots/SCR1-default.png` in both themes.
 - [x] T0.10 `CLAUDE.md` (product line, pointer to `specs/fluently-mvp/`, stack branch and 04 link, commands, rules per tech-spec-planner §6); `.env.example` from 04 §10; Sentry init (DSN optional locally) — S — Refs: 04 §10 — Depends on: T0.1
   Done when: file exists with every command in 04 §11; `pnpm build` passes with no Sentry DSN set.
@@ -51,6 +51,8 @@ You'll be able to see: the 3-step onboarding, the projects list (empty, filled, 
   Done when: `tests/integration/O10-projects.test.ts` passes: valid create pins default toolkit version (null allowed until Slice 3), empty and 81-char names return `validation`, archive/unarchive round-trips; `tests/components/SCR4-new-project.test.tsx` covers default, invalid, saving, error.
 - [ ] T1.4 SCR3 projects list: O11 cursor pagination (25), search, Active/Archived filter, status chips, all SCR3 states (loading skeleton after 300 ms, empty first use, default, no results, error, no-toolkit banners admin/member) — M — Refs: AC7.3, AC25.4, SCR3, EC2 — Depends on: T1.3
   Done when: `tests/components/SCR3-projects.test.tsx` one test per state with 03 copy; `e2e/FL2.spec.ts` step 1 'create project from empty state opens intake route'; screenshots `SCR3-*` vs 03b SCR3.
+- [ ] T1.6 [P] Desktop-only notice: below 1024 px every signed-in screen shows `app.desktopOnly`; sign-in screens unaffected — S — Refs: AC22.6, D23 — Depends on: T0.7
+  Done when: `e2e/desktop-only.spec.ts` passes: 'at 1000 px /projects shows app.desktopOnly', 'at 1024 px /projects shows the page', 'at 390 px /sign-in shows the form'; screenshot `SCR3-desktopOnly` vs 03b.
 - [ ] T1.5 [P] `logEvent` helper (O33) + `project_created` event — S — Refs: NFR13 — Depends on: T1.3
   Done when: `tests/integration/events.test.ts` 'project_created recorded with mode and channel' passes.
 
@@ -123,7 +125,7 @@ Slice check: suite green; FL2 end to end passes with FakeAiClient; FF2–FF4 pas
 
 ## Slice 5: Canvas and stage engine (US22, US25 shell, AC11.1–AC11.3, AC11.7, AC11.8)
 Goal: the project opens as a live canvas showing objectives and ethics, with the checkpoint panel and a generic stage runner that later stages plug into.
-You'll be able to see: the canvas with columns, objective and ethics nodes, the inspector, the checkpoint panel saying what to do next, list view, narrow-screen message.
+You'll be able to see: the canvas with columns, objective and ethics nodes, the inspector, the checkpoint panel saying what to do next, list view.
 
 - [ ] T5.1 Canvas (`@xyflow/react`): deterministic column layout, node card component with all 03b states (default, hover, selected, focused, stale, running, failed, dimmed), badges as text+icon, pan/zoom 25–200%, fit, minimap, arrow-key navigation, Enter opens inspector — M — Refs: AC22.1, AC22.2, AC22.4, 03b §6 Node card — Depends on: T4.2
   Done when: `tests/components/SCR5-canvas.test.tsx` passes: nodes placed in correct column per type; each marker renders its text label; ArrowRight moves focus to nearest node in next column; screenshot `SCR5-default` vs 03b SCR5.
@@ -137,8 +139,8 @@ You'll be able to see: the canvas with columns, objective and ethics nodes, the 
   Done when: `tests/jobs/stage-engine.test.ts` passes: 'start queues run', 'second start → conflict', 'cancel marks cancelled and keeps nodes', 'timeout marks failed', 'run continues after its starter is deactivated (EC8)'.
 - [ ] T5.6 SCR8 checkpoint panel: ready to research, running (step list ✓/spinner/✕ with live region, elapsed, cost), partial failure, failed, cancelled, collapsed; MI4, MI8; O20 `decideCheckpoint` + `approve_checkpoint` function (approve path) — M — Refs: AC25.1, AC25.3, AC25.4, AC2.4, SCR8, MI4, MI8 — Depends on: T5.5
   Done when: `tests/components/SCR8-checkpoint.test.tsx` one test per listed state; `tests/integration/O20-checkpoint.test.ts` 'approve records decision and sets status'; MI4 live region announces "…: done".
-- [ ] T5.7 Project shell: header (name, mode · channel, toolkit version, cost so far, tabs Canvas/Intake/Report), intake-not-approved state, narrow (< 1024 px) message, offline banner, session-expired modal (FF14), URL state `?node=` — M — Refs: AC22.6, SCR5 states, FF14, 03 §9 — Depends on: T5.1
-  Done when: `tests/components/SCR5-shell.test.tsx` covers intake first, narrow window, offline, session expired; `e2e/FF14.spec.ts` 'expired session → sign in modal → text kept' passes.
+- [ ] T5.7 Project shell: header (name, mode · channel, toolkit version, cost so far, tabs Canvas/Intake/Report), intake-not-approved state, offline banner, session-expired modal (FF14), URL state `?node=` — M — Refs: AC22.6, SCR5 states, FF14, 03 §9 — Depends on: T5.1
+  Done when: `tests/components/SCR5-shell.test.tsx` covers intake first, offline, session expired; `e2e/FF14.spec.ts` 'expired session → sign in modal → text kept' passes.
 
 Slice check: suite green; seeded project renders every SCR5 state listed; a fake stage started from SCR8 shows live steps. **Stop for the user.**
 
@@ -175,7 +177,7 @@ You'll be able to see: the Audit Report, the citation check table, cost warnings
 
 - [ ] T7.1 O27 report model from the graph (sections per AC15.1, citation numbering, labels) — M — Refs: AC15.1–AC15.3 — Depends on: T6.6
   Done when: `tests/integration/O27-report.test.ts` passes: every finding in report has a citation or `AI inference`; editing a node changes the next report.
-- [ ] T7.2 SCR9 UI: loading, not yet, default, stale banner, citation check table; read-only at narrow widths — M — Refs: SCR9, AC12.8, AC22.6 — Depends on: T7.1
+- [ ] T7.2 SCR9 UI: loading, not yet, default, stale banner, citation check table — M — Refs: SCR9, AC12.8 — Depends on: T7.1
   Done when: `tests/components/SCR9-report.test.tsx` one test per SCR9 state (except export); screenshot vs 03b SCR9.
 - [ ] T7.3 Cost cap: near-cap header chip at 80%, pause at 100% before next AI call (`paused_cost`), O31 raise cap (admin) / confirm over cap (member) — M — Refs: AC27.3, AC27.4, FF12 — Depends on: T5.5
   Done when: `tests/integration/O31-cap.test.ts` and `e2e/FF12.spec.ts` pass ('stage pauses at cap; member confirms; run continues').

@@ -1,6 +1,7 @@
 import type { Page } from "@playwright/test";
 
-const WIDTHS = [1280, 390] as const;
+// Desktop only (D23): designed at 1280, narrowest supported width 1024.
+const WIDTHS = [1280, 1024] as const;
 const THEMES = ["light", "dark"] as const;
 
 /**

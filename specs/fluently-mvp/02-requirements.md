@@ -220,7 +220,7 @@ As a strategist, I want a test plan for the approved variants, so that I can pro
 - **AC22.3** WHEN a stage is running THE SYSTEM SHALL show its column header with progress and the step currently running.
 - **AC22.4** THE SYSTEM SHALL support pan, zoom (25–200%), fit to view, a minimap, and keyboard navigation between nodes (arrow keys move focus to the nearest node in that direction; Enter opens the inspector).
 - **AC22.5** WHEN a member selects a node THE SYSTEM SHALL open the inspector (SCR7) with the node's full content, sources, history (who created/edited it and when) and actions.
-- **AC22.6** WHERE the browser window is narrower than 1024 px THE SYSTEM SHALL show the Audit Report (SCR9) and lo-fi previews read-only and show `[copy: canvas.needsWiderScreen]` instead of the canvas.
+- **AC22.6** WHERE the browser window is narrower than 1024 px THE SYSTEM SHALL replace every signed-in screen (SCR2–SCR12) with `[copy: app.desktopOnly]`, and SHALL keep the sign-in, sign-up and reset screens (SCR1) usable at any width. Content returns as soon as the window is 1024 px or wider, without a reload.
 
 ### US23: Trace the path (Must) — JS3
 - **AC23.1** WHEN a member clicks an annotation pin, or chooses *Trace* on any node THE SYSTEM SHALL highlight the full path from that item back to its sources and both objectives, dim all other nodes, and list the path in the inspector in order (annotation → variant → recommendation → principle → opportunity → themes → findings → sources → objectives).
