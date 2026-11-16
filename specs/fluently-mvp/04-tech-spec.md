@@ -56,6 +56,7 @@ Versions checked on npm on 2026-11-16; pin exact versions at scaffold (T0.1) and
 | D18 | Uploaded images and PDFs are passed to Claude as base64 `image` / `document` blocks; CSV/XLSX/TXT are converted to text server-side; `.eml` parsed to HTML + subject | AC8.6, AC8.8, AC19.3 | Files API (adds lifecycle to manage) |
 | D19 | Report export (Should) with `@react-pdf/renderer` for PDF and a Markdown serialiser over the same report model | Same content as SCR9 (AC15.4); runs in a serverless function | Headless Chromium on Vercel (heavy) |
 | D21 | `cacheComponents` and `partialPrefetching` are **off** in `next.config.ts`; Next 16 middleware is `proxy.ts` | Every page is per-user and dynamic; the static-shell model would force Suspense around every session read for no benefit in an internal tool | Keeping Cache Components on |
+| D22 | shadcn/ui components are written by hand in `components/ui/` on `radix-ui`, `class-variance-authority`, `tailwind-merge` (same structure as shadcn's) | The shadcn registry host is blocked from the build environment, so the CLI can't fetch them; npm is reachable | Waiting for network access to the registry |
 | D20 | Email + password sign-in only (Supabase Auth) with email verification; local email captured by the Supabase stack's mail catcher | US1 | Magic links, SSO (later) |
 
 ## 3. Architecture

@@ -1,26 +1,163 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+
+/* Design tokens from specs/fluently-mvp/03b-design-direction.md §3.
+   Colours: every text role is checked ≥ 4.5:1 by tests/unit/tokens.test.ts. */
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --bg: #fafaf9;
+  --surface: #ffffff;
+  --surface-2: #f2f2ef;
+  --border: #e2e2dd;
+  --text: #1c1c1a;
+  --text-muted: #5c5c57;
+  --primary: #3451c7;
+  --primary-foreground: #ffffff;
+  --danger: #b42318;
+  --danger-foreground: #ffffff;
+  --success: #1f7a35;
+  --warning: #8f5200;
+  --node-objectives: #5b3cc4;
+  --node-sources: #1a63a8;
+  --node-themes: #0a6672;
+  --node-opportunities: #1f7a35;
+  --node-solutions: #b23d0a;
+  --node-lofi: #4a4f55;
+  --node-tests: #a11d4b;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --bg: #121211;
+    --surface: #1b1b19;
+    --surface-2: #262623;
+    --border: #34342f;
+    --text: #f1f1ee;
+    --text-muted: #a9a9a2;
+    --primary: #8fa6ff;
+    --primary-foreground: #121211;
+    --danger: #ff8a80;
+    --danger-foreground: #121211;
+    --success: #6cd685;
+    --warning: #f5b451;
+    --node-objectives: #b49cff;
+    --node-sources: #7db8f0;
+    --node-themes: #5ccad6;
+    --node-opportunities: #6cd685;
+    --node-solutions: #ff9966;
+    --node-lofi: #b8bec5;
+    --node-tests: #ff8fb3;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+:root {
+  /* Elevation (03b §3). Dark mode relies on borders and surface lightness instead. */
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-2: 0 8px 32px rgba(0, 0, 0, 0.16);
+
+  /* Motion (03b §3). No springs. */
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 320ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-exit: cubic-bezier(0.3, 0, 1, 1);
+  --ease-emphasis: cubic-bezier(0.05, 0.7, 0.1, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --shadow-1: 0 0 0 1px var(--border);
+    --shadow-2: 0 0 0 1px var(--border);
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-danger: var(--danger);
+  --color-danger-foreground: var(--danger-foreground);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-node-objectives: var(--node-objectives);
+  --color-node-sources: var(--node-sources);
+  --color-node-themes: var(--node-themes);
+  --color-node-opportunities: var(--node-opportunities);
+  --color-node-solutions: var(--node-solutions);
+  --color-node-lofi: var(--node-lofi);
+  --color-node-tests: var(--node-tests);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+
+  /* Type scale (px / line-height) */
+  --text-caption: 12px;
+  --text-caption--line-height: 16px;
+  --text-small: 14px;
+  --text-small--line-height: 20px;
+  --text-body: 16px;
+  --text-body--line-height: 24px;
+  --text-section: 18px;
+  --text-section--line-height: 26px;
+  --text-page: 22px;
+  --text-page--line-height: 30px;
+  --text-report: 28px;
+  --text-report--line-height: 36px;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+
+  --shadow-elev-1: var(--shadow-1);
+  --shadow-elev-2: var(--shadow-2);
+
+  --ease-standard: var(--ease-standard);
+  --ease-exit: var(--ease-exit);
+  --ease-emphasis: var(--ease-emphasis);
+}
+
+@utility duration-fast {
+  transition-duration: var(--duration-fast);
+  animation-duration: var(--duration-fast);
+}
+@utility duration-base {
+  transition-duration: var(--duration-base);
+  animation-duration: var(--duration-base);
+}
+@utility duration-slow {
+  transition-duration: var(--duration-slow);
+  animation-duration: var(--duration-slow);
+}
+
+/* Reduced motion: movement is removed; only quick fades remain (03b §3). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: var(--duration-fast) !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+  }
+  :focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
 }
