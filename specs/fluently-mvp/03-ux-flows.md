@@ -695,6 +695,23 @@ Format: user action → system response → resulting state (ACs).
 | report.openLink / report.uploadedFile | "Open" / "Uploaded file" |
 | report.backToReport | "Back to report" |
 
+**Added for project management (2026-11-17, from icebox IB5): please confirm this wording.** A "…" menu on each projects-list row and beside the project name in the project header.
+
+| Key | Text |
+|---|---|
+| project.menu | "Project actions for {name}" (screen reader name of the "…" button) |
+| project.rename / project.archive / project.restore / project.delete | "Rename" / "Archive" / "Restore" / "Delete" |
+| project.renameTitle | "Rename project" |
+| project.nameLabel / project.clientLabel | "Project name" / "Client (optional)" |
+| project.save / project.saving | "Save" / "Saving…" |
+| project.renamed | "Project renamed." |
+| project.deleteTitle | "Delete {name}?" |
+| project.deleteBody | "This permanently deletes the brief, the tree, the report and every uploaded file. It can't be undone. Archive the project instead if you might need it again." |
+| project.deleteConfirmLabel | "Type the project name to confirm" |
+| project.deleteConfirm / project.deleting | "Delete project" / "Deleting…" |
+| project.deleteMismatch | "Type the name exactly as shown." |
+| project.deleted | "Project deleted." |
+
 **Turning things off and undoing:** deactivating a member, removing an allowlist entry, cancelling a stage, and undoing a delete all use `[common.saveFailed]` if they fail, and leave the previous state unchanged.
 
 ## 8. Behavioural design notes (for Fluently's own interface)

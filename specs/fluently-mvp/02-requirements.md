@@ -82,6 +82,10 @@ As a member, I want to create a project for a brief, so that all its work lives 
 - **AC7.3** WHEN any member opens the projects list THE SYSTEM SHALL show all workspace projects with name, mode, channel, current stage, status (`in progress`, `waiting for you`, `running`, `failed`), last edited by and when, newest first.
 - **AC7.4** WHEN a newer toolkit version exists than the one a project is pinned to THE SYSTEM SHALL show the pinned version on the project and SHALL not change it. `[Assumption]` Re-pinning is out of scope for v1.
 - **AC7.5** WHEN a member archives a project THE SYSTEM SHALL hide it from the default list and show it under "Archived"; un-archiving restores it unchanged.
+- **AC7.6** WHEN a member renames a project or changes its client label, from the projects list or from the project header, THE SYSTEM SHALL save it with the same rules as AC7.1–AC7.2 and show the new name everywhere. *(Added 2026-11-17 from icebox IB5.)*
+- **AC7.7** WHEN a member archives or restores a project from the project header THE SYSTEM SHALL behave as AC7.5 and return them to the projects list. *(Added 2026-11-17 from icebox IB5.)*
+- **AC7.8** WHEN an admin deletes a project, after typing its exact name to confirm, THE SYSTEM SHALL permanently remove the project, everything in it (brief, tree, sources, runs) and its uploaded files, keep its AI cost rows for usage totals (without the project link), and record who deleted it. Members SHALL not see *Delete*, and the server SHALL refuse it from anyone but an admin. *(Added 2026-11-17 from icebox IB5; user decision: admins only.)*
+- **AC7.9** THE SYSTEM SHALL let only admins change a project's AI budget (AC27.4); other project fields stay editable by any member. *(Added 2026-11-17.)*
 
 ### US8: Intake with AI coaching (Must) — JS1
 As a strategist, I want Fluently to suggest a sharper version of what I write and say why, so that my objectives are specific enough to drive the work.

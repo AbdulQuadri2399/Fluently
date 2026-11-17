@@ -16,3 +16,11 @@ export const listProjectsSchema = z.object({
   cursor: z.string().optional(),
 });
 export type ListProjectsInput = z.input<typeof listProjectsSchema>;
+
+// O10 updateProject (AC7.6): same rules as creating.
+export const updateProjectSchema = z.object({
+  id: z.uuid(),
+  name: createProjectSchema.shape.name,
+  clientLabel: z.string().trim().max(80).optional(),
+});
+export type UpdateProjectInput = z.input<typeof updateProjectSchema>;

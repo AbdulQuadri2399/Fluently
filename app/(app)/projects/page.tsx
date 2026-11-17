@@ -7,8 +7,10 @@ import { projectsCopy as c } from "@/components/projects/copy";
 import {
   archiveProject,
   createProject,
+  deleteProject,
   listProjects,
   unarchiveProject,
+  updateProject,
 } from "@/lib/actions/projects";
 import * as service from "@/lib/projects/service";
 import { pageContext } from "@/lib/projects/workspace";
@@ -53,6 +55,9 @@ export default async function ProjectsPage({ searchParams }: PageProps<"/project
           list={listProjects}
           archive={archiveProject}
           restore={unarchiveProject}
+          update={updateProject}
+          remove={deleteProject}
+          isAdmin={ctx.isAdmin}
         />
       )}
     </main>

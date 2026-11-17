@@ -7,6 +7,7 @@ import {
   sql,
   uniqueEmail,
 } from "../helpers/supabase";
+import { createIsolatedAdmin } from "../helpers/supabase";
 
 // T1.1: projects, intakes, project_ratings access rules (04 section 4, NFR5).
 describe("RLS: projects, intakes, project_ratings", () => {
@@ -102,5 +103,40 @@ describe("RLS: projects, intakes, project_ratings", () => {
     for (const table of ["projects", "intakes", "project_ratings"]) {
       expect((await anon.from(table).select("*")).data ?? []).toEqual([]);
     }
+  });
+
+  it("member can't change the budget; admins can (AC7.9)", async () => {
+    const admin = await createIsolatedAdmin();
+    const member = await admin.addMember();
+    const p = await admin.client
+      .from("projects")
+      .insert({
+        workspace_id: admin.workspaceId,
+        name: "Budget guard",
+        mode: "new",
+        channel: "screens",
+        created_by: admin.id,
+        updated_by: admin.id,
+      })
+      .select("id")
+      .single();
+    const id = p.data!.id as string;
+    const byMember = await member.client
+      .from("projects")
+      .update({ cost_cap_override_gbp: 500, updated_by: member.id })
+      .eq("id", id);
+    expect(byMember.error).not.toBeNull();
+    const rename = await member.client
+      .from("projects")
+      .update({ name: "Renamed by a member", updated_by: member.id })
+      .eq("id", id)
+      .select("id");
+    expect(rename.data).toHaveLength(1);
+    const byAdmin = await admin.client
+      .from("projects")
+      .update({ cost_cap_override_gbp: 20, updated_by: admin.id })
+      .eq("id", id)
+      .select("id");
+    expect(byAdmin.data).toHaveLength(1);
   });
 });

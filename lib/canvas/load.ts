@@ -179,12 +179,13 @@ export async function loadHeader(client: Client, projectId: string) {
   const { data: p } = await client
     .from("projects")
     .select(
-      "id, name, mode, channel, workspace_id, cost_cap_override_gbp, pinned:toolkit_versions!projects_toolkit_version_id_toolkit_versions_id_fk(number)",
+      "id, name, mode, channel, client_label, archived_at, workspace_id, cost_cap_override_gbp, pinned:toolkit_versions!projects_toolkit_version_id_toolkit_versions_id_fk(number)",
     )
     .eq("id", projectId)
     .maybeSingle();
   if (!p) return null;
-  const [{ data: ws }, { data: usage }] = await Promise.all([
+  const { data: auth } = await client.auth.getUser();
+  const [{ data: ws }, { data: usage }, { data: me }] = await Promise.all([
     client
       .from("workspaces")
       .select(
@@ -193,6 +194,11 @@ export async function loadHeader(client: Client, projectId: string) {
       .eq("id", p.workspace_id)
       .single(),
     client.from("ai_usage").select("cost_usd").eq("project_id", projectId),
+    client
+      .from("members")
+      .select("role")
+      .eq("id", auth.user?.id ?? "")
+      .maybeSingle(),
   ]);
   const one = <T>(x: T | T[] | null | undefined) => (Array.isArray(x) ? x[0] : x) ?? null;
   const usd = (usage ?? []).reduce((sum, u) => sum + Number(u.cost_usd), 0);
@@ -201,6 +207,9 @@ export async function loadHeader(client: Client, projectId: string) {
     name: p.name,
     mode: p.mode,
     channel: p.channel,
+    clientLabel: p.client_label,
+    archived: Boolean(p.archived_at),
+    isAdmin: me?.role === "admin",
     pinned: one(p.pinned)?.number ?? null,
     latest: one(ws?.current)?.number ?? null,
     spentGbp: toGbp(usd, Number(ws?.gbp_per_usd ?? 0.79)),

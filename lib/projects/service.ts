@@ -5,7 +5,9 @@ import type { Database } from "@/lib/supabase/database.types";
 import {
   createProjectSchema,
   listProjectsSchema,
+  updateProjectSchema,
   type CreateProjectInput,
+  type UpdateProjectInput,
   type ListProjectsInput,
 } from "@/lib/schemas/project";
 
@@ -89,6 +91,64 @@ async function setArchived(client: Client, id: string, archived: boolean): Promi
 /** O10 archiveProject / unarchiveProject (AC7.5). */
 export const archiveProject = (client: Client, id: string) => setArchived(client, id, true);
 export const unarchiveProject = (client: Client, id: string) => setArchived(client, id, false);
+
+/** O10 updateProject (AC7.6): rename and change the client label. Any member. */
+export async function updateProject(
+  client: Client,
+  input: UpdateProjectInput,
+): Promise<ActionResult> {
+  const parsed = updateProjectSchema.safeParse(input);
+  if (!parsed.success) return fail("validation");
+  const me = await currentMember(client);
+  if (!me) return fail("forbidden");
+  const { data, error } = await client
+    .from("projects")
+    .update({
+      name: parsed.data.name,
+      client_label: parsed.data.clientLabel || null,
+      updated_by: me.id,
+    })
+    .eq("id", parsed.data.id)
+    .select("id");
+  if (error) return fail("unavailable");
+  if (!data || data.length === 0) return fail("not_found");
+  return ok(undefined);
+}
+
+/**
+ * O10 deleteProject (AC7.8, NFR7): admins only, after typing the exact name. Uploaded files are
+ * removed first (the storage rules need the project to exist), then the project row; its
+ * contents go with it, AI cost rows stay for usage totals without the project link.
+ */
+export async function deleteProject(
+  client: Client,
+  input: { id: string; confirmName: string },
+): Promise<ActionResult> {
+  const me = await currentMember(client);
+  if (!me || me.role !== "admin") return fail("forbidden");
+  const { data: p } = await client
+    .from("projects")
+    .select("id, name, workspace_id")
+    .eq("id", input.id)
+    .maybeSingle();
+  if (!p || p.workspace_id !== me.workspace_id) return fail("not_found");
+  if ((input.confirmName ?? "").trim() !== p.name) return fail("validation");
+
+  const { data: uploads } = await client
+    .from("uploads")
+    .select("storage_path")
+    .eq("project_id", p.id);
+  const paths = (uploads ?? []).map((u) => u.storage_path);
+  for (let i = 0; i < paths.length; i += 100) {
+    const { error } = await client.storage.from("uploads").remove(paths.slice(i, i + 100));
+    if (error) return fail("unavailable");
+  }
+  const { data, error } = await client.from("projects").delete().eq("id", p.id).select("id");
+  if (error) return fail("unavailable");
+  if (!data || data.length === 0) return fail("forbidden");
+  await logEvent(client, me, "project_deleted", { project_id: p.id, name: p.name });
+  return ok(undefined);
+}
 
 function escapeLike(s: string) {
   return s.replace(/[\\%_]/g, (c) => `\\${c}`);

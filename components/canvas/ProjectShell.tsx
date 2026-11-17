@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import { authCopy } from "@/components/auth/copy";
 import { channelNames } from "@/components/projects/copy";
+import { ProjectMenu, type ProjectMenuActions } from "@/components/projects/ProjectMenu";
 import { toolkitCopy } from "@/components/toolkit/copy";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,6 +25,9 @@ export type HeaderInfo = {
   mode: string;
   channel: string;
   pinned: number | null;
+  clientLabel: string | null;
+  archived: boolean;
+  isAdmin: boolean;
   latest: number | null;
   spentGbp: number;
   capGbp: number;
@@ -117,11 +121,14 @@ export function ProjectShell({
   header,
   signIn,
   children,
+  projectActions,
 }: {
   header: HeaderInfo;
   signIn: (i: { email: string; password: string }) => Promise<ActionResult<{ next: string }>>;
   children: ReactNode;
+  projectActions?: ProjectMenuActions;
 }) {
+  const router = useRouter();
   const pathname = usePathname();
   const online = useOnline();
   const base = `/projects/${header.id}`;
@@ -138,7 +145,25 @@ export function ProjectShell({
     <div className="flex h-dvh min-h-0 flex-col">
       <header className="flex items-end gap-6 border-b border-line bg-paper px-6 pt-4">
         <div className="grid min-w-0 gap-0.5 pb-3">
-          <h1 className="truncate text-lead font-semibold tracking-tight">{header.name}</h1>
+          <div className="flex min-w-0 items-center gap-1">
+            <h1 className="truncate text-lead font-semibold tracking-tight">{header.name}</h1>
+            {header.clientLabel ? (
+              <span className="truncate text-small text-muted">· {header.clientLabel}</span>
+            ) : null}
+            {projectActions ? (
+              <ProjectMenu
+                project={{ id: header.id, name: header.name, clientLabel: header.clientLabel }}
+                archived={header.archived}
+                isAdmin={header.isAdmin}
+                actions={projectActions}
+                onChanged={() => router.refresh()}
+                onArchived={(archived) =>
+                  router.push(archived ? "/projects?filter=archived" : "/projects")
+                }
+                onDeleted={() => router.push("/projects")}
+              />
+            ) : null}
+          </div>
           <p className="truncate text-caption text-muted">
             {MODE_NAMES[header.mode] ?? header.mode} ·{" "}
             {channelNames[header.channel] ?? header.channel}

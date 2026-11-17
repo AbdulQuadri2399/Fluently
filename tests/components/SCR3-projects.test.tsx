@@ -43,6 +43,8 @@ function list(
     })),
     archive: vi.fn(async () => ({ ok: true as const, data: undefined })),
     restore: vi.fn(async () => ({ ok: true as const, data: undefined })),
+    update: vi.fn(async () => ({ ok: true as const, data: undefined })),
+    remove: vi.fn(async () => ({ ok: true as const, data: undefined })),
   };
   render(
     <ProjectsList
@@ -103,7 +105,8 @@ describe("SCR3 Projects", () => {
   it("default: archive removes the row; Load more fetches the next page", async () => {
     const p = row();
     const actions = list([p], { nextCursor: "x|y" });
-    await userEvent.click(screen.getByRole("button", { name: `${c.archive} ${p.name}` }));
+    await userEvent.click(screen.getByRole("button", { name: c.menu(p.name) }));
+    await userEvent.click(await screen.findByRole("menuitem", { name: c.archive }));
     expect(actions.archive).toHaveBeenCalledWith(p.id);
     expect(screen.queryByText(p.name)).not.toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: c.loadMore }));
@@ -118,7 +121,8 @@ describe("SCR3 Projects", () => {
   it("archived: rows offer Restore", async () => {
     const p = row();
     const actions = list([p], { filter: "archived" });
-    await userEvent.click(screen.getByRole("button", { name: `${c.restore} ${p.name}` }));
+    await userEvent.click(screen.getByRole("button", { name: c.menu(p.name) }));
+    await userEvent.click(await screen.findByRole("menuitem", { name: c.restore }));
     expect(actions.restore).toHaveBeenCalledWith(p.id);
   });
 

@@ -19,6 +19,7 @@ import {
   stageNames,
   statusNames,
 } from "./copy";
+import { ProjectMenu, type ProjectMenuActions } from "./ProjectMenu";
 import { NoResults } from "./States";
 
 type Page = { items: ProjectRow[]; nextCursor: string | null };
@@ -41,6 +42,9 @@ export function ProjectsList({
   list,
   archive,
   restore,
+  update,
+  remove,
+  isAdmin = false,
 }: {
   initial: Page;
   filter: Filter;
@@ -48,6 +52,9 @@ export function ProjectsList({
   list: (input: ListProjectsInput) => Promise<ActionResult<Page>>;
   archive: (id: string) => Promise<ActionResult>;
   restore: (id: string) => Promise<ActionResult>;
+  update: ProjectMenuActions["update"];
+  remove: ProjectMenuActions["remove"];
+  isAdmin?: boolean;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -67,16 +74,10 @@ export function ProjectsList({
     router.push(qs ? `${pathname}?${qs}` : pathname);
   }
 
-  async function toggleArchive(row: ProjectRow) {
-    const res = filter === "active" ? await archive(row.id) : await restore(row.id);
-    if (!res.ok) {
-      toast.error(c.saveFailed);
-      return;
-    }
-    setRows((r) => r.filter((x) => x.id !== row.id));
-    toast(filter === "active" ? c.archived : c.restored);
+  const drop = (id: string) => {
+    setRows((r) => r.filter((x) => x.id !== id));
     router.refresh();
-  }
+  };
 
   function loadMore() {
     if (!cursor) return;
@@ -151,7 +152,7 @@ export function ProjectsList({
               <th className="py-2 pr-4 font-medium">{c.colChannel}</th>
               <th className="py-2 pr-4 font-medium">{c.colEdited}</th>
               <th className="w-px py-2">
-                <span className="sr-only">{filter === "active" ? c.archive : c.restore}</span>
+                <span className="sr-only">{c.menu("")}</span>
               </th>
             </tr>
           </thead>
@@ -179,15 +180,16 @@ export function ProjectsList({
                   {now ? editedBy(relativeTime(p.updatedAt, now), p.updatedByName) : null}
                 </td>
                 <td className="py-3 text-right">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    aria-label={`${filter === "active" ? c.archive : c.restore} ${p.name}`}
-                    className="opacity-0 group-focus-within:opacity-100 group-hover:opacity-100"
-                    onClick={() => void toggleArchive(p)}
-                  >
-                    {filter === "active" ? c.archive : c.restore}
-                  </Button>
+                  <ProjectMenu
+                    project={{ id: p.id, name: p.name, clientLabel: p.clientLabel }}
+                    archived={filter === "archived"}
+                    isAdmin={isAdmin}
+                    actions={{ update, archive, restore, remove }}
+                    onChanged={() => router.refresh()}
+                    onArchived={() => drop(p.id)}
+                    onDeleted={() => drop(p.id)}
+                    className="opacity-0 group-focus-within:opacity-100 group-hover:opacity-100 data-[state=open]:opacity-100"
+                  />
                 </td>
               </tr>
             ))}

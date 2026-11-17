@@ -206,6 +206,11 @@ You'll be able to see: the Audit Report, the citation check table, cost warnings
 - [x] T7.10 Watch the research: AI writes research questions (stored on the run, used by search steps); activity log table written by J2; *See what it's doing* panel, live (icebox IB11, slim version) — M — Refs: AC11.9, AC11.10 — Depends on: T6.5
   Done when: `tests/jobs/J2-research.test.ts` 'questions stored and used' and 'activity logged per step' pass; `tests/rls/activity.test.ts` two-user test passes; `e2e/activity.spec.ts` shows questions and log during a run.
 
+- [x] T7.11 Manage a project: rename and change client (list row menu and project header menu), archive and restore from the header (icebox IB5) — S — Refs: AC7.6, AC7.7 — Depends on: T1.3
+  Done when: `tests/integration/O10-delete.test.ts` 'rename validates and saves' passes; `tests/components/SCR3-project-menu.test.tsx` passes.
+- [x] T7.12 Delete a project, admins only: type-the-name confirm; removes project data and uploaded files, keeps AI cost rows; members can't; only admins change the AI budget (icebox IB5) — S — Refs: AC7.8, AC7.9, NFR7 — Depends on: T7.11
+  Done when: `tests/integration/O10-delete.test.ts` ('admin deletes: rows and files gone, usage kept', 'member refused', 'wrong name refused') and `tests/rls/projects.test.ts` 'member can't change the budget' pass; `e2e/project-menu.spec.ts` passes.
+
 Slice check: suite green; report renders on seeded and live projects; A1–A3 results recorded. **Stop for the user** (go / iterate decision).
 
 ---
