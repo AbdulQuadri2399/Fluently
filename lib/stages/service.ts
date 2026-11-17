@@ -79,3 +79,28 @@ export async function retryResearch(
   if (error) return fail(mapError(error.code));
   return ok({ stageRunId: data as string });
 }
+
+/** O31 raiseProjectCap (AC27.4): admins only; a run paused at the cap is queued again (its id). */
+export async function raiseProjectCap(
+  client: Client,
+  projectId: string,
+  capGbp: number,
+): Promise<ActionResult<{ resumedRunId: string | null }>> {
+  if (!Number.isFinite(capGbp) || capGbp <= 0 || capGbp > 1000) return fail("validation");
+  const { data, error } = await client.rpc("raise_project_cap", {
+    p_project: projectId,
+    p_cap: capGbp,
+  });
+  if (error) return fail(mapError(error.code));
+  return ok({ resumedRunId: (data as string | null) ?? null });
+}
+
+/** O31 confirmOverCap (AC27.4): a member lets the paused run carry on past the budget. */
+export async function confirmOverCap(
+  client: Client,
+  runId: string,
+): Promise<ActionResult<{ stageRunId: string }>> {
+  const { data, error } = await client.rpc("confirm_over_cap", { p_run: runId });
+  if (error) return fail(mapError(error.code));
+  return ok({ stageRunId: data as string });
+}

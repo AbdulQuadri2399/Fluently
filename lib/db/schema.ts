@@ -573,6 +573,13 @@ export const stageRuns = pgTable(
     model: text("model"),
     inngestRunId: text("inngest_run_id"),
     retryOf: uuid("retry_of"),
+    // AC11.9: research questions the AI wrote from the objectives.
+    questions: jsonb("questions").notNull().default([]),
+    // AC27.4: a member chose to continue this run past the project's AI budget.
+    overCapConfirmedBy: uuid("over_cap_confirmed_by").references(() => members.id, {
+      onDelete: "set null",
+    }),
+    overCapConfirmedAt: timestamp("over_cap_confirmed_at", { withTimezone: true }),
     errorCode: text("error_code"),
     startedAt: timestamp("started_at", { withTimezone: true }),
     finishedAt: timestamp("finished_at", { withTimezone: true }),
@@ -836,5 +843,36 @@ export const sources = pgTable(
       to: authenticatedRole,
       withCheck: sql`public.is_member(${t.workspaceId}) and ${t.addedBy} = ${authUid}`,
     }),
+  ],
+).enableRLS();
+
+// ---------- Slice 7: research activity log (AC11.10, 04 D32) ----------
+
+export const runEvents = pgTable(
+  "run_events",
+  {
+    id: id(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "restrict" }),
+    projectId: uuid("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    stageRunId: uuid("stage_run_id")
+      .notNull()
+      .references(() => stageRuns.id, { onDelete: "cascade" }),
+    kind: text("kind").notNull(),
+    step: text("step"),
+    count: integer("count"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    check(
+      "run_events_kind_valid",
+      sql`${t.kind} in ('questions','started','found','kept','dropped','done','failed','paused_cost','resumed')`,
+    ),
+    index("run_events_run_idx").on(t.stageRunId, t.createdAt),
+    // Written only by jobs (service role); members read.
+    memberRead("run_events"),
   ],
 ).enableRLS();

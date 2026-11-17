@@ -471,6 +471,38 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"run_events": {
+                  Row: {
+                    "count": number | null,"created_at": string,"id": string,"kind": string,"project_id": string,"stage_run_id": string,"step": string | null,"workspace_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "count"?: number | null,"created_at"?: string,"id"?: string,"kind": string,"project_id": string,"stage_run_id": string,"step"?: string | null,"workspace_id": string
+                  }
+                  Update: {
+                    "count"?: number | null,"created_at"?: string,"id"?: string,"kind"?: string,"project_id"?: string,"stage_run_id"?: string,"step"?: string | null,"workspace_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "run_events_project_id_projects_id_fk"
+      columns: ["project_id"]
+isOneToOne: false
+      referencedRelation: "projects"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "run_events_stage_run_id_stage_runs_id_fk"
+      columns: ["stage_run_id"]
+isOneToOne: false
+      referencedRelation: "stage_runs"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "run_events_workspace_id_workspaces_id_fk"
+      columns: ["workspace_id"]
+isOneToOne: false
+      referencedRelation: "workspaces"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"sources": {
                   Row: {
                     "added_by": string | null,"authors": (string)[] | null,"created_at": string,"doi": string | null,"excerpt": string | null,"external_id": string | null,"handle": string,"id": string,"meta": NonNullable<Json>,"project_id": string,"retrieved_at": string,"source_type": string,"stage_run_id": string | null,"title": string,"updated_at": string,"upload_id": string | null,"url": string | null,"workspace_id": string,"year": number | null
@@ -517,17 +549,23 @@ isOneToOne: false
                   ]
                 },"stage_runs": {
                   Row: {
-                    "created_at": string,"error_code": string | null,"feedback": string | null,"finished_at": string | null,"id": string,"inngest_run_id": string | null,"model": string | null,"project_id": string,"replace_human": boolean,"retry_of": string | null,"stage": string,"started_at": string | null,"started_by": string,"status": string,"steps": NonNullable<Json>,"updated_at": string,"workspace_id": string
+                    "created_at": string,"error_code": string | null,"feedback": string | null,"finished_at": string | null,"id": string,"inngest_run_id": string | null,"model": string | null,"over_cap_confirmed_at": string | null,"over_cap_confirmed_by": string | null,"project_id": string,"questions": NonNullable<Json>,"replace_human": boolean,"retry_of": string | null,"stage": string,"started_at": string | null,"started_by": string,"status": string,"steps": NonNullable<Json>,"updated_at": string,"workspace_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "created_at"?: string,"error_code"?: string | null,"feedback"?: string | null,"finished_at"?: string | null,"id"?: string,"inngest_run_id"?: string | null,"model"?: string | null,"project_id": string,"replace_human"?: boolean,"retry_of"?: string | null,"stage": string,"started_at"?: string | null,"started_by": string,"status"?: string,"steps"?: NonNullable<Json>,"updated_at"?: string,"workspace_id": string
+                    "created_at"?: string,"error_code"?: string | null,"feedback"?: string | null,"finished_at"?: string | null,"id"?: string,"inngest_run_id"?: string | null,"model"?: string | null,"over_cap_confirmed_at"?: string | null,"over_cap_confirmed_by"?: string | null,"project_id": string,"questions"?: NonNullable<Json>,"replace_human"?: boolean,"retry_of"?: string | null,"stage": string,"started_at"?: string | null,"started_by": string,"status"?: string,"steps"?: NonNullable<Json>,"updated_at"?: string,"workspace_id": string
                   }
                   Update: {
-                    "created_at"?: string,"error_code"?: string | null,"feedback"?: string | null,"finished_at"?: string | null,"id"?: string,"inngest_run_id"?: string | null,"model"?: string | null,"project_id"?: string,"replace_human"?: boolean,"retry_of"?: string | null,"stage"?: string,"started_at"?: string | null,"started_by"?: string,"status"?: string,"steps"?: NonNullable<Json>,"updated_at"?: string,"workspace_id"?: string
+                    "created_at"?: string,"error_code"?: string | null,"feedback"?: string | null,"finished_at"?: string | null,"id"?: string,"inngest_run_id"?: string | null,"model"?: string | null,"over_cap_confirmed_at"?: string | null,"over_cap_confirmed_by"?: string | null,"project_id"?: string,"questions"?: NonNullable<Json>,"replace_human"?: boolean,"retry_of"?: string | null,"stage"?: string,"started_at"?: string | null,"started_by"?: string,"status"?: string,"steps"?: NonNullable<Json>,"updated_at"?: string,"workspace_id"?: string
                   }
                   Relationships: [
                     {
+      foreignKeyName: "stage_runs_over_cap_confirmed_by_members_id_fk"
+      columns: ["over_cap_confirmed_by"]
+isOneToOne: false
+      referencedRelation: "members"
+      referencedColumns: ["id"]
+    },{
       foreignKeyName: "stage_runs_project_id_projects_id_fk"
       columns: ["project_id"]
 isOneToOne: false
@@ -684,6 +722,9 @@ isOneToOne: false
 "cancel_stage":
 { Args: { "p_run": string }; Returns: undefined
                            },
+"confirm_over_cap":
+{ Args: { "p_run": string }; Returns: string
+                           },
 "is_admin":
 { Args: { "ws": string }; Returns: boolean
                            },
@@ -695,6 +736,9 @@ isOneToOne: false
                            },
 "move_assets":
 { Args: { "p_project": string,"p_to": string,"p_uploads": (string)[] }; Returns: string
+                           },
+"raise_project_cap":
+{ Args: { "p_cap": number,"p_project": string }; Returns: string
                            },
 "record_override":
 { Args: { "p_node": string,"p_reason": string }; Returns: string

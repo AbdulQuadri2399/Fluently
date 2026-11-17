@@ -11,6 +11,7 @@ import {
   type CoachOutput,
   type EthicsOutput,
   type FindingsOutput,
+  type QuestionsOutput,
   type SynthesisOutput,
 } from "./schemas";
 
@@ -151,6 +152,7 @@ export function fakeEthics(brief: string, sector: string, flagList: string[]): E
 export const FAKE_FAIL_MARKER = "#unavailable";
 
 export const defaultResponders: Record<string, Responder> = {
+  questions: (call) => fakeQuestions(str(call.input?.business), str(call.input?.behavioural)),
   findings: (call) => fakeFindings((call.input?.sources as SourceRef[] | undefined) ?? []),
   synthesis: (call) =>
     fakeSynthesis(
@@ -172,6 +174,19 @@ export const defaultResponders: Record<string, Responder> = {
 };
 
 type SourceRef = { handle: string; type: string };
+
+/** Made-up research questions (AC11.9), built from the two objectives. */
+export function fakeQuestions(business: string, behavioural: string): QuestionsOutput {
+  const goal = behavioural || business || "the behaviour we want";
+  return {
+    questions: [
+      `Where in the current journey do people stop before "${goal.slice(0, 80)}"?`,
+      "What makes this step feel like effort, and how do people describe it in their own words?",
+      "What do competitors do at the same step, and what do their customers say about it?",
+      "Which behavioural principles explain the drop-off, and how strong is the evidence for each?",
+    ],
+  };
+}
 
 /** Made-up findings: one or two per kind of source, citing real handles from this run. */
 export function fakeFindings(sources: SourceRef[]): FindingsOutput {
@@ -256,6 +271,7 @@ export function fakeSynthesis(
       contradicts: false,
       gapQuestion: null,
       gapMethod: null,
+      gapKind: null,
     },
     {
       title: "Show progress through verification",
@@ -265,6 +281,7 @@ export function fakeSynthesis(
       contradicts: false,
       gapQuestion: null,
       gapMethod: null,
+      gapKind: null,
     },
     {
       title: "Explain where the ID photo goes",
@@ -274,6 +291,7 @@ export function fakeSynthesis(
       contradicts: false,
       gapQuestion: "Do people drop out because of privacy worries, or because of effort?",
       gapMethod: services[1] ?? services[0] ?? "Desk research",
+      gapKind: "generative" as const,
     },
   ].filter((o) => o.themes.every((t) => t < themes.length));
   return {

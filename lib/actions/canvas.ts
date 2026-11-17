@@ -68,3 +68,15 @@ export async function moveAssets(projectId: string, uploadIds: string[], toNodeI
   revalidatePath(`/projects/${projectId}`, "layout");
   return res;
 }
+export async function raiseProjectCap(projectId: string, capGbp: number) {
+  const res = await stages.raiseProjectCap(await createClient(), projectId, capGbp);
+  if (res.ok && res.data.resumedRunId) startResearch(res.data.resumedRunId);
+  revalidatePath(`/projects/${projectId}`, "layout");
+  return res;
+}
+export async function confirmOverCap(projectId: string, runId: string) {
+  const res = await stages.confirmOverCap(await createClient(), runId);
+  if (res.ok) startResearch(res.data.stageRunId);
+  revalidatePath(`/projects/${projectId}`, "layout");
+  return res;
+}

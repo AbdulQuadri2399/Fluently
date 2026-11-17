@@ -64,6 +64,8 @@ export const synthesisSchema = z.object({
         contradicts: z.boolean(),
         gapQuestion: z.string().max(400).nullable(),
         gapMethod: z.string().max(120).nullable(),
+        // AC13.5: discovery confirms or measures; generative explores needs not yet understood.
+        gapKind: z.enum(["discovery", "generative"]).nullable(),
       }),
     )
     .max(8),
@@ -78,3 +80,9 @@ export const synthesisSchema = z.object({
     .max(5),
 });
 export type SynthesisOutput = z.infer<typeof synthesisSchema>;
+
+/** J2 questions step (AC11.9): research questions written from the objectives. */
+export const questionsSchema = z.object({
+  questions: z.array(z.string().min(5).max(240)).min(3).max(6),
+});
+export type QuestionsOutput = z.infer<typeof questionsSchema>;

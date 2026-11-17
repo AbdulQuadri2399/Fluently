@@ -148,6 +148,20 @@
       "when": 1794922165644,
       "tag": "20261117132925_asset_cards",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1794937449656,
+      "tag": "20261117174409_run_events",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1794937455981,
+      "tag": "20261117174415_cost_cap",
+      "breakpoints": true
     }
   ]
 }

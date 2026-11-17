@@ -119,6 +119,7 @@ describe("J2 research", () => {
             contradicts: true,
             gapQuestion: "Q?",
             gapMethod: "Eye tracking (not offered)",
+            gapKind: null,
           },
         ],
         externalPrinciples: [],
@@ -271,5 +272,128 @@ describe("J2 research", () => {
     const themes = await nodes(projectId, "theme");
     expect(themes.some((t) => t.title === "A theme a person added")).toBe(true);
     expect(themes.some((t) => t.id === theme!.id)).toBe(false); // the AI's earlier theme was replaced
+  });
+
+  it("questions stored and used: written from the objectives, passed to search (AC11.9)", async () => {
+    const queries: string[] = [];
+    const base = fakeResearchDeps(new FakeAiClient(quiet));
+    const deps: ResearchDeps = {
+      ...base,
+      papers: async (q) => {
+        queries.push(q);
+        return base.papers(q);
+      },
+      web: async (step, q) => {
+        queries.push(q);
+        return base.web(step, q);
+      },
+    };
+    const { runId } = await startedRun();
+    await runResearch(db, runId, { deps });
+    const { data: run } = await admin.client
+      .from("stage_runs")
+      .select("questions")
+      .eq("id", runId)
+      .single();
+    const questions = run!.questions as string[];
+    expect(questions.length).toBeGreaterThanOrEqual(3);
+    expect(questions.length).toBeLessThanOrEqual(6);
+    expect(queries.every((q) => q.includes(questions[0]!))).toBe(true);
+  });
+
+  it("activity logged per step (AC11.10)", async () => {
+    const { runId } = await startedRun();
+    await runResearch(db, runId);
+    const { data: events } = await admin.client
+      .from("run_events")
+      .select("kind, step, count")
+      .eq("stage_run_id", runId)
+      .order("created_at");
+    const has = (kind: string, step: string | null) =>
+      events!.some((e) => e.kind === kind && e.step === step);
+    expect(events![0]).toMatchObject({ kind: "questions" });
+    for (const step of [
+      "toolkit",
+      "papers",
+      "web",
+      "competitors",
+      "reviews",
+      "findings",
+      "synthesis",
+    ]) {
+      expect(has("started", step), step).toBe(true);
+      expect(has("done", step), step).toBe(true);
+    }
+    expect(events!.find((e) => e.kind === "found" && e.step === "papers")!.count).toBeGreaterThan(
+      0,
+    );
+    expect(has("kept", "papers")).toBe(true);
+  });
+
+  it("a failing step is logged as failed (AC11.10)", async () => {
+    const base = fakeResearchDeps(new FakeAiClient(quiet));
+    const { runId } = await startedRun();
+    await runResearch(db, runId, {
+      deps: { ...base, papers: async () => Promise.reject(new Error("down")) },
+    });
+    const { data: events } = await admin.client
+      .from("run_events")
+      .select("kind, step")
+      .eq("stage_run_id", runId);
+    expect(events).toContainEqual({ kind: "failed", step: "papers" });
+  });
+
+  it("every gap has a kind (AC13.5)", async () => {
+    const { projectId, runId } = await startedRun();
+    await runResearch(db, runId);
+    const gaps = await nodes(projectId, "gap");
+    expect(gaps.length).toBeGreaterThan(0);
+    for (const g of gaps)
+      expect(["discovery", "generative"]).toContain((g.data as { kind: string }).kind);
+  });
+
+  it("themes get a strength from the confidence rule (AC12.11)", async () => {
+    const { projectId, runId } = await startedRun();
+    await runResearch(db, runId);
+    const themes = await nodes(projectId, "theme");
+    expect(themes.length).toBeGreaterThan(0);
+    for (const t of themes) {
+      expect(["High", "Med", "Low"]).toContain(t.confidence);
+      expect((t.data as { confidenceReason?: string }).confidenceReason).toBeTruthy();
+    }
+  });
+
+  it("pauses at the AI budget before the next AI call; a member confirms and it finishes (AC27.4)", async () => {
+    const { projectId, runId } = await startedRun();
+    const { data: p } = await admin.client
+      .from("projects")
+      .select("workspace_id")
+      .eq("id", projectId)
+      .single();
+    // £10 cap at 0.79 GBP/USD: $13 of usage is over it.
+    await (db as ReturnType<typeof adminClient>).from("ai_usage").insert({
+      workspace_id: p!.workspace_id,
+      project_id: projectId,
+      stage: "ethics",
+      step: "ethics",
+      model: "claude-haiku-5-5",
+      input_tokens: 0,
+      output_tokens: 0,
+      cost_usd: 13,
+      duration_ms: 1,
+      success: true,
+    } as never);
+    expect(await runResearch(db, runId)).toBe("paused");
+    const paused = await admin.client.from("stage_runs").select("status").eq("id", runId).single();
+    expect(paused.data!.status).toBe("paused_cost");
+
+    const { error } = await admin.client.rpc("confirm_over_cap", { p_run: runId });
+    expect(error).toBeNull();
+    expect(await runResearch(db, runId)).toBe("succeeded");
+    const { data: events } = await admin.client
+      .from("run_events")
+      .select("kind")
+      .eq("stage_run_id", runId);
+    expect(events!.map((e) => e.kind)).toEqual(expect.arrayContaining(["paused_cost", "resumed"]));
   });
 });

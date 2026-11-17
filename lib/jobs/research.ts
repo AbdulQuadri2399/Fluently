@@ -7,8 +7,10 @@ import {
   type ModelPrices,
   type StageModels,
 } from "@/lib/ai/models";
+import { toGbp } from "@/lib/ai/cost";
 import {
   findingsSchema,
+  questionsSchema,
   synthesisSchema,
   type FindingsOutput,
   type SynthesisOutput,
@@ -111,7 +113,7 @@ export async function runResearch(
   db: Db,
   runId: string,
   opts: { stepDelayMs?: number; now?: () => number; deps?: ResearchDeps } = {},
-): Promise<"succeeded" | "partial" | "cancelled" | "failed"> {
+): Promise<"succeeded" | "partial" | "cancelled" | "failed" | "paused"> {
   const now = opts.now ?? Date.now;
   const deps = opts.deps ?? fakeResearchDeps();
   const backoff = deps.backoffMs ?? [1000, 3000];
@@ -119,16 +121,32 @@ export async function runResearch(
   if (!run) throw new Error(`stage run ${runId} not found`);
   if (run.status === "cancelled") return "cancelled";
   const started = run.started_at ? new Date(run.started_at).getTime() : now();
-  if (!run.started_at) {
-    await db
-      .from("stage_runs")
-      .update({ status: "running", started_at: new Date(started).toISOString() })
-      .eq("id", runId)
-      .eq("status", "queued");
-  }
   const projectId = run.project_id;
   const workspaceId = run.workspace_id;
   const steps = (run.steps as Step[]).map((s) => ({ ...s }));
+  // AC11.10: the activity log members can open while research runs.
+  async function logEvent(kind: string, step: string | null = null, count: number | null = null) {
+    await db.from("run_events").insert({
+      workspace_id: workspaceId,
+      project_id: projectId,
+      stage_run_id: runId,
+      kind,
+      step,
+      count,
+    });
+  }
+  // Queued → running; a run resumed after a budget pause keeps its start time.
+  await db
+    .from("stage_runs")
+    .update({ status: "running", started_at: new Date(started).toISOString() })
+    .eq("id", runId)
+    .eq("status", "queued");
+  const { count: pauses } = await db
+    .from("run_events")
+    .select("id", { count: "exact", head: true })
+    .eq("stage_run_id", runId)
+    .eq("kind", "paused_cost");
+  if (pauses) await logEvent("resumed");
   const runIds = run.retry_of ? [runId, run.retry_of] : [runId];
   const saveSteps = () =>
     db
@@ -152,11 +170,36 @@ export async function runResearch(
       .eq("id", projectId);
     return status;
   };
+  // AC27.4: before each AI step, stop if the project has used its AI budget, unless a member
+  // confirmed going over for this run. The step in progress always finishes first.
+  const overCap = async () => {
+    const [{ data: p }, { data: usage }, { data: latest }] = await Promise.all([
+      db
+        .from("projects")
+        .select("cost_cap_override_gbp, workspaces(cost_cap_gbp, gbp_per_usd)")
+        .eq("id", projectId)
+        .single(),
+      db.from("ai_usage").select("cost_usd").eq("project_id", projectId),
+      db.from("stage_runs").select("over_cap_confirmed_at").eq("id", runId).single(),
+    ]);
+    if (latest?.over_cap_confirmed_at) return false;
+    const w = (Array.isArray(p?.workspaces) ? p?.workspaces[0] : p?.workspaces) ?? null;
+    const cap = Number(p?.cost_cap_override_gbp ?? w?.cost_cap_gbp ?? 10);
+    const usd = (usage ?? []).reduce((sum, u) => sum + Number(u.cost_usd), 0);
+    return toGbp(usd, Number(w?.gbp_per_usd ?? 0.79)) >= cap;
+  };
   const checkpoint = async () => {
     const { data: latest } = await db.from("stage_runs").select("status").eq("id", runId).single();
     if (latest?.status === "cancelled") return "cancelled" as const;
     if (now() - started > RUN_TIMEOUT_MS) return "timeout" as const;
+    if (await overCap()) return "paused" as const;
     return null;
+  };
+  const pause = async () => {
+    await db.from("stage_runs").update({ status: "paused_cost" }).eq("id", runId);
+    await db.from("projects").update({ status: "waiting" }).eq("id", projectId);
+    await logEvent("paused_cost");
+    return "paused" as const;
   };
 
   // Context: brief, workspace settings, pinned toolkit, objective cards.
@@ -188,6 +231,47 @@ export async function runResearch(
   ]
     .filter(Boolean)
     .join(". ");
+
+  // ---- Research questions (AC11.9): written once per run from the objectives, then used by search. ----
+  let questions = ((run.questions ?? []) as string[]).filter(Boolean);
+  if (!questions.length) {
+    const stop = await checkpoint();
+    if (stop === "cancelled") return finish("cancelled");
+    if (stop === "timeout") return finish("failed", "timeout");
+    if (stop === "paused") return pause();
+    try {
+      const out = await deps.ai.generate({
+        workspaceId,
+        projectId,
+        stage: "research",
+        step: "questions",
+        system:
+          "Write 3 to 6 research questions that would tell us why people do or don't do the behaviour in the brief, and what would change it. Plain English, one sentence each.",
+        prompt: `Business objective: ${intake?.business_objective ?? ""}\nBehavioural objective: ${intake?.behavioural_objective ?? ""}\nAudience: ${intake?.audience_context ?? ""}`,
+        schema: questionsSchema,
+        settings,
+        input: {
+          business: intake?.business_objective ?? "",
+          behavioural: intake?.behavioural_objective ?? "",
+        },
+        maxTokens: 1000,
+      });
+      questions = out.questions;
+      await db
+        .from("stage_runs")
+        .update({ questions: questions as unknown as NonNullable<Json> })
+        .eq("id", runId);
+      await logEvent("questions", null, questions.length);
+    } catch {
+      // Questions help steer search; research carries on from the brief without them.
+      questions = [];
+    }
+  }
+  // Fake mode only: the failure marker in the brief still reaches the papers search.
+  const paperQuery =
+    (questions[0] ?? brief ?? "behaviour change") +
+    (brief.includes(FAKE_FAIL_PAPERS) ? ` ${FAKE_FAIL_PAPERS}` : "");
+  const webQuery = questions.length ? questions.join(" | ") : brief;
 
   // One Evidence card for research; a re-run reuses it.
   const groups: EvidenceGroup[] = GROUPS.map((g) => ({
@@ -310,7 +394,9 @@ export async function runResearch(
     const stop = await checkpoint();
     if (stop === "cancelled") return finish("cancelled");
     if (stop === "timeout") return finish("failed", "timeout");
+    if (stop === "paused") return pause();
     step.status = "running";
+    await logEvent("started", step.key);
     const group = groups.find((g) => g.key === step.key);
     if (group) group.status = "running";
     await saveSteps();
@@ -376,7 +462,7 @@ export async function runResearch(
         }
         stored = await insertSources("client_data", rows);
       } else if (step.key === "papers") {
-        const papers = await withRetries(() => deps.papers(brief || "behaviour change"), backoff);
+        const papers = await withRetries(() => deps.papers(paperQuery), backoff);
         stored = await insertSources(
           "papers",
           papers.map((p) => ({
@@ -396,7 +482,7 @@ export async function runResearch(
         );
       } else {
         const kind = step.key as "web" | "competitors" | "reviews";
-        const results = await withRetries(() => deps.web(kind, brief), backoff);
+        const results = await withRetries(() => deps.web(kind, webQuery), backoff);
         stored = await insertSources(
           kind,
           results.map((r) => ({
@@ -421,9 +507,18 @@ export async function runResearch(
       step.status = "done";
       step.count = step.key === "toolkit" ? stored.length : (group?.count ?? stored.length);
       if (group) group.status = "done";
+      await logEvent("found", step.key, stored.length);
+      if (step.key === "papers") {
+        const kept = stored.filter(
+          (x) => (x.meta as { hasAbstract?: boolean })?.hasAbstract !== false,
+        ).length;
+        await logEvent("kept", step.key, kept);
+      }
+      await logEvent("done", step.key);
     } catch {
       step.status = "failed";
       if (group) group.status = "failed";
+      await logEvent("failed", step.key);
     }
     await saveSteps();
     await saveCard();
@@ -458,8 +553,10 @@ export async function runResearch(
     const stop = await checkpoint();
     if (stop === "cancelled") return finish("cancelled");
     if (stop === "timeout") return finish("failed", "timeout");
+    if (stop === "paused") return pause();
     findStep.status = "running";
     await saveSteps();
+    await logEvent("started", "findings");
     let out: FindingsOutput;
     try {
       out = await deps.ai.generate({
@@ -469,7 +566,7 @@ export async function runResearch(
         step: "findings",
         system:
           "Extract findings from the sources. Each finding cites the handles (like S3) of the sources it rests on. If a finding rests on no source, mark aiInference true. Never cite anything not listed.",
-        prompt: `Brief: ${brief}\n\nSources:\n${usable.map((s) => `${s.handle} [${s.source_type}] ${s.title}: ${s.excerpt ?? ""}`).join("\n")}`,
+        prompt: `Brief: ${brief}\n\nResearch questions:\n${questions.join("\n")}\n\nSources:\n${usable.map((s) => `${s.handle} [${s.source_type}] ${s.title}: ${s.excerpt ?? ""}`).join("\n")}`,
         schema: findingsSchema,
         settings,
         input: { sources: usable.map((s) => ({ handle: s.handle, type: s.source_type })) },
@@ -478,12 +575,15 @@ export async function runResearch(
     } catch (e) {
       findStep.status = "failed";
       await saveSteps();
+      await logEvent("failed", "findings");
       return finish("failed", e instanceof AiError ? `findings_${e.code}` : "findings");
     }
     const checked = checkCitations(
       out.findings,
       usable.map((s) => s.handle),
     );
+    if (checked.rejectedHandles.length)
+      await logEvent("dropped", "findings", checked.rejectedHandles.length);
     if (checked.rejectedHandles.length) {
       await db.from("events").insert({
         workspace_id: workspaceId,
@@ -553,6 +653,8 @@ export async function runResearch(
     findStep.status = "done";
     findStep.count = findingNodes.length;
     await saveSteps();
+    await logEvent("found", "findings", findingNodes.length);
+    await logEvent("done", "findings");
   } else {
     const { data: existing } = await db
       .from("nodes")
@@ -579,8 +681,10 @@ export async function runResearch(
     const stop = await checkpoint();
     if (stop === "cancelled") return finish("cancelled");
     if (stop === "timeout") return finish("failed", "timeout");
+    if (stop === "paused") return pause();
     synthStep.status = "running";
     await saveSteps();
+    await logEvent("started", "synthesis");
     let out: SynthesisOutput;
     const paperHandle = (allSources ?? []).find((s) => s.source_type === "paper")?.handle ?? null;
     try {
@@ -590,7 +694,7 @@ export async function runResearch(
         stage: "research",
         step: "synthesis",
         system:
-          "Group the findings into themes (by index), then up to 8 opportunities (by theme index), each with candidate principles chosen only from the listed toolkit keys. For opportunities with weak or conflicting evidence, give the open question and a method from the listed services or 'Desk research'. List principles from sources that aren't in the toolkit as external principles.",
+          "Group the findings into themes (by index), then up to 8 opportunities (by theme index), each with candidate principles chosen only from the listed toolkit keys. For opportunities with weak or conflicting evidence, give the open question, a method from the listed services or 'Desk research', and whether answering it needs discovery research (confirm or measure what we think is happening) or generative research (explore needs and reasons we don't yet understand). List principles from sources that aren't in the toolkit as external principles.",
         prompt: `Brief: ${brief}${run.feedback ? `\n\nThe team sent this back with feedback: ${run.feedback}` : ""}\n\nFindings:\n${findingNodes.map((f, i) => `${i}. ${f.text} [${f.handles.join(", ") || "AI inference"}]`).join("\n")}\n\nToolkit keys: ${principleKeys.join(", ")}\nServices: ${services.join(", ")}`,
         schema: synthesisSchema,
         settings,
@@ -606,6 +710,7 @@ export async function runResearch(
       // AC11.6: findings and sources are kept; Retry synthesis re-runs only this step.
       synthStep.status = "failed";
       await saveSteps();
+      await logEvent("failed", "synthesis");
       return finish("failed", e instanceof AiError ? `synthesis_${e.code}` : "synthesis");
     }
 
@@ -623,6 +728,16 @@ export async function runResearch(
         themeIds.push("");
         continue;
       }
+      // AC12.11: theme strength uses the same rule as opportunity confidence.
+      const themeHandles = [...new Set(linked.flatMap((f) => f.handles))];
+      const strength = confidence({
+        sources: themeHandles.map((h) => ({
+          id: idOf.get(h) ?? h,
+          type: typeOf.get(h) ?? "desk",
+        })),
+        aiInference: linked.some((f) => f.aiInference),
+        contradicts: linked.some((f) => f.stance === "contradicts"),
+      });
       const { data: node } = await db
         .from("nodes")
         .insert({
@@ -631,7 +746,12 @@ export async function runResearch(
           type: "theme",
           stage: "research",
           title: t.title,
-          data: { summary: t.summary },
+          data: {
+            summary: t.summary,
+            confidenceReason: strength.reason,
+            sourceCount: themeHandles.length,
+          },
+          confidence: strength.level,
           provenance: "ai",
           stage_run_id: runId,
           sort_order: i,
@@ -711,7 +831,7 @@ export async function runResearch(
             type: "gap",
             stage: "research",
             title: o.gapQuestion ?? `What would confirm "${o.title}"?`,
-            data: { method, opportunity: node.id },
+            data: { method, kind: o.gapKind ?? "discovery", opportunity: node.id },
             provenance: "ai",
             stage_run_id: runId,
             sort_order: 100 + i,
@@ -744,6 +864,7 @@ export async function runResearch(
     synthStep.status = "done";
     synthStep.count = out.opportunities.length;
     await saveSteps();
+    await logEvent("done", "synthesis");
   }
 
   const anyFailed = steps.some((s) => s.status === "failed");
