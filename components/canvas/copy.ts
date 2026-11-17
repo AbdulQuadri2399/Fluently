@@ -93,6 +93,11 @@ export const canvasCopy = {
       low_contradict: "The sources disagree.",
     } as Record<string, string>,
   },
+  assets: {
+    split: "Split card",
+    hint: "Select screens, then split them into their own card. Drag a screen onto another assets card to move it.",
+    select: (name: string) => `Select ${name}`,
+  },
   addCardLater: "Adding cards by hand comes with editing, in a later build step.",
   intakeFirst: "Start with the intake. Your objectives will appear here.",
   lockedWhileRunning: (stage: string) =>

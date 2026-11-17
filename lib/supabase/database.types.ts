@@ -693,6 +693,9 @@ isOneToOne: false
 "is_member":
 { Args: { "ws": string }; Returns: boolean
                            },
+"move_assets":
+{ Args: { "p_project": string,"p_to": string,"p_uploads": (string)[] }; Returns: string
+                           },
 "record_override":
 { Args: { "p_node": string,"p_reason": string }; Returns: string
                            },

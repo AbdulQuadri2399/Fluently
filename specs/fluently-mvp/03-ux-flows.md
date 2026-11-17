@@ -434,6 +434,7 @@ Format: user action → system response → resulting state (ACs).
 | assets.defaultName | "Current assets" |
 | assets.count | "{n} screens" / "{n} emails" / "{n} assets" (mixed) |
 | assets.split | "Split card" |
+| assets.hint | "Select screens, then split them into their own card. Drag a screen onto another assets card to move it." *(added Slice 6, please confirm)* |
 | lane.addCard | "Add a card to {lane}" (accessible name of the + button) |
 | assets.uploadedBy | "Uploaded by {name}" |
 | canvas.cantConnect | "These two can't be connected. Lines run from one stage to the next." |

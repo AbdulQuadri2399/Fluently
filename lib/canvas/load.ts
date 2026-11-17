@@ -98,6 +98,21 @@ export async function loadTree(client: Client, projectId: string): Promise<Proje
     .select("default_toolkit_version_id")
     .eq("id", p.workspace_id)
     .single();
+  // AC22.10: Current assets cards show thumbnails, from short-lived private links.
+  const assets = new Map<string, { id: string; fileName: string; url: string | null }>();
+  if ((nodes ?? []).some((n) => n.type === "asset_set")) {
+    const { data: ups } = await client
+      .from("uploads")
+      .select("id, file_name, mime, storage_path")
+      .eq("project_id", projectId)
+      .eq("kind", "asset");
+    const images = (ups ?? []).filter((u) => u.mime.startsWith("image/"));
+    const signed = images.length
+      ? ((await client.storage.from("uploads").createSignedUrls(images.map((u) => u.storage_path), 3600)).data ?? [])
+      : [];
+    const urlOf = new Map(images.map((u, i) => [u.id, signed[i]?.signedUrl ?? null]));
+    for (const u of ups ?? []) assets.set(u.id, { id: u.id, fileName: u.file_name, url: urlOf.get(u.id) ?? null });
+  }
   return {
     project: {
       id: p.id,
@@ -115,7 +130,15 @@ export async function loadTree(client: Client, projectId: string): Promise<Proje
       type: n.type,
       stage: n.stage,
       title: n.title,
-      data: (n.data ?? {}) as Record<string, unknown>,
+      data:
+        n.type === "asset_set"
+          ? {
+              ...((n.data ?? {}) as Record<string, unknown>),
+              assets: (((n.data as { uploadIds?: string[] } | null)?.uploadIds ?? []) as string[])
+                .map((id) => assets.get(id))
+                .filter(Boolean),
+            }
+          : ((n.data ?? {}) as Record<string, unknown>),
       status: n.status,
       stale: n.stale,
       lowSpecificity: n.low_specificity,

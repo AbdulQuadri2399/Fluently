@@ -63,3 +63,8 @@ export async function retryResearch(projectId: string, runId: string, synthesisO
 export async function getNodeEvidence(nodeId: string) {
   return canvas.nodeEvidence(await createClient(), nodeId);
 }
+export async function moveAssets(projectId: string, uploadIds: string[], toNodeId: string | null) {
+  const res = await canvas.moveAssets(await createClient(), projectId, uploadIds, toNodeId);
+  revalidatePath(`/projects/${projectId}`, "layout");
+  return res;
+}

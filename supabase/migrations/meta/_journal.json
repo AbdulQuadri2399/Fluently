@@ -141,6 +141,13 @@
       "when": 1794922002981,
       "tag": "20261117132642_candidate_source_link",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1794922165644,
+      "tag": "20261117132925_asset_cards",
+      "breakpoints": true
     }
   ]
 }

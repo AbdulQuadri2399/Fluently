@@ -289,3 +289,25 @@ export async function nodeEvidence(client: Client, nodeId: string): Promise<Node
   }
   return { sources, external };
 }
+
+/** O36 split / move assets between Current assets cards (AC22.11). `toNodeId` null = split into a new card. */
+export async function moveAssets(
+  client: Client,
+  projectId: string,
+  uploadIds: string[],
+  toNodeId: string | null,
+): Promise<ActionResult<{ nodeId: string }>> {
+  const parsed = z.array(z.uuid()).min(1).max(20).safeParse(uploadIds);
+  if (!parsed.success) return fail("validation");
+  const { data, error } = await client.rpc("move_assets", {
+    p_project: projectId,
+    p_uploads: parsed.data,
+    p_to: toNodeId,
+  } as never);
+  if (error) {
+    if (error.code === "22023") return fail("validation");
+    if (error.code === "P0002") return fail("not_found");
+    return fail(error.code === "42501" ? "forbidden" : "unavailable");
+  }
+  return ok({ nodeId: data as string });
+}
