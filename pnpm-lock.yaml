@@ -27,7 +27,7 @@ importers:
         specifier: 2.119.0
         version: 2.119.0(@opentelemetry/api@1.10.0)
       '@xyflow/react':
-        specifier: ^13.0.1
+        specifier: 13.0.1
         version: 13.0.1(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       class-variance-authority:
         specifier: 0.7.1
