@@ -42,3 +42,4 @@ The user is a behavioural designer, not a developer. In every message to them:
 - Never commit the real Behavioural Design Toolkit; only `fixtures/toolkit/` (invented data).
 - Tests live in `tests/` and `e2e/`, never under `app/`.
 - Update 04 when a technical decision changes.
+- New ideas that aren't in the plan go to `specs/icebox.md` (with source and date), never straight into code.

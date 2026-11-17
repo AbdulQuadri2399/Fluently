@@ -321,4 +321,4 @@ Slice check: full suite and CI green; release checklist complete. **Stop for the
 ---
 
 ## Later (ideas not in scope)
-- (empty)
+Parked ideas live in the icebox: `specs/icebox.md`. Don't build anything from it until it's moved into 02 and this file.
