@@ -195,6 +195,17 @@ You'll be able to see: the Audit Report, the citation check table, cost warnings
 - [ ] T7.5 **Service test (user):** run 1–3 past briefs (OQ8) through research with the demo model preset; fill the results table in `scripts/success-test.md` — S — Refs: A1, A2, A3, NFR4, NFR11 — Depends on: T7.4
   Done when: results table filled; any fail recorded with the decision (iterate prompts before Slice 9, or continue).
 
+- [ ] T7.6 Report download: O28 Markdown + PDF from the report model; exporting / export failed states (moved from T13.3 on 2026-11-17 at the user's request) — M — Refs: AC15.4 — Depends on: T7.1
+  Done when: `tests/integration/O28-export.test.ts` 'Markdown and PDF contain same citations as report model' passes; SCR9 component tests for exporting/failed.
+- [ ] T7.7 Gaps by kind: gaps labelled Discovery / Generative in J2 synthesis; report gaps summary and grouping (icebox IB8) — S — Refs: AC13.5 — Depends on: T7.1
+  Done when: `tests/jobs/J2-research.test.ts` 'every gap has a kind' and SCR9 test 'gaps summary counts by kind' pass.
+- [ ] T7.8 Theme strength and one tag style: theme strength from the AC12.6 rule; pastel High green / Med amber / Low red tags on cards, details panel, decision panel and report (icebox IB7) — S — Refs: AC12.11, AC12.12 — Depends on: T6.6
+  Done when: `tests/unit/confidence.test.ts` 'theme strength' cases and `tests/components/StrengthTag.test.tsx` pass.
+- [ ] T7.9 Decision panel sizes: minimised / standard / expanded, choices kept, size remembered (icebox IB9) — S — Refs: AC25.5 — Depends on: T6.8
+  Done when: `tests/components/SCR8-sizes.test.tsx` 'selection survives minimise and expand' and 'size remembered' pass.
+- [ ] T7.10 Watch the research: AI writes research questions (stored on the run, used by search steps); activity log table written by J2; *See what it's doing* panel, live (icebox IB11, slim version) — M — Refs: AC11.9, AC11.10 — Depends on: T6.5
+  Done when: `tests/jobs/J2-research.test.ts` 'questions stored and used' and 'activity logged per step' pass; `tests/rls/activity.test.ts` two-user test passes; `e2e/activity.spec.ts` shows questions and log during a run.
+
 Slice check: suite green; report renders on seeded and live projects; A1–A3 results recorded. **Stop for the user** (go / iterate decision).
 
 ---
@@ -291,7 +302,7 @@ You'll be able to see: toolkit browser and enrichment review; Markdown and PDF d
   Done when: `tests/components/SCR11-browser.test.tsx` passes.
 - [ ] T13.2 Migration `principle_enrichments` + J7 + O32 + Enrichments tab; pending never used by stages — M — Refs: AC6.1–AC6.3 — Depends on: T13.1
   Done when: `tests/jobs/J7.test.ts` and `tests/integration/O32-enrichment.test.ts` ('pending not returned to stage prompts') pass.
-- [ ] T13.3 O28 export Markdown + PDF; exporting / export failed states — M — Refs: AC15.4 — Depends on: T7.1
+- [ ] T13.3 (moved to Slice 7 as T7.6 on 2026-11-17) O28 export Markdown + PDF; exporting / export failed states — M — Refs: AC15.4 — Depends on: T7.1
   Done when: `tests/integration/O28-export.test.ts` 'Markdown and PDF contain same citations as report model' passes; component tests for exporting/failed.
 
 Slice check: suite green. **Stop for the user.**

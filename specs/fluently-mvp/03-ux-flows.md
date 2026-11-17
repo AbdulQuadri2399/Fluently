@@ -148,7 +148,8 @@ Copy keys in `[brackets]` are written out in §7.
 | State | User sees | Can do |
 |---|---|---|
 | Ready to research | `[checkpoint.readyResearch]` | *Start research* |
-| Running | Stage name, step list with ✓ / spinner / ✕, elapsed time, cost so far | *Cancel* |
+| Running | Stage name, step list with ✓ / spinner / ✕, elapsed time, cost so far | *Cancel*, *See what it's doing* |
+| Activity (added 2026-11-17, AC11.10) | Side panel: research questions, then the activity log, newest at the bottom, live | Close; open again after the run |
 | Research checkpoint | "Choose the opportunities to pursue", list with checkboxes, confidence, gaps count | Approve, send back |
 | Nothing selected | Button disabled + `[checkpoint.selectAtLeastOne]` | Select |
 | Solutions checkpoint | Recommendations by opportunity, select/edit/add | Approve, send back |
@@ -157,18 +158,19 @@ Copy keys in `[brackets]` are written out in §7.
 | Send back form | Feedback (≥ 10 chars), checkbox *Also replace nodes people added or edited* (off) | *Send back* |
 | Partial failure / failed / cancelled | `[stage.partialFail]` / `[stage.failed]` / `[stage.cancelled]` | Retry |
 | Complete | `[checkpoint.complete]` + rating 1–5 (once) | Rate, close |
-| Collapsed | One line: next action | Expand |
+| Collapsed / minimised | One line: what's waiting, count, main action | *Show what's next*, *Expand* |
+| Expanded (added 2026-11-17, AC25.5) | Full height over the canvas, same content | *Minimise*, *Standard size* |
 
 ### SCR9 Audit Report
 | State | User sees | Can do |
 |---|---|---|
 | Loading | Skeleton paragraphs | — |
 | Not yet | `[report.notYet]` | Back to canvas |
-| Default | Sections per AC15.1, citation markers `[1]` linking to a source list; `AI inference` labels; low-confidence and low-specificity labels | Read, open citation, trace |
+| Default | Sections per AC15.1, citation markers `[1]` linking to a source list; `AI inference` labels; strength and confidence tags (AC12.12); low-specificity labels; gaps summary grouped Discovery / Generative (AC13.5) | Read, open citation, trace, *Download* (Markdown or PDF) |
 | Stale content | Banner `[report.hasStale]` | Go to canvas |
 | Citation check | Table of every citation with record and link | Open links |
-| Exporting (Should) | "Preparing your file…" | Wait |
-| Export failed (Should) | `[report.exportFailed]` | Retry |
+| Exporting | `[report.exporting]` | Wait |
+| Export failed | `[report.exportFailed]` | Retry |
 
 ### SCR10 Lo-fi preview
 | State | User sees | Can do |
@@ -648,6 +650,30 @@ Format: user action → system response → resulting state (ACs).
 | gap.status | "Open question · {method}" |
 | confidence.reasons | High: "Three or more sources of at least two kinds agree." · Med: "Two or more sources agree." / "Three or more sources, all of one kind." · Low: "Only one source." / "Only AI inference, no stored source." / "The sources disagree." |
 | checkpoint.solutionsNext | "Opportunities chosen. Solutions arrive in a later build step." (prototype only) |
+
+**Added for Slice 7 (2026-11-17, from icebox IB7–IB9, IB11 and the report download): please confirm this wording.**
+
+| Key | Text |
+|---|---|
+| activity.open | "See what it's doing" |
+| activity.title | "What Fluently is doing" |
+| activity.questions | "Research questions" |
+| activity.questionsHint | "Written from your objectives. Each search step uses them." |
+| activity.log | "Activity" |
+| activity.empty | "Nothing yet. Steps appear here as they start." |
+| activity.events | "{step} started" / "{step}: {n} found" / "{step}: {n} kept" / "{n} citations dropped: not in the search results" / "{step} done" / "{step} didn't work" |
+| activity.close | "Close" |
+| strength.tag | "{level} strength" (themes) · confidence keeps "{level} confidence" (opportunities) |
+| strength.levels | "High" / "Med" / "Low" |
+| gap.kind | "Discovery" / "Generative" |
+| gap.kindHint | Discovery: "Confirm or measure what we think is happening." · Generative: "Explore needs and reasons we don't yet understand." |
+| report.gapsSummary | "{n} open questions: {d} for discovery research, {g} for generative research." |
+| report.gapsNone | "No evidence gaps. Every opportunity has agreeing sources." |
+| report.download | "Download" |
+| report.downloadMarkdown / report.downloadPdf | "Markdown (.md)" / "PDF" |
+| report.exporting | "Preparing your file…" |
+| report.citationCheck | "Citation check" |
+| panel.minimise / panel.expand / panel.standard | "Minimise" / "Expand" / "Standard size" |
 
 **Turning things off and undoing:** deactivating a member, removing an allowlist entry, cancelling a stage, and undoing a delete all use `[common.saveFailed]` if they fail, and leave the previous state unchanged.
 

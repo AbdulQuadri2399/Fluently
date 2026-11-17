@@ -123,6 +123,8 @@ As a strategist, I want research to run on its own and show progress, so that I 
 - **AC11.6** IF synthesis itself fails after retries THEN THE SYSTEM SHALL mark the stage `failed`, keep all source and finding nodes, and offer *Retry synthesis* without re-running retrieval.
 - **AC11.7** WHEN the member chooses *Cancel* on a running stage THE SYSTEM SHALL stop further AI calls within 30 seconds, keep what's produced, and mark the stage `cancelled`.
 - **AC11.8** WHILE a stage is running THE SYSTEM SHALL prevent edits to that stage's nodes and to the nodes it is built from, and say why `[copy: canvas.lockedWhileRunning]`.
+- **AC11.9** WHEN research starts THE SYSTEM SHALL have the AI write 3–6 research questions from the behavioural and business objectives, store them on the stage run, and use them to steer the search steps. *(Added 2026-11-17 from icebox IB11.)*
+- **AC11.10** WHILE research runs, and after it ends, THE SYSTEM SHALL let the member open *See what it's doing*: the research questions, then a time-ordered activity log (step started, sources found, sources kept, citations dropped by the citation check, step done or failed), updated live. *(Added 2026-11-17 from icebox IB11.)*
 
 ### US12: Sourced findings, themes and opportunities (Must) — JS2, JS3
 As a strategist, I want findings grouped into themes and opportunities, each linked to its sources with a confidence rating, so that I can trust and choose.
@@ -135,6 +137,8 @@ As a strategist, I want findings grouped into themes and opportunities, each lin
 - **AC12.7** WHEN a member opens a finding, theme or opportunity THE SYSTEM SHALL show its sources with links, the confidence and the reason for it.
 - **AC12.8** WHEN a member opens *Citation check* on the Audit Report THE SYSTEM SHALL list every citation with its stored record and a link, so 20 can be spot-checked (NFR4).
 - **AC12.10** WHEN a member adds a source from the Evidence card (upload or link) after research THE SYSTEM SHALL store it as a source, mark themes built from Evidence as Out of date, and offer *Regenerate stale*. *(Added 2026-11-17.)*
+- **AC12.11** THE SYSTEM SHALL give each theme a strength of High, Med or Low using the AC12.6 rule over the sources of its findings, computed in code, and show the reason as for opportunities. *(Added 2026-11-17 from icebox IB7.)*
+- **AC12.12** WHEREVER confidence or strength is shown (cards, details panel, decision panel, Audit Report) THE SYSTEM SHALL use the same pastel tags: High green, Med amber, Low red, each with its word so colour is never the only signal. *(Added 2026-11-17 from icebox IB7.)*
 - **AC12.9** WHERE a principle from research is not in the toolkit THE SYSTEM SHALL show it as `External principle, not yet in toolkit` with its source, and add it to a "Toolkit candidates" list in SCR11 for the team's Pending Insights review.
 
 ### US13: Evidence gaps (Must) — JS2, JS5
@@ -143,6 +147,7 @@ As a strategist, I want to see where evidence is weak and what would answer it, 
 - **AC13.2** IF an opportunity is Med or High and its sources agree THEN THE SYSTEM SHALL not create a gap for it.
 - **AC13.3** THE SYSTEM SHALL choose methods only from the workspace's agency services list (admin-editable; seeded with "Implicit response test (IRT)" and "Behavioural interviews") or `Desk research`.
 - **AC13.4** WHILE an opportunity is Low confidence THE SYSTEM SHALL keep it selectable and show `Low confidence` on it and everything built from it.
+- **AC13.5** WHEN a gap is created THE SYSTEM SHALL label it *Discovery* (to confirm or measure what we think is happening) or *Generative* (to explore needs and reasons we don't yet understand); the Audit Report SHALL open its gaps section with a summary (number of gaps, how many of each kind, the methods suggested) and group the gaps under those two headings, each with its open question, method and the opportunity it affects. *(Added 2026-11-17 from icebox IB8.)*
 
 ### US14: Choose opportunities (Must) — JS2
 As a strategist, I want to pick which opportunities to pursue, so that solutions focus where I judge best.
@@ -155,7 +160,7 @@ As a strategist, I want the research as a readable report, so that I can review 
 - **AC15.1** WHEN research completes THE SYSTEM SHALL generate the Audit Report view (SCR9) from the graph: summary, objectives (with any low-specificity flag), sources by type with counts, themes, opportunities with confidence, evidence gaps, ethics result and any overrides, toolkit version.
 - **AC15.2** THE SYSTEM SHALL show every claim in the report with an inline citation marker linking to its source record or the label `AI inference`.
 - **AC15.3** WHEN graph nodes change THE SYSTEM SHALL reflect the change in the report on next open (the report is a view, not a copy).
-- **AC15.4** (Should) WHEN a member exports the report THE SYSTEM SHALL produce Markdown and PDF files with the same content and citations as SCR9.
+- **AC15.4** (Should; moved into Slice 7 on 2026-11-17 at the user's request) WHEN a member exports the report THE SYSTEM SHALL produce Markdown and PDF files with the same content and citations as SCR9.
 
 ---
 
@@ -259,6 +264,7 @@ As a strategist, I want to draw or remove lines between cards, so that the tree 
 - **AC25.2** WHEN the member sends back with feedback (≥ 10 characters) THE SYSTEM SHALL re-run the stage with that feedback, keep the previous output in history, and keep human-added and human-edited nodes unless the member chooses to replace them.
 - **AC25.3** THE SYSTEM SHALL record every checkpoint decision (stage, decision, feedback, who, when) and show it in the project history.
 - **AC25.4** WHILE a checkpoint is waiting THE SYSTEM SHALL show the project as `waiting for you` on SCR3.
+- **AC25.5** THE SYSTEM SHALL let the member switch the checkpoint panel between three sizes: *minimised* (one line: what's waiting and the main action), *standard*, and *expanded* (full height of the canvas, for reading); choices and typed feedback SHALL survive switching, and the size SHALL be remembered per member. *(Added 2026-11-17 from icebox IB9.)*
 
 ### US26: Override a flag with a reason (Must) — JS6
 - **AC26.1** WHEN a member overrides any ethics flag (gate, recommendation or variant) THE SYSTEM SHALL require a written reason of ≥ 20 characters and record it with who and when.
