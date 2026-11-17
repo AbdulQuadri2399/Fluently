@@ -96,6 +96,12 @@ function EditForm({
 }
 
 export type HistoryItem = { change: string; at: string; by: string };
+export type NodeEvidenceView = {
+  sources: { id: string; title: string; url: string | null; type: string; handle: string }[];
+  external: { name: string; mechanism: string | null; sourceTitle: string }[];
+};
+
+const RESEARCH_TYPES = new Set(["finding", "theme", "opportunity", "gap"]);
 
 /** SCR7 details panel (AC22.5, AC11.8): type, title, properties, connections, history. Read-only until Slice 8. */
 export function Inspector({
@@ -105,6 +111,7 @@ export function Inspector({
   running,
   runningStage,
   loadHistory,
+  loadEvidence,
   onClose,
   onSelect,
   projectId,
@@ -117,6 +124,7 @@ export function Inspector({
   running: boolean;
   runningStage: string | null;
   loadHistory: (nodeId: string) => Promise<HistoryItem[]>;
+  loadEvidence?: (nodeId: string) => Promise<NodeEvidenceView>;
   onClose: () => void;
   onSelect: (id: string) => void;
   projectId?: string;
@@ -130,6 +138,17 @@ export function Inspector({
 }) {
   const [history, setHistory] = useState<HistoryItem[] | null>(null);
   const [editing, setEditing] = useState(false);
+  const [evidence, setEvidence] = useState<NodeEvidenceView | null>(null);
+  useEffect(() => {
+    if (!loadEvidence || !RESEARCH_TYPES.has(node.type)) return;
+    let live = true;
+    loadEvidence(node.id)
+      .then((e) => live && setEvidence(e))
+      .catch(() => live && setEvidence({ sources: [], external: [] }));
+    return () => {
+      live = false;
+    };
+  }, [node.id, node.type, loadEvidence]);
   const [savedAt, setSavedAt] = useState(0);
   useEffect(() => {
     let live = true;
@@ -267,6 +286,57 @@ export function Inspector({
               <span className="font-mono text-[12.5px] text-muted">
                 {g.status === "done" ? g.count : (c.stepStatus[g.status] ?? g.status)}
               </span>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+      {node.type === "opportunity" && node.confidence ? (
+        <p className="grid gap-0.5 rounded-sm bg-soft px-3 py-2 text-small">
+          <span className="font-medium">{c.checkpoint.confidenceLabel(node.confidence)}</span>
+          <span className="text-muted">
+            {c.labels.confidenceReason[
+              (node.data as { confidenceReason?: string }).confidenceReason ?? ""
+            ] ?? ""}
+          </span>
+        </p>
+      ) : null}
+      {node.type === "finding" ? <p className="text-small text-muted">{v.status}</p> : null}
+      {evidence?.sources.length ? (
+        <details open className="grid gap-2">
+          <summary className="cursor-pointer text-small font-medium">{c.inspector.sources}</summary>
+          <ul className="mt-2 grid gap-1.5 text-small">
+            {evidence.sources.map((s) => (
+              <li key={s.id} className="flex gap-2">
+                <span className="font-mono text-[11px] text-muted">{s.handle}</span>
+                {s.url ? (
+                  <a
+                    href={s.url}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="hover:underline"
+                  >
+                    {s.title}
+                  </a>
+                ) : (
+                  <span>{s.title}</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </details>
+      ) : null}
+      {evidence?.external.length ? (
+        <ul className="grid gap-1.5 text-small">
+          {evidence.external.map((e) => (
+            <li key={e.name} className="grid gap-0.5 rounded-sm border border-line px-3 py-2">
+              <span className="text-caption font-medium text-info">{c.labels.external}</span>
+              <span>
+                {e.name}
+                {e.mechanism ? ` · ${e.mechanism}` : ""}
+              </span>
+              {e.sourceTitle ? (
+                <span className="text-caption text-muted">{e.sourceTitle}</span>
+              ) : null}
             </li>
           ))}
         </ul>

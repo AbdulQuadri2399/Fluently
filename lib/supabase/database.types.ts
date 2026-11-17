@@ -572,6 +572,12 @@ isOneToOne: false
       referencedRelation: "projects"
       referencedColumns: ["id"]
     },{
+      foreignKeyName: "toolkit_candidates_source_id_sources_id_fk"
+      columns: ["source_id"]
+isOneToOne: false
+      referencedRelation: "sources"
+      referencedColumns: ["id"]
+    },{
       foreignKeyName: "toolkit_candidates_workspace_id_workspaces_id_fk"
       columns: ["workspace_id"]
 isOneToOne: false

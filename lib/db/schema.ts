@@ -477,7 +477,9 @@ export const toolkitCandidates = pgTable(
       .references(() => projects.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
     mechanism: text("mechanism"),
-    sourceId: uuid("source_id").notNull(),
+    sourceId: uuid("source_id")
+      .notNull()
+      .references((): AnyPgColumn => sources.id, { onDelete: "cascade" }),
     ...timestamps(),
   },
   (t) => [

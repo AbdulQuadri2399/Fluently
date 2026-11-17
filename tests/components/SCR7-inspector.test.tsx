@@ -200,4 +200,106 @@ describe("SCR7 details panel", () => {
       "true",
     );
   });
+
+  describe("research labels (AC12.4, AC12.7, AC12.9)", () => {
+    const evidence = vi.fn(async () => ({
+      sources: [
+        {
+          id: "x",
+          title: "The goal-gradient hypothesis resurrected",
+          url: "https://doi.org/10.1509/jmkr.43.1.39",
+          type: "paper",
+          handle: "S1",
+        },
+      ],
+      external: [
+        {
+          name: "Endowed progress",
+          mechanism: "Motivation",
+          sourceTitle: "The goal-gradient hypothesis resurrected",
+        },
+      ],
+    }));
+    const show = (n: TreeNode) =>
+      render(
+        <Inspector
+          node={n}
+          nodes={[n]}
+          edges={[]}
+          running={false}
+          runningStage={null}
+          loadHistory={history}
+          loadEvidence={evidence}
+          onClose={vi.fn()}
+          onSelect={vi.fn()}
+        />,
+      );
+
+    it("sources with links", async () => {
+      show(
+        node({
+          id: "f1",
+          type: "finding",
+          title: "People speed up near the goal",
+          data: { sources: ["S1"] },
+        }),
+      );
+      const link = await screen.findByRole("link", {
+        name: "The goal-gradient hypothesis resurrected",
+      });
+      expect(link).toHaveAttribute("href", "https://doi.org/10.1509/jmkr.43.1.39");
+    });
+
+    it("confidence and its reason", () => {
+      show(
+        node({
+          id: "o1",
+          type: "opportunity",
+          title: "Explain where the ID photo goes",
+          confidence: "Low",
+          data: { confidenceReason: "low_single" },
+        }),
+      );
+      expect(screen.getAllByText("Low confidence").length).toBeGreaterThan(0);
+      expect(screen.getByText(c.labels.confidenceReason.low_single!)).toBeInTheDocument();
+    });
+
+    it("Qualitative signal · n sources", () => {
+      show(
+        node({
+          id: "f2",
+          type: "finding",
+          title: "Reviews mention the photo step",
+          data: { sources: ["S7", "S8"], socialCount: 2 },
+        }),
+      );
+      expect(screen.getAllByText(c.labels.qualitative(2)).length).toBeGreaterThan(0);
+    });
+
+    it("AI inference", () => {
+      show(
+        node({
+          id: "f3",
+          type: "finding",
+          title: "Maybe a trust issue",
+          data: { sources: [], aiInference: true },
+        }),
+      );
+      expect(screen.getAllByText(c.labels.aiInference).length).toBeGreaterThan(0);
+    });
+
+    it("External principle, not yet in toolkit", async () => {
+      show(
+        node({
+          id: "o2",
+          type: "opportunity",
+          title: "Show progress",
+          confidence: "High",
+          data: { confidenceReason: "high_multi_type" },
+        }),
+      );
+      expect(await screen.findByText(c.labels.external)).toBeInTheDocument();
+      expect(screen.getByText("Endowed progress · Motivation")).toBeInTheDocument();
+    });
+  });
 });

@@ -10,7 +10,7 @@ import type { ProjectTree } from "@/lib/canvas/load";
 import { AddSourceDialog, type AddSourceFns } from "./AddSourceDialog";
 import { barState, CheckpointBar } from "./CheckpointBar";
 import { canvasCopy as c } from "./copy";
-import { Inspector, type HistoryItem } from "./Inspector";
+import { Inspector, type HistoryItem, type NodeEvidenceView } from "./Inspector";
 import { ListView } from "./ListView";
 import { TreeCanvas } from "./TreeCanvas";
 
@@ -20,6 +20,7 @@ export type CanvasActions = {
   reorderNodes: (projectId: string, ids: string[]) => Promise<ActionResult>;
   getNodeHistory: (nodeId: string) => Promise<HistoryItem[]>;
   addSource?: AddSourceFns;
+  getNodeEvidence?: (nodeId: string) => Promise<NodeEvidenceView>;
   approveResearch?: (
     projectId: string,
     selection: string[],
@@ -143,6 +144,7 @@ export function ProjectCanvas({ tree, actions }: { tree: ProjectTree; actions: C
           running={ethicsRunning}
           runningStage={active ? (run?.stage ?? null) : null}
           loadHistory={actions.getNodeHistory}
+          loadEvidence={actions.getNodeEvidence}
           onClose={() => setParam("node", null)}
           onSelect={(id) => setParam("node", id)}
           projectId={tree.project.id}

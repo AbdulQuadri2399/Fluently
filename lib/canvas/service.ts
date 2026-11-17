@@ -224,3 +224,68 @@ export async function addSource(
       .in("id", [...stale]);
   return ok({ sourceId: src.id });
 }
+
+export type NodeEvidence = {
+  sources: { id: string; title: string; url: string | null; type: string; handle: string }[];
+  external: { name: string; mechanism: string | null; sourceTitle: string }[];
+};
+
+/** AC12.7, AC12.9: the stored sources behind a finding, theme or opportunity, and external principles. */
+export async function nodeEvidence(client: Client, nodeId: string): Promise<NodeEvidence> {
+  const { data: node } = await client
+    .from("nodes")
+    .select("id, project_id, type, data")
+    .eq("id", nodeId)
+    .maybeSingle();
+  if (!node) return { sources: [], external: [] };
+  // Walk upstream to the findings this card rests on.
+  const findingIds = new Set<string>();
+  let frontier = [node.id];
+  const seen = new Set(frontier);
+  while (frontier.length) {
+    const { data: ups } = await client.from("nodes").select("id, type").in("id", frontier);
+    for (const u of ups ?? []) if (u.type === "finding") findingIds.add(u.id);
+    const { data: edges } = await client.from("edges").select("from_id").in("to_id", frontier);
+    frontier = (edges ?? []).map((e) => e.from_id).filter((id) => !seen.has(id));
+    frontier.forEach((id) => seen.add(id));
+    if (seen.size > 500) break;
+  }
+  const { data: findings } = findingIds.size
+    ? await client
+        .from("nodes")
+        .select("data, stage_run_id")
+        .in("id", [...findingIds])
+    : { data: [] };
+  const handles = new Set(
+    (findings ?? []).flatMap((f) => (f.data as { sources?: string[] }).sources ?? []),
+  );
+  const { data: rows } = handles.size
+    ? await client
+        .from("sources")
+        .select("id, title, url, source_type, handle, created_at")
+        .eq("project_id", node.project_id)
+        .in("handle", [...handles])
+        .order("created_at", { ascending: false })
+    : { data: [] };
+  const byHandle = new Map<string, NonNullable<typeof rows>[number]>();
+  for (const r of rows ?? []) if (!byHandle.has(r.handle)) byHandle.set(r.handle, r); // latest run wins
+  const sources = [...byHandle.values()].map((r) => ({
+    id: r.id,
+    title: r.title,
+    url: r.url,
+    type: r.source_type,
+    handle: r.handle,
+  }));
+  let external: NodeEvidence["external"] = [];
+  if (node.type === "opportunity") {
+    const { data: cands } = await client
+      .from("toolkit_candidates")
+      .select("name, mechanism, source:sources(title)")
+      .eq("project_id", node.project_id);
+    external = (cands ?? []).map((c) => {
+      const s = Array.isArray(c.source) ? c.source[0] : c.source;
+      return { name: c.name, mechanism: c.mechanism, sourceTitle: s?.title ?? "" };
+    });
+  }
+  return { sources, external };
+}

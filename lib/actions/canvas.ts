@@ -60,3 +60,6 @@ export async function retryResearch(projectId: string, runId: string, synthesisO
   revalidatePath(`/projects/${projectId}`, "layout");
   return res;
 }
+export async function getNodeEvidence(nodeId: string) {
+  return canvas.nodeEvidence(await createClient(), nodeId);
+}

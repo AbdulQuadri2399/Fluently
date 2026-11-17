@@ -128,6 +128,7 @@ export const canvasCopy = {
       string
     >,
     connected: "Connected to",
+    sources: "Sources",
     history: "History",
     historyNames: {
       created: "Created",

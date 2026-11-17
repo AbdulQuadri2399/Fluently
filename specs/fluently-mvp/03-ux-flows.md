@@ -621,7 +621,8 @@ Format: user action → system response → resulting state (ACs).
 | card.markers | "Out of date" / "Low specificity" / "Failed" / "Running" / "Flagged" / "Overridden" |
 | inspector.props | "Type" / "Stage" / "Made by" / "Model" / "Status" / "Created" |
 | inspector.madeBy | "AI" / "AI, edited by a person" / "A person" |
-| inspector.sections | "Connected to" / "History" |
+| inspector.sections | "Connected to" / "Sources" / "History" |
+| inspector.external | "External principle, not yet in toolkit" |
 | inspector.history | "Created" / "Edited" / "Regenerated" / "Merged" / "Deleted" / "Restored" |
 | inspector.close | "Close details" |
 | checkpoint.goToBrief | "Go to brief" |
