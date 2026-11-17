@@ -10,4 +10,10 @@ export const easing = {
 export const mi = {
   /** MI12: any button press. Omitted under reduced motion. */
   press: "transition-transform duration-fast ease-standard active:scale-[0.98]",
+  /** MI1: a suggestion appears under the field (fade + 8 px rise). */
+  suggestionIn: "animate-in fade-in-0 slide-in-from-bottom-2 duration-base ease-emphasis",
+  /** MI1 with reduced motion: fade only, quickly. */
+  suggestionInReduced: "animate-in fade-in-0 duration-fast",
+  /** MI11: badge swaps to "Overridden". */
+  badgeSwap: "animate-in fade-in-0 duration-fast",
 } as const;

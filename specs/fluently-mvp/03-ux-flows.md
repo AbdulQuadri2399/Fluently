@@ -560,6 +560,37 @@ Format: user action → system response → resulting state (ACs).
 | toolkit.versionLabel / toolkit.default | "Version {n}" / "Default" |
 | toolkit.pin | "Toolkit v{n}" / "newer v{n} available" (project header, EC1) |
 
+**Added during the build (Slice 4, 2026-11-17): please confirm this wording.** Brief (SCR6).
+
+| Key | Copy |
+|---|---|
+| intake.title | "Brief" |
+| intake.businessLabel / intake.businessHelp | "Business objective" / "What the client wants to change, with a number. For example: raise completed sign-ups by 15% in 3 months." |
+| intake.behaviouralLabel / intake.behaviouralHelp | "Behavioural objective" / "Who does what, and when. For example: new customers upload their ID within their first day." |
+| intake.audienceLabel / intake.audienceHelp | "Audience and context" / "Who they are, and the moment they meet this design." |
+| intake.constraintsLabel / intake.constraintsHelp | "Constraints (optional)" / "Brand, design system, regulation, anything that can't change." |
+| intake.sectorLabel / intake.sectorPlaceholder / intake.sectorOther | "Sector" / "Choose a sector" / "Which sector?" |
+| intake.assetsLabel | "Current assets" |
+| intake.assetsHelpScreens / intake.assetsHelpEmail | "Screenshots of the screens you're optimising. PNG, JPG or WebP up to 10 MB, up to 20 files." / "The emails you're optimising: HTML or EML files, or screenshots. Up to 10 MB each, up to 20 files." |
+| intake.figmaLabel | "Figma link (optional)" |
+| intake.clientDataLabel / intake.clientDataHelp | "Client data (optional)" / "Reviews, support tickets, analytics exports. CSV, TXT, PDF or XLSX up to 20 MB, up to 10 files." |
+| intake.addFiles / intake.uploading / intake.removeFile | "Add files" / "Uploading…" / "Remove {file}" |
+| intake.coachLoading | "Looking for a sharper version…" |
+| intake.suggested / intake.why | "Suggested" / "Why: {reason}" |
+| intake.useSuggestion / intake.editSuggestion / intake.keepMine | "Use suggestion" / "Edit suggestion" / "Keep mine" |
+| intake.lowSpecificity | "Low specificity" |
+| intake.saving / intake.saved / common.tryAgain | "Saving…" / "Saved just now" / "Try again" |
+| intake.approve / intake.approving | "Approve objectives" / "Approving…" |
+| intake.approvedBy | "Approved by {name}, {time}" |
+| intake.editIntake / intake.editConfirm | "Edit intake" / "Edit anyway" |
+| ethics.checking | "Checking the brief against our ethics rules…" |
+| ethics.passed | "Ethics check passed" |
+| ethics.flaggedTitle | "The ethics check flagged this brief" |
+| ethics.editBrief / ethics.override | "Edit brief" / "Override with a reason" |
+| ethics.reasonLabel / ethics.reasonHelp | "Your reason" / "Recorded on the canvas with your name. At least 20 characters." |
+| ethics.recordOverride / ethics.overridden | "Record override" / "Overridden by {initials}" |
+| ethics.archive | "Archive project" |
+
 **Turning things off and undoing:** deactivating a member, removing an allowlist entry, cancelling a stage, and undoing a delete all use `[common.saveFailed]` if they fail, and leave the previous state unchanged.
 
 ## 8. Behavioural design notes (for Fluently's own interface)

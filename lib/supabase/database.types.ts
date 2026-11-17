@@ -634,6 +634,9 @@ isOneToOne: false
 "record_override":
 { Args: { "p_node": string,"p_reason": string }; Returns: string
                            },
+"retry_ethics":
+{ Args: { "p_project": string }; Returns: string
+                           },
 "save_toolkit_version":
 { Args: { "p_file_name": string,"p_principles": Json,"p_relations": Json,"p_warnings": Json }; Returns: {
               "version_id": string,"version_number": number

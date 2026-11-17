@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { channelNames, stageNames } from "@/components/projects/copy";
 import { toolkitCopy } from "@/components/toolkit/copy";
 import { toolkitPin } from "@/lib/toolkit/guard";
@@ -16,6 +16,9 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[id]"
     .eq("id", id)
     .maybeSingle();
   if (!project) notFound();
+  // Until the tree arrives (Slice 5), a project opens on its brief.
+  if (project.current_stage === "intake" || project.current_stage === "ethics")
+    redirect(`/projects/${id}/brief`);
   const { data: ws } = await supabase
     .from("workspaces")
     .select(

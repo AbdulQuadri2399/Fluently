@@ -3,29 +3,11 @@ import { fail, ok, type ActionResult } from "@/lib/actions/result";
 import { logEvent } from "@/lib/events/log";
 import { currentMember } from "@/lib/projects/service";
 import type { Database } from "@/lib/supabase/database.types";
-import type { IntakeRow } from "./service";
+import { missingForApproval } from "./approve-rules";
+
+export { missingForApproval, type Missing } from "./approve-rules";
 
 type Client = SupabaseClient<Database>;
-
-export type Missing = "business_objective" | "behavioural_objective" | "sector" | "assets";
-
-/** AC9.1, AC8.6: what still stops the brief being approved, in screen order. */
-export function missingForApproval(
-  intake: Pick<
-    IntakeRow,
-    "business_objective" | "behavioural_objective" | "sector" | "sector_other"
-  >,
-  mode: string,
-  assetCount: number,
-): Missing[] {
-  const missing: Missing[] = [];
-  if (!intake.business_objective?.trim()) missing.push("business_objective");
-  if (!intake.behavioural_objective?.trim()) missing.push("behavioural_objective");
-  if (!intake.sector?.trim() || (intake.sector === "Other" && !intake.sector_other?.trim()))
-    missing.push("sector");
-  if (mode === "optimise" && assetCount === 0) missing.push("assets");
-  return missing;
-}
 
 /**
  * O15 approveObjectives (AC9.1, AC9.2, AC10.4, EC9): refuses incomplete briefs, blocks refused
@@ -136,4 +118,17 @@ export async function recordOverride(
     rule: o?.[0]?.rule ?? "",
   });
   return ok({ overrideId: data as string });
+}
+
+/** AC10.5: queues the ethics check again after it failed. */
+export async function retryEthics(
+  client: Client,
+  projectId: string,
+): Promise<ActionResult<{ stageRunId: string }>> {
+  const { data, error } = await client.rpc("retry_ethics", { p_project: projectId });
+  if (error)
+    return fail(
+      error.code === "42501" ? "forbidden" : error.code === "P0003" ? "conflict" : "unavailable",
+    );
+  return ok({ stageRunId: data as string });
 }

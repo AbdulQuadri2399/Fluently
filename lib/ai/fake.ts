@@ -141,8 +141,14 @@ export function fakeEthics(brief: string, sector: string, flagList: string[]): E
   return { result: reasons.length ? "flag" : "pass", reasons };
 }
 
+/** Fake mode only: text containing this marker makes the made-up call fail (FF2 demos and tests). */
+export const FAKE_FAIL_MARKER = "#unavailable";
+
 export const defaultResponders: Record<string, Responder> = {
-  coach: (call) => fakeCoach(str(call.input?.field), str(call.input?.text)),
+  coach: (call) => {
+    if (str(call.input?.text).includes(FAKE_FAIL_MARKER)) throw new AiError("unavailable");
+    return fakeCoach(str(call.input?.field), str(call.input?.text));
+  },
   ethics: (call) =>
     fakeEthics(
       str(call.input?.brief),
