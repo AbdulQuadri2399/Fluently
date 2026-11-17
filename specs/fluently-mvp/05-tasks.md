@@ -157,7 +157,7 @@ You'll be able to see: research running live on the canvas and the research chec
 
 - [ ] T6.1 **Spike S1 / service test** (needs user's `ANTHROPIC_API_KEY`): one live call each with `web_search_20260209` and `web_search_20250305` on `claude-haiku-5-5`; record result and chosen variant per model in 04 D17 — S — Refs: 04 §12 — Depends on: T4.1
   Done when: `pnpm tsx scripts/spike-web-search.ts` output pasted in slice report and 04 D17 updated.
-- [ ] T6.2 [P] `lib/retrieval/semanticScholar.ts`, `openAlex.ts` (15 s timeout, backoff, fallback) + fakes — S — Refs: D17, AC12.1 — Depends on: —
+- [x] T6.2 [P] `lib/retrieval/semanticScholar.ts`, `openAlex.ts` (15 s timeout, backoff, fallback) + fakes — S — Refs: D17, AC12.1 — Depends on: —
   Done when: `tests/unit/retrieval.test.ts` passes with recorded fixtures: maps to source rows; 429 → backoff then fallback.
 - [x] T6.3 Migration: `sources` table + RLS; `lib/rules/citationCheck.ts` (handles only from this run) — S — Refs: D8, AC12.2, AC12.3, NFR4 — Depends on: T4.2
   Done when: `tests/unit/citationCheck.test.ts` passes: unknown handle dropped + `citation_rejected` logged; finding with no valid source becomes `AI inference` only if model labelled it so, otherwise dropped.

@@ -1,0 +1,28 @@
+{
+  "total": 2,
+  "offset": 0,
+  "data": [
+    {
+      "paperId": "a1b2c3",
+      "title": "The goal-gradient hypothesis resurrected",
+      "url": "https://www.semanticscholar.org/paper/a1b2c3",
+      "year": 2006,
+      "abstract": "People accelerate their efforts as they approach a reward.",
+      "authors": [
+        { "name": "Ran Kivetz" },
+        { "name": "Oleg Urminsky" },
+        { "name": "Yuhuang Zheng" }
+      ],
+      "externalIds": { "DOI": "10.1509/jmkr.43.1.39" }
+    },
+    {
+      "paperId": "d4e5f6",
+      "title": "A paper without an abstract",
+      "url": null,
+      "year": 2018,
+      "abstract": null,
+      "authors": [{ "name": "Some Author" }],
+      "externalIds": {}
+    }
+  ]
+}

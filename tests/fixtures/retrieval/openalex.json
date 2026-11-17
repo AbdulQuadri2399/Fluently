@@ -1,0 +1,14 @@
+{
+  "meta": { "count": 1 },
+  "results": [
+    {
+      "id": "https://openalex.org/W123",
+      "display_name": "Defaults and choice architecture",
+      "publication_year": 2012,
+      "doi": "https://doi.org/10.1000/xyz",
+      "authorships": [{ "author": { "display_name": "Jane Example" } }],
+      "abstract_inverted_index": { "Defaults": [0], "shape": [1], "choices": [2] },
+      "primary_location": { "landing_page_url": "https://example.org/defaults" }
+    }
+  ]
+}
