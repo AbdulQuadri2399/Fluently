@@ -2,6 +2,7 @@
 // Helper functions (is_member, is_admin, is_email_allowed) live in the first custom migration.
 import { sql } from "drizzle-orm";
 import {
+  type AnyPgColumn,
   boolean,
   check,
   index,
@@ -46,7 +47,10 @@ export const workspaces = pgTable(
       .array()
       .notNull()
       .default(sql`'{}'::text[]`),
-    defaultToolkitVersionId: uuid("default_toolkit_version_id"),
+    defaultToolkitVersionId: uuid("default_toolkit_version_id").references(
+      (): AnyPgColumn => toolkitVersions.id,
+      { onDelete: "set null" },
+    ),
     stageModels: jsonb("stage_models")
       .notNull()
       .default(sql.raw(`'${JSON.stringify(DEFAULT_STAGE_MODELS)}'::jsonb`)),
@@ -177,7 +181,9 @@ export const projects = pgTable(
     mode: text("mode").notNull(),
     channel: text("channel").notNull(),
     clientLabel: text("client_label"),
-    toolkitVersionId: uuid("toolkit_version_id"),
+    toolkitVersionId: uuid("toolkit_version_id").references((): AnyPgColumn => toolkitVersions.id, {
+      onDelete: "restrict",
+    }),
     status: text("status").notNull().default("in_progress"),
     currentStage: text("current_stage").notNull().default("intake"),
     variantsPerRec: integer("variants_per_rec").notNull().default(2),
@@ -340,6 +346,160 @@ export const aiUsage = pgTable(
     // Members read their workspace's usage; only server jobs (service role) write it.
     pgPolicy("ai_usage_select", {
       for: "select",
+      to: authenticatedRole,
+      using: isMember("workspace_id"),
+    }),
+  ],
+).enableRLS();
+
+// ---------- Slice 3: toolkit versions (04 section 4, AC4.5–AC4.8) ----------
+// Saved versions are immutable: select for members, insert for admins, no update/delete policies.
+
+export const toolkitVersions = pgTable(
+  "toolkit_versions",
+  {
+    id: id(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references((): AnyPgColumn => workspaces.id, { onDelete: "restrict" }),
+    number: integer("number").notNull(),
+    fileName: text("file_name").notNull(),
+    uploadedBy: uuid("uploaded_by")
+      .notNull()
+      .references(() => members.id, { onDelete: "restrict" }),
+    principleCount: integer("principle_count").notNull(),
+    warnings: jsonb("warnings").notNull().default([]),
+    ...timestamps(),
+  },
+  (t) => [
+    uniqueIndex("toolkit_versions_number_unique").on(t.workspaceId, t.number),
+    pgPolicy("toolkit_versions_select", {
+      for: "select",
+      to: authenticatedRole,
+      using: isMember("workspace_id"),
+    }),
+    pgPolicy("toolkit_versions_insert", {
+      for: "insert",
+      to: authenticatedRole,
+      withCheck: sql`public.is_admin(${t.workspaceId}) and ${t.uploadedBy} = ${authUid}`,
+    }),
+  ],
+).enableRLS();
+
+export const principles = pgTable(
+  "principles",
+  {
+    id: id(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "restrict" }),
+    versionId: uuid("version_id")
+      .notNull()
+      .references(() => toolkitVersions.id, { onDelete: "cascade" }),
+    principleKey: text("principle_key").notNull(),
+    name: text("name").notNull(),
+    generalGoal: text("general_goal").notNull(),
+    subGoal: text("sub_goal").notNull(),
+    mechanism: text("mechanism").notNull(),
+    sense: text("sense"),
+    quickInsight: text("quick_insight"),
+    extendedExplanation: text("extended_explanation"),
+    examples: text("examples"),
+    linkToPaper: text("link_to_paper"),
+    reference: text("reference"),
+    designLever: text("design_lever"),
+    outcome: text("outcome"),
+    evidence: text("evidence"),
+    relatedRaw: text("related_raw"),
+    evidenceLevel: text("evidence_level").notNull(),
+    ...timestamps(),
+  },
+  (t) => [
+    check("principles_evidence_level_valid", sql`${t.evidenceLevel} in ('strong','some','none')`),
+    uniqueIndex("principles_version_key_unique").on(t.versionId, t.principleKey),
+    index("principles_version_goal_idx").on(t.versionId, t.generalGoal, t.subGoal),
+    pgPolicy("principles_select", {
+      for: "select",
+      to: authenticatedRole,
+      using: isMember("workspace_id"),
+    }),
+    pgPolicy("principles_insert", {
+      for: "insert",
+      to: authenticatedRole,
+      withCheck: isAdmin("workspace_id"),
+    }),
+  ],
+).enableRLS();
+
+export const principleRelations = pgTable(
+  "principle_relations",
+  {
+    id: id(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "restrict" }),
+    versionId: uuid("version_id")
+      .notNull()
+      .references(() => toolkitVersions.id, { onDelete: "cascade" }),
+    fromId: uuid("from_id")
+      .notNull()
+      .references(() => principles.id, { onDelete: "cascade" }),
+    toId: uuid("to_id")
+      .notNull()
+      .references(() => principles.id, { onDelete: "cascade" }),
+    ...timestamps(),
+  },
+  (t) => [
+    uniqueIndex("principle_relations_unique").on(t.fromId, t.toId),
+    index("principle_relations_version_idx").on(t.versionId),
+    pgPolicy("principle_relations_select", {
+      for: "select",
+      to: authenticatedRole,
+      using: isMember("workspace_id"),
+    }),
+    pgPolicy("principle_relations_insert", {
+      for: "insert",
+      to: authenticatedRole,
+      withCheck: isAdmin("workspace_id"),
+    }),
+  ],
+).enableRLS();
+
+export const toolkitCandidates = pgTable(
+  "toolkit_candidates",
+  {
+    id: id(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "restrict" }),
+    projectId: uuid("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    mechanism: text("mechanism"),
+    sourceId: uuid("source_id").notNull(),
+    ...timestamps(),
+  },
+  (t) => [
+    index("toolkit_candidates_workspace_idx").on(t.workspaceId),
+    pgPolicy("toolkit_candidates_select", {
+      for: "select",
+      to: authenticatedRole,
+      using: isMember("workspace_id"),
+    }),
+    pgPolicy("toolkit_candidates_insert", {
+      for: "insert",
+      to: authenticatedRole,
+      withCheck: isMember("workspace_id"),
+    }),
+    pgPolicy("toolkit_candidates_update", {
+      for: "update",
+      to: authenticatedRole,
+      using: isMember("workspace_id"),
+      withCheck: isMember("workspace_id"),
+    }),
+    pgPolicy("toolkit_candidates_delete", {
+      for: "delete",
       to: authenticatedRole,
       using: isMember("workspace_id"),
     }),

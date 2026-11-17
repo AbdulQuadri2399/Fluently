@@ -38,12 +38,7 @@ describe("O1 sign-up allowlist at the database (AC1.1, AC1.2, AC1.7, D13)", () =
     try {
       await db
         .begin(async (tx) => {
-          await tx`delete from public.projects`;
-          await tx`delete from public.events`;
-          await tx`delete from public.ai_usage`;
-          await tx`delete from public.allowlist_entries`;
-          await tx`delete from public.members`;
-          await tx`delete from public.workspaces`;
+          await tx`truncate public.workspaces, public.members cascade`;
           await tx`update private.app_config set bootstrap_admin_email = 'boss@bootstrap.test'`;
           await tx`insert into auth.users (instance_id, id, aud, role, email, created_at, updated_at)
                    values ('00000000-0000-0000-0000-000000000000', gen_random_uuid(),

@@ -153,6 +153,70 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"principle_relations": {
+                  Row: {
+                    "created_at": string,"from_id": string,"id": string,"to_id": string,"updated_at": string,"version_id": string,"workspace_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"from_id": string,"id"?: string,"to_id": string,"updated_at"?: string,"version_id": string,"workspace_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"from_id"?: string,"id"?: string,"to_id"?: string,"updated_at"?: string,"version_id"?: string,"workspace_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "principle_relations_from_id_principles_id_fk"
+      columns: ["from_id"]
+isOneToOne: false
+      referencedRelation: "principles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "principle_relations_to_id_principles_id_fk"
+      columns: ["to_id"]
+isOneToOne: false
+      referencedRelation: "principles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "principle_relations_version_id_toolkit_versions_id_fk"
+      columns: ["version_id"]
+isOneToOne: false
+      referencedRelation: "toolkit_versions"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "principle_relations_workspace_id_workspaces_id_fk"
+      columns: ["workspace_id"]
+isOneToOne: false
+      referencedRelation: "workspaces"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"principles": {
+                  Row: {
+                    "created_at": string,"design_lever": string | null,"evidence": string | null,"evidence_level": string,"examples": string | null,"extended_explanation": string | null,"general_goal": string,"id": string,"link_to_paper": string | null,"mechanism": string,"name": string,"outcome": string | null,"principle_key": string,"quick_insight": string | null,"reference": string | null,"related_raw": string | null,"sense": string | null,"sub_goal": string,"updated_at": string,"version_id": string,"workspace_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"design_lever"?: string | null,"evidence"?: string | null,"evidence_level": string,"examples"?: string | null,"extended_explanation"?: string | null,"general_goal": string,"id"?: string,"link_to_paper"?: string | null,"mechanism": string,"name": string,"outcome"?: string | null,"principle_key": string,"quick_insight"?: string | null,"reference"?: string | null,"related_raw"?: string | null,"sense"?: string | null,"sub_goal": string,"updated_at"?: string,"version_id": string,"workspace_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"design_lever"?: string | null,"evidence"?: string | null,"evidence_level"?: string,"examples"?: string | null,"extended_explanation"?: string | null,"general_goal"?: string,"id"?: string,"link_to_paper"?: string | null,"mechanism"?: string,"name"?: string,"outcome"?: string | null,"principle_key"?: string,"quick_insight"?: string | null,"reference"?: string | null,"related_raw"?: string | null,"sense"?: string | null,"sub_goal"?: string,"updated_at"?: string,"version_id"?: string,"workspace_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "principles_version_id_toolkit_versions_id_fk"
+      columns: ["version_id"]
+isOneToOne: false
+      referencedRelation: "toolkit_versions"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "principles_workspace_id_workspaces_id_fk"
+      columns: ["workspace_id"]
+isOneToOne: false
+      referencedRelation: "workspaces"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"project_ratings": {
                   Row: {
                     "created_at": string,"id": string,"member_id": string,"project_id": string,"rating": number,"updated_at": string,"workspace_id": string
@@ -204,6 +268,12 @@ isOneToOne: false
       referencedRelation: "members"
       referencedColumns: ["id"]
     },{
+      foreignKeyName: "projects_toolkit_version_id_toolkit_versions_id_fk"
+      columns: ["toolkit_version_id"]
+isOneToOne: false
+      referencedRelation: "toolkit_versions"
+      referencedColumns: ["id"]
+    },{
       foreignKeyName: "projects_updated_by_members_id_fk"
       columns: ["updated_by"]
 isOneToOne: false
@@ -211,6 +281,58 @@ isOneToOne: false
       referencedColumns: ["id"]
     },{
       foreignKeyName: "projects_workspace_id_workspaces_id_fk"
+      columns: ["workspace_id"]
+isOneToOne: false
+      referencedRelation: "workspaces"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"toolkit_candidates": {
+                  Row: {
+                    "created_at": string,"id": string,"mechanism": string | null,"name": string,"project_id": string,"source_id": string,"updated_at": string,"workspace_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"id"?: string,"mechanism"?: string | null,"name": string,"project_id": string,"source_id": string,"updated_at"?: string,"workspace_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"id"?: string,"mechanism"?: string | null,"name"?: string,"project_id"?: string,"source_id"?: string,"updated_at"?: string,"workspace_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "toolkit_candidates_project_id_projects_id_fk"
+      columns: ["project_id"]
+isOneToOne: false
+      referencedRelation: "projects"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "toolkit_candidates_workspace_id_workspaces_id_fk"
+      columns: ["workspace_id"]
+isOneToOne: false
+      referencedRelation: "workspaces"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"toolkit_versions": {
+                  Row: {
+                    "created_at": string,"file_name": string,"id": string,"number": number,"principle_count": number,"updated_at": string,"uploaded_by": string,"warnings": NonNullable<Json>,"workspace_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"file_name": string,"id"?: string,"number": number,"principle_count": number,"updated_at"?: string,"uploaded_by": string,"warnings"?: NonNullable<Json>,"workspace_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"file_name"?: string,"id"?: string,"number"?: number,"principle_count"?: number,"updated_at"?: string,"uploaded_by"?: string,"warnings"?: NonNullable<Json>,"workspace_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "toolkit_versions_uploaded_by_members_id_fk"
+      columns: ["uploaded_by"]
+isOneToOne: false
+      referencedRelation: "members"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "toolkit_versions_workspace_id_workspaces_id_fk"
       columns: ["workspace_id"]
 isOneToOne: false
       referencedRelation: "workspaces"
@@ -229,7 +351,13 @@ isOneToOne: false
                     "agency_services"?: (string)[],"cost_cap_gbp"?: number,"created_at"?: string,"default_toolkit_version_id"?: string | null,"gbp_per_usd"?: number,"id"?: string,"model_prices"?: NonNullable<Json>,"name"?: string,"sector_flag_list"?: (string)[],"sector_refuse_list"?: (string)[],"stage_models"?: NonNullable<Json>,"updated_at"?: string
                   }
                   Relationships: [
-                    
+                    {
+      foreignKeyName: "workspaces_default_toolkit_version_id_toolkit_versions_id_fk"
+      columns: ["default_toolkit_version_id"]
+isOneToOne: false
+      referencedRelation: "toolkit_versions"
+      referencedColumns: ["id"]
+    }
                   ]
                 }
           }
@@ -248,6 +376,11 @@ isOneToOne: false
                            },
 "is_member":
 { Args: { "ws": string }; Returns: boolean
+                           },
+"save_toolkit_version":
+{ Args: { "p_file_name": string,"p_principles": Json,"p_relations": Json,"p_warnings": Json }; Returns: {
+              "version_id": string,"version_number": number
+            }[]
                            },
 "set_member_active":
 { Args: { "is_active": boolean,"member_id": string }; Returns: undefined
