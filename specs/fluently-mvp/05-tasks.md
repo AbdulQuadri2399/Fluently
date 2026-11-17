@@ -184,26 +184,26 @@ Slice check: suite green; FL3 and FF5 pass with fakes; one live research run on 
 Goal: the research reads as a report with checkable citations, projects stay within budget, and the team runs the riskiest-assumption tests A1–A3 before more is built.
 You'll be able to see: the Audit Report, the citation check table, cost warnings.
 
-- [ ] T7.1 O27 report model from the graph (sections per AC15.1, citation numbering, labels) — M — Refs: AC15.1–AC15.3 — Depends on: T6.6
+- [x] T7.1 O27 report model from the graph (sections per AC15.1, citation numbering, labels) — M — Refs: AC15.1–AC15.3 — Depends on: T6.6
   Done when: `tests/integration/O27-report.test.ts` passes: every finding in report has a citation or `AI inference`; editing a node changes the next report.
-- [ ] T7.2 SCR9 UI: loading, not yet, default, stale banner, citation check table — M — Refs: SCR9, AC12.8 — Depends on: T7.1
+- [x] T7.2 SCR9 UI: loading, not yet, default, stale banner, citation check table — M — Refs: SCR9, AC12.8 — Depends on: T7.1
   Done when: `tests/components/SCR9-report.test.tsx` one test per SCR9 state (except export); screenshot vs 03b SCR9.
-- [ ] T7.3 Cost cap: near-cap header chip at 80%, pause at 100% before next AI call (`paused_cost`), O31 raise cap (admin) / confirm over cap (member) — M — Refs: AC27.3, AC27.4, FF12 — Depends on: T5.5
+- [x] T7.3 Cost cap: near-cap header chip at 80%, pause at 100% before next AI call (`paused_cost`), O31 raise cap (admin) / confirm over cap (member) — M — Refs: AC27.3, AC27.4, FF12 — Depends on: T5.5
   Done when: `tests/integration/O31-cap.test.ts` and `e2e/FF12.spec.ts` pass ('stage pauses at cap; member confirms; run continues').
-- [ ] T7.4 `scripts/success-test.md` checklist for A1–A3 (how to run a past brief, rate the report blind, spot-check 20 citations from SCR9, read cost on SCR12) — S — Refs: 01 §8 A1–A3 — Depends on: T7.2
+- [x] T7.4 `scripts/success-test.md` checklist for A1–A3 (how to run a past brief, rate the report blind, spot-check 20 citations from SCR9, read cost on SCR12) — S — Refs: 01 §8 A1–A3 — Depends on: T7.2
   Done when: file exists with steps and a results table.
 - [ ] T7.5 **Service test (user):** run 1–3 past briefs (OQ8) through research with the demo model preset; fill the results table in `scripts/success-test.md` — S — Refs: A1, A2, A3, NFR4, NFR11 — Depends on: T7.4
   Done when: results table filled; any fail recorded with the decision (iterate prompts before Slice 9, or continue).
 
-- [ ] T7.6 Report download: O28 Markdown + PDF from the report model; exporting / export failed states (moved from T13.3 on 2026-11-17 at the user's request) — M — Refs: AC15.4 — Depends on: T7.1
+- [x] T7.6 Report download: O28 Markdown + PDF from the report model; exporting / export failed states (moved from T13.3 on 2026-11-17 at the user's request) — M — Refs: AC15.4 — Depends on: T7.1
   Done when: `tests/integration/O28-export.test.ts` 'Markdown and PDF contain same citations as report model' passes; SCR9 component tests for exporting/failed.
-- [ ] T7.7 Gaps by kind: gaps labelled Discovery / Generative in J2 synthesis; report gaps summary and grouping (icebox IB8) — S — Refs: AC13.5 — Depends on: T7.1
+- [x] T7.7 Gaps by kind: gaps labelled Discovery / Generative in J2 synthesis; report gaps summary and grouping (icebox IB8) — S — Refs: AC13.5 — Depends on: T7.1
   Done when: `tests/jobs/J2-research.test.ts` 'every gap has a kind' and SCR9 test 'gaps summary counts by kind' pass.
-- [ ] T7.8 Theme strength and one tag style: theme strength from the AC12.6 rule; pastel High green / Med amber / Low red tags on cards, details panel, decision panel and report (icebox IB7) — S — Refs: AC12.11, AC12.12 — Depends on: T6.6
+- [x] T7.8 Theme strength and one tag style: theme strength from the AC12.6 rule; pastel High green / Med amber / Low red tags on cards, details panel, decision panel and report (icebox IB7) — S — Refs: AC12.11, AC12.12 — Depends on: T6.6
   Done when: `tests/unit/confidence.test.ts` 'theme strength' cases and `tests/components/StrengthTag.test.tsx` pass.
-- [ ] T7.9 Decision panel sizes: minimised / standard / expanded, choices kept, size remembered (icebox IB9) — S — Refs: AC25.5 — Depends on: T6.8
+- [x] T7.9 Decision panel sizes: minimised / standard / expanded, choices kept, size remembered (icebox IB9) — S — Refs: AC25.5 — Depends on: T6.8
   Done when: `tests/components/SCR8-sizes.test.tsx` 'selection survives minimise and expand' and 'size remembered' pass.
-- [ ] T7.10 Watch the research: AI writes research questions (stored on the run, used by search steps); activity log table written by J2; *See what it's doing* panel, live (icebox IB11, slim version) — M — Refs: AC11.9, AC11.10 — Depends on: T6.5
+- [x] T7.10 Watch the research: AI writes research questions (stored on the run, used by search steps); activity log table written by J2; *See what it's doing* panel, live (icebox IB11, slim version) — M — Refs: AC11.9, AC11.10 — Depends on: T6.5
   Done when: `tests/jobs/J2-research.test.ts` 'questions stored and used' and 'activity logged per step' pass; `tests/rls/activity.test.ts` two-user test passes; `e2e/activity.spec.ts` shows questions and log during a run.
 
 Slice check: suite green; report renders on seeded and live projects; A1–A3 results recorded. **Stop for the user** (go / iterate decision).

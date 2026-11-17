@@ -663,11 +663,18 @@ Format: user action → system response → resulting state (ACs).
 | activity.empty | "Nothing yet. Steps appear here as they start." |
 | activity.events | "{step} started" / "{step}: {n} found" / "{step}: {n} kept" / "{n} citations dropped: not in the search results" / "{step} done" / "{step} didn't work" |
 | activity.close | "Close" |
+| activity.events (more) | "Wrote {n} research questions" / "Paused: the project reached its AI budget" / "Carried on after the AI budget pause" |
+| budget.continue / budget.continuing | "Continue anyway" / "Continuing…" |
+| budget.raise / budget.raiseTitle | "Raise budget" / "Raise this project's AI budget" |
+| budget.raiseLabel / budget.raiseHelp | "New budget (£)" / "Research carries on as soon as you save." |
+| budget.raiseInvalid | "Enter an amount above what's been spent, up to £1,000." |
+| budget.save / budget.saving | "Save and continue" / "Saving…" |
+| checkpoint.panelName | "Decision panel" (screen reader name; replaces "Hide", which became *Minimise*) |
 | strength.tag | "{level} strength" (themes) · confidence keeps "{level} confidence" (opportunities) |
 | strength.levels | "High" / "Med" / "Low" |
 | gap.kind | "Discovery" / "Generative" |
 | gap.kindHint | Discovery: "Confirm or measure what we think is happening." · Generative: "Explore needs and reasons we don't yet understand." |
-| report.gapsSummary | "{n} open questions: {d} for discovery research, {g} for generative research." |
+| report.gapsSummary | "{n} open questions: {d} for discovery research, {g} for generative research." ("question" when there's one) |
 | report.gapsNone | "No evidence gaps. Every opportunity has agreeing sources." |
 | report.download | "Download" |
 | report.downloadMarkdown / report.downloadPdf | "Markdown (.md)" / "PDF" |

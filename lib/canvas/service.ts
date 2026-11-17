@@ -311,3 +311,31 @@ export async function moveAssets(
   }
   return ok({ nodeId: data as string });
 }
+
+export type RunActivity = {
+  questions: string[];
+  events: { id: string; kind: string; step: string | null; count: number | null; at: string }[];
+};
+
+/** AC11.9, AC11.10: the research questions and the activity log of one stage run. */
+export async function runActivity(client: Client, runId: string): Promise<RunActivity> {
+  const [{ data: run }, { data: events }] = await Promise.all([
+    client.from("stage_runs").select("questions").eq("id", runId).maybeSingle(),
+    client
+      .from("run_events")
+      .select("id, kind, step, count, created_at")
+      .eq("stage_run_id", runId)
+      .order("created_at")
+      .limit(500),
+  ]);
+  return {
+    questions: ((run?.questions ?? []) as string[]).filter((q) => typeof q === "string"),
+    events: (events ?? []).map((e) => ({
+      id: e.id,
+      kind: e.kind,
+      step: e.step,
+      count: e.count,
+      at: e.created_at,
+    })),
+  };
+}

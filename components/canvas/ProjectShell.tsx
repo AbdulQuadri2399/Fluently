@@ -6,6 +6,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { authCopy } from "@/components/auth/copy";
 import { channelNames } from "@/components/projects/copy";
 import { toolkitCopy } from "@/components/toolkit/copy";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -147,6 +148,13 @@ export function ProjectShell({
               : ""}
             {` · ${c.cost(formatGbp(header.spentGbp), formatGbp(header.capGbp))}`}
           </p>
+          {header.capGbp > 0 && header.spentGbp >= header.capGbp * 0.8 ? (
+            <p role="status" className="justify-self-start">
+              <Badge kind="status" tone={header.spentGbp >= header.capGbp ? "bad" : "warn"}>
+                {c.nearCap(formatGbp(header.spentGbp), formatGbp(header.capGbp))}
+              </Badge>
+            </p>
+          ) : null}
         </div>
         <nav aria-label={header.name} className="ml-auto flex gap-1">
           {tabs.map((t) => (

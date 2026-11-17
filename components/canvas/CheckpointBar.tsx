@@ -5,6 +5,7 @@ import {
   ArrowsOutSimpleIcon,
   CheckIcon,
   MinusIcon,
+  PulseIcon,
   XIcon,
 } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
@@ -28,7 +29,8 @@ export type BarState =
   | { kind: "cancelled"; run: RunInfo }
   | { kind: "researchDone" }
   | { kind: "choose"; run: RunInfo; partial: boolean }
-  | { kind: "solutionsNext" };
+  | { kind: "solutionsNext" }
+  | { kind: "pausedCost"; run: RunInfo; isAdmin: boolean };
 
 /** Works out what the decision bar should say from the project's state (SCR8). */
 export function barState(input: {
@@ -44,6 +46,7 @@ export function barState(input: {
   if (run && (run.status === "queued" || run.status === "running")) {
     return run.stage === "ethics" ? { kind: "ethicsRunning" } : { kind: "running", run };
   }
+  if (run?.status === "paused_cost") return { kind: "pausedCost", run, isAdmin: input.isAdmin };
   if (input.currentStage === "solutions") return { kind: "solutionsNext" };
   const ethics = input.nodes.find((n) => n.type === "ethics");
   if (!ethics || ethics.status === "failed") return { kind: "ethicsFailed" };
@@ -117,6 +120,10 @@ export function CheckpointBar({
   onApprove,
   onSendBack,
   onRetry,
+  onOpenActivity,
+  capLabel = "£10.00",
+  onContinueOverCap,
+  onRaiseCap,
 }: {
   projectId: string;
   state: BarState;
@@ -127,6 +134,13 @@ export function CheckpointBar({
   onApprove?: (selection: string[]) => Promise<boolean>;
   onSendBack?: (feedback: string, replaceHuman: boolean) => Promise<boolean>;
   onRetry?: (runId: string, synthesisOnly: boolean) => Promise<void>;
+  /** Opens "See what it's doing" for the latest research run (AC11.10). */
+  onOpenActivity?: () => void;
+  /** The project's AI budget, formatted (AC27.4). */
+  capLabel?: string;
+  onContinueOverCap?: (runId: string) => Promise<void>;
+  /** Admins only: opens the raise-budget dialog. */
+  onRaiseCap?: () => void;
 }) {
   const [size, setSize] = usePanelSize();
   const [chosen, setChosen] = useState(0);
@@ -281,7 +295,42 @@ export function CheckpointBar({
     case "researchDone":
       message = c.checkpoint.researchDone;
       break;
+    case "pausedCost":
+      message = c.atCap(capLabel);
+      steps = state.run.steps;
+      action = (
+        <span className="flex gap-2">
+          {state.isAdmin && onRaiseCap ? (
+            <Button variant="secondary" onClick={onRaiseCap}>
+              {c.budget.raise}
+            </Button>
+          ) : null}
+          <Button
+            loading={busy}
+            loadingLabel={c.budget.continuing}
+            onClick={async () => {
+              setBusy(true);
+              await onContinueOverCap?.(state.run.id);
+              setBusy(false);
+            }}
+          >
+            {c.budget.continue}
+          </Button>
+        </span>
+      );
+      break;
   }
+  const activityButton =
+    onOpenActivity && "run" in state && state.run.stage === "research" ? (
+      <button
+        type="button"
+        onClick={onOpenActivity}
+        className="mr-auto inline-flex items-center gap-1 rounded-xs px-1.5 py-1 text-caption text-muted hover:bg-soft hover:text-ink"
+      >
+        <PulseIcon aria-hidden="true" className="size-3.5" />
+        {c.activity.open}
+      </button>
+    ) : null;
 
   const sizeButton = (to: PanelSize) => {
     const label =
@@ -333,6 +382,7 @@ export function CheckpointBar({
         </div>
       ) : (
         <div className="-my-1 flex justify-end gap-1">
+          {activityButton}
           {sizeButton("minimised")}
           {expanded ? sizeButton("standard") : sizeButton("expanded")}
         </div>

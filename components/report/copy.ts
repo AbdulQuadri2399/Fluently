@@ -30,7 +30,7 @@ export const reportCopy = {
   principles: "Candidate principles",
   affects: (opportunity: string) => `Affects: ${opportunity}`,
   gapsSummary: (n: number, d: number, g: number) =>
-    `${n} open questions: ${d} for discovery research, ${g} for generative research.`,
+    `${n} open ${n === 1 ? "question" : "questions"}: ${d} for discovery research, ${g} for generative research.`,
   gapsNone: "No evidence gaps. Every opportunity has agreeing sources.",
   gapKind: { discovery: "Discovery", generative: "Generative" },
   gapKindHint: {

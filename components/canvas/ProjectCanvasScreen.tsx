@@ -4,15 +4,19 @@ import * as canvasActions from "@/lib/actions/canvas";
 import * as intakeActions from "@/lib/actions/intake";
 import type { ProjectTree } from "@/lib/canvas/load";
 import { createClient } from "@/lib/supabase/client";
-import { ProjectCanvas } from "./ProjectCanvas";
+import { ProjectCanvas, type Budget } from "./ProjectCanvas";
 
 /** Wires the tree to the server; files for Add source go straight from the browser to private storage. */
-export function ProjectCanvasScreen({ tree }: { tree: ProjectTree }) {
+export function ProjectCanvasScreen({ tree, budget }: { tree: ProjectTree; budget?: Budget }) {
   const projectId = tree.project.id;
   return (
     <ProjectCanvas
       tree={tree}
+      budget={budget}
       actions={{
+        getRunActivity: canvasActions.getRunActivity,
+        confirmOverCap: canvasActions.confirmOverCap,
+        raiseProjectCap: canvasActions.raiseProjectCap,
         startStage: canvasActions.startStage,
         cancelStage: canvasActions.cancelStage,
         reorderNodes: canvasActions.reorderNodes,

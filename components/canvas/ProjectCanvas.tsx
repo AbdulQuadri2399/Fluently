@@ -6,7 +6,11 @@ import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { useRealtimeProject } from "@/hooks/useRealtimeProject";
 import type { ActionResult } from "@/lib/actions/result";
+import { formatGbp } from "@/lib/ai/cost";
 import type { ProjectTree } from "@/lib/canvas/load";
+import type { RunActivity } from "@/lib/canvas/service";
+import { ActivityPanel } from "./ActivityPanel";
+import { RaiseCapDialog } from "./RaiseCapDialog";
 import { AddSourceDialog, type AddSourceFns } from "./AddSourceDialog";
 import { barState, CheckpointBar } from "./CheckpointBar";
 import { canvasCopy as c } from "./copy";
@@ -44,10 +48,31 @@ export type CanvasActions = {
     projectId: string,
     input: { nodeId: string; title: string; body: string | null; version: number },
   ) => Promise<ActionResult<{ version: number }>>;
+  getRunActivity?: (runId: string) => Promise<RunActivity>;
+  confirmOverCap?: (
+    projectId: string,
+    runId: string,
+  ) => Promise<ActionResult<{ stageRunId: string }>>;
+  raiseProjectCap?: (
+    projectId: string,
+    capGbp: number,
+  ) => Promise<ActionResult<{ resumedRunId: string | null }>>;
 };
 
+export type Budget = { spentGbp: number; capGbp: number };
+
 /** SCR5 project canvas: tree or list, details panel (?node=), decision bar, live updates. */
-export function ProjectCanvas({ tree, actions }: { tree: ProjectTree; actions: CanvasActions }) {
+export function ProjectCanvas({
+  tree,
+  actions,
+  budget = { spentGbp: 0, capGbp: 10 },
+}: {
+  tree: ProjectTree;
+  actions: CanvasActions;
+  budget?: Budget;
+}) {
+  const [activityOpen, setActivityOpen] = useState(false);
+  const [raising, setRaising] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
@@ -220,7 +245,41 @@ export function ProjectCanvas({ tree, actions }: { tree: ProjectTree; actions: C
               }
             : undefined
         }
+        onOpenActivity={actions.getRunActivity ? () => setActivityOpen(true) : undefined}
+        capLabel={formatGbp(budget.capGbp)}
+        onContinueOverCap={
+          actions.confirmOverCap
+            ? async (runId) => {
+                const res = await actions.confirmOverCap!(tree.project.id, runId);
+                if (!res.ok) toast.error(c.edit.saveFailed);
+                router.refresh();
+              }
+            : undefined
+        }
+        onRaiseCap={actions.raiseProjectCap ? () => setRaising(true) : undefined}
       />
+      {actions.getRunActivity && run && run.stage === "research" ? (
+        <ActivityPanel
+          open={activityOpen}
+          onOpenChange={setActivityOpen}
+          runId={run.id}
+          active={active}
+          load={actions.getRunActivity}
+        />
+      ) : null}
+      {actions.raiseProjectCap ? (
+        <RaiseCapDialog
+          open={raising}
+          onOpenChange={setRaising}
+          spentGbp={budget.spentGbp}
+          capGbp={budget.capGbp}
+          onSave={async (cap) => {
+            const res = await actions.raiseProjectCap!(tree.project.id, cap);
+            router.refresh();
+            return res.ok;
+          }}
+        />
+      ) : null}
     </div>
   );
 }

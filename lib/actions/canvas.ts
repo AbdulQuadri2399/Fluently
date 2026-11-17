@@ -80,3 +80,6 @@ export async function confirmOverCap(projectId: string, runId: string) {
   revalidatePath(`/projects/${projectId}`, "layout");
   return res;
 }
+export async function getRunActivity(runId: string) {
+  return canvas.runActivity(await createClient(), runId);
+}
