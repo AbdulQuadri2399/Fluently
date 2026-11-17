@@ -37,7 +37,7 @@ export const canvasCopy = {
   canvasView: "Canvas view",
   addCard: (lane: string) => `Add a card to ${lane}`,
   sourcesSummary: (n: number, kinds: number) =>
-    `${n} ${n === 1 ? "source" : "sources"} across ${kinds} kinds`,
+    `${n} ${n === 1 ? "source" : "sources"} across ${kinds} ${kinds === 1 ? "kind" : "kinds"}`,
   sourcesCollecting: (done: number, of: number) => `Collecting sources · ${done} of ${of} kinds`,
   expand: "Expand card",
   collapse: "Collapse card",

@@ -7,7 +7,11 @@ async function openSeeded(page: import("@playwright/test").Page) {
   const projectId = await seedApprovedProject(who.email);
   const db = serviceClient();
   const { data: p } = await db.from("projects").select("workspace_id").eq("id", projectId).single();
-  const { data: objs } = await db.from("nodes").select("id").eq("project_id", projectId).eq("type", "objective");
+  const { data: objs } = await db
+    .from("nodes")
+    .select("id")
+    .eq("project_id", projectId)
+    .eq("type", "objective");
   const groups = [
     { key: "papers", title: "Academic papers", count: 12, status: "done" },
     { key: "web", title: "Web and market", count: 8, status: "done" },
@@ -27,7 +31,12 @@ async function openSeeded(page: import("@playwright/test").Page) {
     .select("id")
     .single();
   await db.from("edges").insert(
-    objs!.map((o) => ({ workspace_id: p!.workspace_id, project_id: projectId, from_id: o.id, to_id: src!.id })),
+    objs!.map((o) => ({
+      workspace_id: p!.workspace_id,
+      project_id: projectId,
+      from_id: o.id,
+      to_id: src!.id,
+    })),
   );
   await page.goto("/sign-in");
   await page.getByLabel("Email").fill(who.email);
@@ -62,7 +71,9 @@ test.describe("Cards: expand, edit (AC22.9, AC24.1, MI13, MI6)", () => {
     await expect(card.getByText("Academic papers")).toHaveCount(0);
   });
 
-  test("edit a card after a run: saved, marked edited by a person, history updated", async ({ page }) => {
+  test("edit a card after a run: saved, marked edited by a person, history updated", async ({
+    page,
+  }) => {
     await openSeeded(page);
     await page.getByText("Research sources").click();
     const panel = page.getByRole("complementary", { name: "Source" });
@@ -70,14 +81,16 @@ test.describe("Cards: expand, edit (AC22.9, AC24.1, MI13, MI6)", () => {
     await panel.getByLabel("Title").fill("Sources, checked by Ada");
     await panel.getByLabel("Notes").fill("Two duplicate papers removed.");
     await panel.getByRole("button", { name: "Save" }).click();
-    await expect(page.locator(".react-flow__node").filter({ hasText: "Sources, checked by Ada" })).toBeVisible();
+    await expect(
+      page.locator(".react-flow__node").filter({ hasText: "Sources, checked by Ada" }),
+    ).toBeVisible();
     await expect(panel.getByText("AI, edited by a person")).toBeVisible();
     await expect(panel.getByText("Two duplicate papers removed.")).toBeVisible();
     await panel.getByText("History").click();
     await expect(panel.getByText(/^Edited · /)).toBeVisible();
 
     // Objectives point to the brief instead.
-    await page.getByText("Raise ID checks by 15%").click();
+    await page.locator(".react-flow__node").filter({ hasText: "Raise ID checks by 15%" }).click();
     await expect(page.getByText("Objectives are edited in the brief.")).toBeVisible();
   });
 });

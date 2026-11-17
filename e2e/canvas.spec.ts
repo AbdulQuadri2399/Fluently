@@ -51,9 +51,12 @@ test("SCR5 tree: brief → ethics → canvas → research runs live → list vie
   // Start research; steps tick live and Evidence cards arrive without a reload (AC11.2).
   await page.getByRole("button", { name: "Start research" }).click();
   await expect(page.getByText(/Research is running/)).toBeVisible({ timeout: 10000 });
+  // MI15: lines into the card research is working on flow while it runs, then stop.
+  await expect(page.locator("path.dash-flow")).toHaveCount(2, { timeout: 10000 });
   await shoot(page, "SCR8-running");
   await expect(page.getByText("Research sources")).toBeVisible({ timeout: 15000 });
   await expect(page.getByText(/Research finished/)).toBeVisible({ timeout: 20000 });
+  await expect(page.locator("path.dash-flow")).toHaveCount(0);
 
   // Details panel via click; list view toggle.
   await expect(page.getByText("47 sources across 5 kinds")).toBeVisible();

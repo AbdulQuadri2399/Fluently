@@ -263,17 +263,18 @@ describe("SCR5 canvas", () => {
       flagged,
     ]);
     const sources = screen.getByTestId("card-s9");
-    fireEvent.click(within(sources).getByRole("button", { name: c.expand, hidden: true }));
+    fireEvent.click(sources.querySelector<HTMLButtonElement>(`button[aria-label="${c.expand}"]`)!);
     expect(within(sources).getByText("Academic papers")).toBeInTheDocument();
-    expect(within(sources).getByRole("button", { name: c.collapse, hidden: true })).toHaveAttribute(
-      "aria-expanded",
-      "true",
+    expect(
+      sources.querySelector<HTMLButtonElement>(`button[aria-label="${c.collapse}"]`)!,
+    ).toHaveAttribute("aria-expanded", "true");
+    fireEvent.click(
+      sources.querySelector<HTMLButtonElement>(`button[aria-label="${c.collapse}"]`)!,
     );
-    fireEvent.click(within(sources).getByRole("button", { name: c.collapse, hidden: true }));
     expect(within(sources).queryByText("Academic papers")).not.toBeInTheDocument();
 
     const ethics = screen.getByTestId("card-e9");
-    fireEvent.click(within(ethics).getByRole("button", { name: c.expand, hidden: true }));
+    fireEvent.click(ethics.querySelector<HTMLButtonElement>(`button[aria-label="${c.expand}"]`)!);
     expect(within(ethics).getByText("Mentions a surprise fee.")).toBeInTheDocument();
   });
 
