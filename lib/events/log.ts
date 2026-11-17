@@ -2,7 +2,13 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database, Json } from "@/lib/supabase/database.types";
 
 /** Product events (NFR13, 04 O33). Names are fixed so reports stay comparable. */
-export type EventName = "project_created" | "onboarding_completed" | "onboarding_skipped";
+export type EventName =
+  | "project_created"
+  | "onboarding_completed"
+  | "onboarding_skipped"
+  | "intake_suggestion_resolved"
+  | "objectives_approved"
+  | "ethics_override_recorded";
 
 /**
  * O33 logEvent: records one event for the signed-in member. Never throws and never blocks

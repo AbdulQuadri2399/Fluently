@@ -65,24 +65,20 @@ describe("RLS tree tables", () => {
       (await b.client.from("nodes").update({ title: "x" }).eq("id", nodeId).select("id")).data ??
         [],
     ).toHaveLength(0);
-    const ins = await b.client
-      .from("nodes")
-      .insert({
-        workspace_id: a.workspaceId,
-        project_id: projectId,
-        type: "theme",
-        stage: "research",
-        title: "x",
-      });
+    const ins = await b.client.from("nodes").insert({
+      workspace_id: a.workspaceId,
+      project_id: projectId,
+      type: "theme",
+      stage: "research",
+      title: "x",
+    });
     expect(ins.error).not.toBeNull();
-    const edge = await b.client
-      .from("edges")
-      .insert({
-        workspace_id: a.workspaceId,
-        project_id: projectId,
-        from_id: nodeId,
-        to_id: nodeId,
-      });
+    const edge = await b.client.from("edges").insert({
+      workspace_id: a.workspaceId,
+      project_id: projectId,
+      from_id: nodeId,
+      to_id: nodeId,
+    });
     expect(edge.error).not.toBeNull();
     expect(
       (await b.client.from("node_history").select("id").eq("node_id", nodeId)).data ?? [],
@@ -108,27 +104,23 @@ describe("RLS tree tables", () => {
       .from("node_history")
       .insert({ workspace_id: a.workspaceId, node_id: nodeId, snapshot: {}, change: "edited" });
     expect(h.error).not.toBeNull();
-    const r = await a.client
-      .from("stage_runs")
-      .insert({
-        workspace_id: a.workspaceId,
-        project_id: projectId,
-        stage: "ethics",
-        started_by: a.id,
-      });
+    const r = await a.client.from("stage_runs").insert({
+      workspace_id: a.workspaceId,
+      project_id: projectId,
+      stage: "ethics",
+      started_by: a.id,
+    });
     expect(r.error).not.toBeNull();
   });
 
   it("checkpoints and overrides: only as yourself, never edited or deleted", async () => {
-    const asOther = await a.client
-      .from("checkpoints")
-      .insert({
-        workspace_id: a.workspaceId,
-        project_id: projectId,
-        stage: "intake",
-        decision: "approve",
-        decided_by: b.id,
-      });
+    const asOther = await a.client.from("checkpoints").insert({
+      workspace_id: a.workspaceId,
+      project_id: projectId,
+      stage: "intake",
+      decision: "approve",
+      decided_by: b.id,
+    });
     expect(asOther.error).not.toBeNull();
     const cp = await a.client
       .from("checkpoints")
@@ -144,16 +136,14 @@ describe("RLS tree tables", () => {
     expect(cp.error).toBeNull();
     const del = await a.client.from("checkpoints").delete().eq("id", cp.data!.id).select("id");
     expect(del.data ?? []).toHaveLength(0);
-    const short = await a.client
-      .from("ethics_overrides")
-      .insert({
-        workspace_id: a.workspaceId,
-        project_id: projectId,
-        node_id: nodeId,
-        rule: "Deception",
-        reason: "too short",
-        decided_by: a.id,
-      });
+    const short = await a.client.from("ethics_overrides").insert({
+      workspace_id: a.workspaceId,
+      project_id: projectId,
+      node_id: nodeId,
+      rule: "Deception",
+      reason: "too short",
+      decided_by: a.id,
+    });
     expect(short.error).not.toBeNull();
   });
 });

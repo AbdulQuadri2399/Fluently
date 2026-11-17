@@ -108,7 +108,7 @@ You'll be able to see: the intake with coaching suggestions, uploads, autosave, 
   Done when: `tests/unit/ai-client.test.ts` passes: 'logs usage on success', 'logs failed call', 'malformed JSON retried once then throws'; `tests/unit/ai-schemas.test.ts` passes.
 - [x] T4.2 Migration: `uploads`, `nodes`, `edges`, `node_history`, `stage_runs`, `ethics_overrides` + RLS; private `uploads` bucket + storage policies — M — Refs: 04 §4 — Depends on: T1.1
   Done when: `tests/rls/nodes.test.ts`, `tests/rls/uploads.test.ts`, `tests/rls/storage.test.ts` pass (two-user + signed-out).
-- [ ] T4.3 O12 `saveIntakeField` (versioned autosave) + O13 `coachField` (20 s timeout, low-specificity verdict) + `intake_suggestion_resolved` event — M — Refs: AC8.2–AC8.5, AC8.9 — Depends on: T4.1
+- [x] T4.3 O12 `saveIntakeField` (versioned autosave) + O13 `coachField` (20 s timeout, low-specificity verdict) + `intake_suggestion_resolved` event — M — Refs: AC8.2–AC8.5, AC8.9 — Depends on: T4.1
   Done when: `tests/integration/O13-coach.test.ts` passes: suggestion + reason returned; fake timeout → `unavailable`; vague behavioural objective with *keep mine* sets low_specificity.
 - [ ] T4.4 O14 upload URLs/confirm/remove with type/size/count rules (assets vs client data; `.eml` parsed) — M — Refs: AC8.6–AC8.8, FF3, EC10 — Depends on: T4.2
   Done when: `tests/integration/O14-uploads.test.ts` passes: allowed types accepted; 11 MB image rejected; 21st asset → `validation`; `.eml` yields subject + HTML.
