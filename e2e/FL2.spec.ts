@@ -64,7 +64,9 @@ test.describe("FL2 create a project (AC7.1, AC7.3)", () => {
 
     // Steps 5–6: approve → ethics check → passed, ready for research (AC9.2, AC10.2).
     await page.getByRole("button", { name: "Approve objectives" }).click();
-    await expect(page.getByText("Ethics check passed", { exact: true })).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText("Ethics check passed", { exact: true })).toBeVisible({
+      timeout: 15000,
+    });
     await expect(page.getByText(/Objectives approved and the ethics check passed/)).toBeVisible();
     await shoot(page, "SCR6-approved");
   });

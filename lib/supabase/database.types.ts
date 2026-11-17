@@ -622,6 +622,9 @@ isOneToOne: false
 "can_access_upload":
 { Args: { "object_name": string }; Returns: boolean
                            },
+"cancel_stage":
+{ Args: { "p_run": string }; Returns: undefined
+                           },
 "is_admin":
 { Args: { "ws": string }; Returns: boolean
                            },
@@ -647,6 +650,9 @@ isOneToOne: false
                            },
 "set_member_role":
 { Args: { "member_id": string,"new_role": string }; Returns: undefined
+                           },
+"start_stage":
+{ Args: { "p_project": string,"p_stage": string }; Returns: string
                            }
           }
           Enums: {

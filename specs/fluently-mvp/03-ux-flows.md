@@ -591,6 +591,33 @@ Format: user action → system response → resulting state (ACs).
 | ethics.recordOverride / ethics.overridden | "Record override" / "Overridden by {initials}" |
 | ethics.archive | "Archive project" |
 
+**Added during the build (Slice 5, 2026-11-17): please confirm this wording.** Tree, card details and decision bar (SCR5, SCR7, SCR8).
+
+| Key | Copy |
+|---|---|
+| project.tabs | "Canvas" / "Brief" / "Report" (03 section 1 said "Intake"; "Brief" matches the rest of the app) |
+| project.cost | "£{spent} of £{cap} AI budget" |
+| canvas.toolbar | "Fit to screen" / "Zoom in" / "Zoom out" / "List view" / "Canvas view" |
+| card.types | "Objective" / "Current assets" / "Ethics check" / "Source" / "Finding" / "Theme" / "Opportunity" / "Gap" / "Solution" / "Wireframe" / "Annotation" / "Test plan" / "Override" / "Reference" |
+| card.ethicsStatus | "Passed" / "Flagged · {n} rules" / "Checking…" / "Didn't run" / "Overridden" |
+| card.markers | "Out of date" / "Low specificity" / "Failed" / "Running" / "Flagged" / "Overridden" |
+| inspector.props | "Type" / "Stage" / "Made by" / "Model" / "Status" / "Created" |
+| inspector.madeBy | "AI" / "AI, edited by a person" / "A person" |
+| inspector.sections | "Connected to" / "History" |
+| inspector.history | "Created" / "Edited" / "Regenerated" / "Merged" / "Deleted" / "Restored" |
+| inspector.close | "Close details" |
+| checkpoint.goToBrief | "Go to brief" |
+| checkpoint.ethicsRunning | "Checking the brief against our ethics rules…" |
+| checkpoint.review | "Review" |
+| checkpoint.startResearch / checkpoint.starting | "Start research" / "Starting…" |
+| checkpoint.running | "{stage} is running · {elapsed}" |
+| checkpoint.cancel / checkpoint.cancelling | "Cancel" / "Cancelling…" |
+| checkpoint.retry | "Try again" |
+| checkpoint.researchDone | "Research finished. Themes and opportunities arrive in the next build step." (prototype only) |
+| checkpoint.collapse / checkpoint.expand | "Hide" / "Show what's next" |
+| step.status | "Done" / "Running" / "Didn't work" / "Waiting" |
+| research.steps | "Client data" / "Academic papers" / "Web and market" / "Competitors" / "Reviews and forums" |
+
 **Turning things off and undoing:** deactivating a member, removing an allowlist entry, cancelling a stage, and undoing a delete all use `[common.saveFailed]` if they fail, and leave the previous state unchanged.
 
 ## 8. Behavioural design notes (for Fluently's own interface)

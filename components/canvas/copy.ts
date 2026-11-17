@@ -1,0 +1,123 @@
+// Tree, details panel and decision bar copy (SCR5, SCR7, SCR8), quoted from
+// specs/fluently-mvp/03-ux-flows.md section 7.
+export const laneNames: Record<string, string> = {
+  objectives: "Objectives",
+  evidence: "Evidence",
+  themes: "Themes",
+  opportunities: "Opportunities",
+  solutions: "Solutions",
+  wireframes: "Wireframes",
+  tests: "Tests",
+};
+
+export const typeNames: Record<string, string> = {
+  objective: "Objective",
+  asset_set: "Current assets",
+  ethics: "Ethics check",
+  source: "Source",
+  finding: "Finding",
+  theme: "Theme",
+  opportunity: "Opportunity",
+  gap: "Gap",
+  recommendation: "Solution",
+  lofi_variant: "Wireframe",
+  annotation: "Annotation",
+  test_plan: "Test plan",
+  override: "Override",
+  reference: "Reference",
+};
+
+export const canvasCopy = {
+  tabs: { canvas: "Canvas", brief: "Brief", report: "Report" },
+  cost: (spent: string, cap: string) => `${spent} of ${cap} AI budget`,
+  fit: "Fit to screen",
+  zoomIn: "Zoom in",
+  zoomOut: "Zoom out",
+  listView: "List view",
+  canvasView: "Canvas view",
+  addCard: (lane: string) => `Add a card to ${lane}`,
+  intakeFirst: "Start with the intake. Your objectives will appear here.",
+  lockedWhileRunning: (stage: string) =>
+    `This is being worked on right now. You can edit it once ${stage} finishes.`,
+  offline: "You're offline. Changes will save when you reconnect.",
+  sessionExpired:
+    "You've been signed out. Sign in again to keep working; nothing you typed is lost.",
+  ethicsStatus: {
+    passed: "Passed",
+    flagged: (n: number) => `Flagged · ${n} ${n === 1 ? "rule" : "rules"}`,
+    running: "Checking…",
+    failed: "Didn't run",
+    overridden: "Overridden",
+  },
+  markers: {
+    stale: "Out of date",
+    lowSpecificity: "Low specificity",
+    failed: "Failed",
+    running: "Running",
+    flagged: "Flagged",
+    overridden: "Overridden",
+  },
+  inspector: {
+    type: "Type",
+    stage: "Stage",
+    madeBy: "Made by",
+    model: "Model",
+    status: "Status",
+    created: "Created",
+    madeByValues: { ai: "AI", ai_edited: "AI, edited by a person", human: "A person" } as Record<
+      string,
+      string
+    >,
+    connected: "Connected to",
+    history: "History",
+    historyNames: {
+      created: "Created",
+      edited: "Edited",
+      regenerated: "Regenerated",
+      merged: "Merged",
+      deleted: "Deleted",
+      restored: "Restored",
+    } as Record<string, string>,
+    close: "Close details",
+  },
+  checkpoint: {
+    goToBrief: "Go to brief",
+    ethicsRunning: "Checking the brief against our ethics rules…",
+    ethicsWaiting: "The ethics check needs your decision.",
+    ethicsFailed: "The ethics check didn't run. Research stays paused until it does.",
+    review: "Review",
+    readyResearch:
+      "Objectives approved and the ethics check passed. Next: research. It runs in the background and usually takes 10–20 minutes.",
+    startResearch: "Start research",
+    starting: "Starting…",
+    running: (stage: string, elapsed: string) => `${stage} is running · ${elapsed}`,
+    cancel: "Cancel",
+    cancelling: "Cancelling…",
+    retry: "Try again",
+    partialFail: (steps: string) =>
+      `Research finished, but ${steps} didn't work. Confidence is lower where those sources are missing.`,
+    failed: (stage: string) =>
+      `${stage} stopped before it finished. Everything made so far is kept.`,
+    cancelled: (stage: string) => `${stage} was cancelled. Everything made so far is kept.`,
+    researchDone: "Research finished. Themes and opportunities arrive in the next build step.",
+    noToolkit:
+      "Upload the Behavioural Design Toolkit before running research. Fluently cites every principle from it.",
+    noToolkitMember: "Research is waiting for the toolkit. Ask your Fluently admin to upload it.",
+    uploadToolkit: "Upload toolkit",
+    collapse: "Hide",
+    expand: "Show what's next",
+  },
+  stepStatus: {
+    done: "Done",
+    running: "Running",
+    failed: "Didn't work",
+    waiting: "Waiting",
+  } as Record<string, string>,
+  researchSteps: {
+    client_data: "Client data",
+    papers: "Academic papers",
+    web: "Web and market",
+    competitors: "Competitors",
+    reviews: "Reviews and forums",
+  } as Record<string, string>,
+} as const;
