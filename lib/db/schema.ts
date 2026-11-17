@@ -16,6 +16,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { authenticatedRole, authUid, authUsers } from "drizzle-orm/supabase";
+import { DEFAULT_MODEL_PRICES, DEFAULT_STAGE_MODELS } from "../ai/models";
 
 const id = () => uuid("id").primaryKey().defaultRandom();
 const timestamps = () => ({
@@ -46,6 +47,12 @@ export const workspaces = pgTable(
       .notNull()
       .default(sql`'{}'::text[]`),
     defaultToolkitVersionId: uuid("default_toolkit_version_id"),
+    stageModels: jsonb("stage_models")
+      .notNull()
+      .default(sql.raw(`'${JSON.stringify(DEFAULT_STAGE_MODELS)}'::jsonb`)),
+    modelPrices: jsonb("model_prices")
+      .notNull()
+      .default(sql.raw(`'${JSON.stringify(DEFAULT_MODEL_PRICES)}'::jsonb`)),
     ...timestamps(),
   },
   (t) => [
@@ -300,6 +307,41 @@ export const projectRatings = pgTable(
       for: "insert",
       to: authenticatedRole,
       withCheck: sql`public.is_member(${t.workspaceId}) and ${t.memberId} = ${authUid}`,
+    }),
+  ],
+).enableRLS();
+
+// ---------- Slice 2: AI usage log (04 section 4, AC27.1) ----------
+
+export const aiUsage = pgTable(
+  "ai_usage",
+  {
+    id: id(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "restrict" }),
+    projectId: uuid("project_id").references(() => projects.id, { onDelete: "set null" }),
+    stage: text("stage").notNull(),
+    step: text("step").notNull(),
+    model: text("model").notNull(),
+    inputTokens: integer("input_tokens").notNull(),
+    outputTokens: integer("output_tokens").notNull(),
+    cacheReadTokens: integer("cache_read_tokens").notNull().default(0),
+    cacheWriteTokens: integer("cache_write_tokens").notNull().default(0),
+    webSearches: integer("web_searches").notNull().default(0),
+    costUsd: numeric("cost_usd", { precision: 10, scale: 5 }).notNull(),
+    durationMs: integer("duration_ms").notNull(),
+    success: boolean("success").notNull(),
+    ...timestamps(),
+  },
+  (t) => [
+    index("ai_usage_project_stage_idx").on(t.projectId, t.stage),
+    index("ai_usage_workspace_idx").on(t.workspaceId, t.createdAt),
+    // Members read their workspace's usage; only server jobs (service role) write it.
+    pgPolicy("ai_usage_select", {
+      for: "select",
+      to: authenticatedRole,
+      using: isMember("workspace_id"),
     }),
   ],
 ).enableRLS();

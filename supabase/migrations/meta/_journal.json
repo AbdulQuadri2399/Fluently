@@ -36,6 +36,20 @@
       "when": 1794881872515,
       "tag": "20261117021752_projects_triggers",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794883011427,
+      "tag": "20261117023651_settings",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794883019166,
+      "tag": "20261117023659_member_admin",
+      "breakpoints": true
     }
   ]
 }

@@ -23,7 +23,33 @@ export type Database = {
           }
         },"public": {
           Tables: {
-            "allowlist_entries": {
+            "ai_usage": {
+                  Row: {
+                    "cache_read_tokens": number,"cache_write_tokens": number,"cost_usd": number,"created_at": string,"duration_ms": number,"id": string,"input_tokens": number,"model": string,"output_tokens": number,"project_id": string | null,"stage": string,"step": string,"success": boolean,"updated_at": string,"web_searches": number,"workspace_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "cache_read_tokens"?: number,"cache_write_tokens"?: number,"cost_usd": number,"created_at"?: string,"duration_ms": number,"id"?: string,"input_tokens": number,"model": string,"output_tokens": number,"project_id"?: string | null,"stage": string,"step": string,"success": boolean,"updated_at"?: string,"web_searches"?: number,"workspace_id": string
+                  }
+                  Update: {
+                    "cache_read_tokens"?: number,"cache_write_tokens"?: number,"cost_usd"?: number,"created_at"?: string,"duration_ms"?: number,"id"?: string,"input_tokens"?: number,"model"?: string,"output_tokens"?: number,"project_id"?: string | null,"stage"?: string,"step"?: string,"success"?: boolean,"updated_at"?: string,"web_searches"?: number,"workspace_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "ai_usage_project_id_projects_id_fk"
+      columns: ["project_id"]
+isOneToOne: false
+      referencedRelation: "projects"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "ai_usage_workspace_id_workspaces_id_fk"
+      columns: ["workspace_id"]
+isOneToOne: false
+      referencedRelation: "workspaces"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"allowlist_entries": {
                   Row: {
                     "created_at": string,"created_by": string | null,"id": string,"kind": string,"updated_at": string,"value": string,"workspace_id": string
                   }
@@ -193,14 +219,14 @@ isOneToOne: false
                   ]
                 },"workspaces": {
                   Row: {
-                    "agency_services": (string)[],"cost_cap_gbp": number,"created_at": string,"default_toolkit_version_id": string | null,"gbp_per_usd": number,"id": string,"name": string,"sector_flag_list": (string)[],"sector_refuse_list": (string)[],"updated_at": string
+                    "agency_services": (string)[],"cost_cap_gbp": number,"created_at": string,"default_toolkit_version_id": string | null,"gbp_per_usd": number,"id": string,"model_prices": NonNullable<Json>,"name": string,"sector_flag_list": (string)[],"sector_refuse_list": (string)[],"stage_models": NonNullable<Json>,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "agency_services"?: (string)[],"cost_cap_gbp"?: number,"created_at"?: string,"default_toolkit_version_id"?: string | null,"gbp_per_usd"?: number,"id"?: string,"name": string,"sector_flag_list"?: (string)[],"sector_refuse_list"?: (string)[],"updated_at"?: string
+                    "agency_services"?: (string)[],"cost_cap_gbp"?: number,"created_at"?: string,"default_toolkit_version_id"?: string | null,"gbp_per_usd"?: number,"id"?: string,"model_prices"?: NonNullable<Json>,"name": string,"sector_flag_list"?: (string)[],"sector_refuse_list"?: (string)[],"stage_models"?: NonNullable<Json>,"updated_at"?: string
                   }
                   Update: {
-                    "agency_services"?: (string)[],"cost_cap_gbp"?: number,"created_at"?: string,"default_toolkit_version_id"?: string | null,"gbp_per_usd"?: number,"id"?: string,"name"?: string,"sector_flag_list"?: (string)[],"sector_refuse_list"?: (string)[],"updated_at"?: string
+                    "agency_services"?: (string)[],"cost_cap_gbp"?: number,"created_at"?: string,"default_toolkit_version_id"?: string | null,"gbp_per_usd"?: number,"id"?: string,"model_prices"?: NonNullable<Json>,"name"?: string,"sector_flag_list"?: (string)[],"sector_refuse_list"?: (string)[],"stage_models"?: NonNullable<Json>,"updated_at"?: string
                   }
                   Relationships: [
                     
@@ -222,6 +248,12 @@ isOneToOne: false
                            },
 "is_member":
 { Args: { "ws": string }; Returns: boolean
+                           },
+"set_member_active":
+{ Args: { "is_active": boolean,"member_id": string }; Returns: undefined
+                           },
+"set_member_role":
+{ Args: { "member_id": string,"new_role": string }; Returns: undefined
                            }
           }
           Enums: {
