@@ -21,11 +21,9 @@ test.describe("FL2 create a project (AC7.1, AC7.3)", () => {
     await expect(page.getByRole("heading", { name: "Projects", level: 1 })).toBeVisible();
     await expect(page.getByRole("heading", { name: "No projects yet" })).toBeVisible();
     await expect(
-      page
-        .getByRole("status")
-        .filter({
-          hasText: "Research is waiting for the toolkit. Ask your Fluently admin to upload it.",
-        }),
+      page.getByRole("status").filter({
+        hasText: "Research is waiting for the toolkit. Ask your Fluently admin to upload it.",
+      }),
     ).toBeVisible();
     await shoot(page, "SCR3-empty");
 

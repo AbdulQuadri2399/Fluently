@@ -72,7 +72,7 @@ You'll be able to see: Settings with allowlist, members, models per stage, cost 
   Done when: `tests/integration/O5-allowlist.test.ts` ('add email', 'add domain', 'invalid entry → validation', 'removed entry blocks new sign-up, keeps existing account') and `tests/integration/O6-members.test.ts` ('deactivated member cannot read projects', 'last admin cannot be demoted → conflict') pass.
 - [x] T2.3 O7 `updateWorkspaceSettings` (models + effort per stage, cost cap £1–£500, GBP rate, agency services, flag/refuse sector lists) — S — Refs: AC28.1, AC10.4, AC13.3 — Depends on: T2.1
   Done when: `tests/integration/O7-settings.test.ts` passes: admin saves; member gets `forbidden`; cap 0 and 501 → `validation`.
-- [ ] T2.4 SCR12 UI: admin sections and member read-only usage, all SCR12 states and copy; usage table per project/stage in GBP (`lib/ai/cost.ts` conversion) — M — Refs: AC3.6, AC27.2, SCR12 — Depends on: T2.2, T2.3
+- [x] T2.4 SCR12 UI: admin sections and member read-only usage, all SCR12 states and copy; usage table per project/stage in GBP (`lib/ai/cost.ts` conversion) — M — Refs: AC3.6, AC27.2, SCR12 — Depends on: T2.2, T2.3
   Done when: `tests/components/SCR12-settings.test.tsx` covers default admin, default member, invalid entry, last admin, saved, save failed; `tests/unit/cost.test.ts` 'USD→GBP at configured rate, per-model prices incl. cache and web search' passes; screenshots vs 03b SCR11/SCR12 row.
 
 Slice check: suite green; a member account can't see admin controls (e2e `e2e/settings.spec.ts`). **Stop for the user.**
