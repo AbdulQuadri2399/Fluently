@@ -538,6 +538,28 @@ Format: user action → system response → resulting state (ACs).
 | settings.colProject / settings.colCalls / settings.colCost / settings.total | "Project" / "AI calls" / "Cost" / "Total" |
 | settings.save / settings.saving | "Save changes" / "Saving…" |
 
+**Added during the build (Slice 3, 2026-11-17): please confirm this wording.** Toolkit page (SCR11).
+
+| Key | Copy |
+|---|---|
+| toolkit.title / toolkit.uploadNew | "Toolkit" / "Upload new version" |
+| toolkit.checking | "Checking your file…" |
+| toolkit.errorFile | "Use a CSV or JSON file up to 10 MB." |
+| toolkit.errorUnreadable | "Couldn't read this file. Check it's a CSV or JSON export of the toolkit." |
+| toolkit.errorEmpty | "This file has no principles in it." |
+| toolkit.errorsTitle | "Fix these problems and upload the file again. Nothing has been saved." |
+| toolkit.warningsTitle | "Warnings" |
+| toolkit.warnUnknownColumns | "Fluently doesn't use these columns, so they were left out: {columns}." |
+| toolkit.warnRelatedNotFound | "Row {row}: the related principle \"{text}\" isn't in this file, so no connection was made. The text is kept." |
+| toolkit.counts | "{n} rows" · "{n} principles" · "{strong} strong · {some} some · {none} none" |
+| toolkit.saveAs / toolkit.savingAs | "Save as version {n}" / "Saving version {n}…" |
+| toolkit.chooseAnother | "Choose another file" |
+| toolkit.versions / toolkit.candidates | "Versions" / "Toolkit candidates" |
+| toolkit.candidatesEmpty | "No candidates yet. When research finds a principle that isn't in the toolkit, it's listed here for review." |
+| toolkit.columns | "Version" / "File" / "Uploaded" / "Principles" / "Evidence" |
+| toolkit.versionLabel / toolkit.default | "Version {n}" / "Default" |
+| toolkit.pin | "Toolkit v{n}" / "newer v{n} available" (project header, EC1) |
+
 **Turning things off and undoing:** deactivating a member, removing an allowlist entry, cancelling a stage, and undoing a delete all use `[common.saveFailed]` if they fail, and leave the previous state unchanged.
 
 ## 8. Behavioural design notes (for Fluently's own interface)
