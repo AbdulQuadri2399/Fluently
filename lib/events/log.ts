@@ -9,7 +9,8 @@ export type EventName =
   | "intake_suggestion_resolved"
   | "objectives_approved"
   | "ethics_override_recorded"
-  | "node_edited";
+  | "node_edited"
+  | "report_exported";
 
 /**
  * O33 logEvent: records one event for the signed-in member. Never throws and never blocks

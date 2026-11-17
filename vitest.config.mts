@@ -19,6 +19,9 @@ export default defineConfig({
         extends: true,
         test: {
           name: "int",
+          alias: {
+            "server-only": new URL("./tests/helpers/server-only.ts", import.meta.url).pathname,
+          },
           include: [
             "tests/integration/**/*.test.ts",
             "tests/rls/**/*.test.ts",

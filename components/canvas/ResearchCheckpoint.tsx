@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 import { canvasCopy as c } from "./copy";
 import { StrengthTag } from "./StrengthTag";
 
@@ -25,12 +26,18 @@ export function ResearchCheckpoint({
   note,
   onApprove,
   onSendBack,
+  onSelectionChange,
+  expanded = false,
 }: {
   opportunities: OpportunityOption[];
   /** e.g. the partial-failure message with Retry failed steps (AC11.5). */
   note?: React.ReactNode;
   onApprove: (selection: string[]) => Promise<boolean>;
   onSendBack: (feedback: string, replaceHuman: boolean) => Promise<boolean>;
+  /** The panel shows the count when minimised (AC25.5). */
+  onSelectionChange?: (count: number) => void;
+  /** Full-height panel: the list isn't capped. */
+  expanded?: boolean;
 }) {
   const [selected, setSelected] = useState<Set<string>>(() => new Set());
   const [busy, setBusy] = useState<null | "approve" | "send">(null);
@@ -49,7 +56,7 @@ export function ResearchCheckpoint({
           {c.checkpoint.allLow}
         </p>
       ) : null}
-      <ul className="grid max-h-56 gap-1 overflow-y-auto">
+      <ul className={cn("grid gap-1", !expanded && "max-h-56 overflow-y-auto")}>
         {opportunities.map((o) => {
           const id = `opp-${o.id}`;
           return (
@@ -57,14 +64,13 @@ export function ResearchCheckpoint({
               <Checkbox
                 id={id}
                 checked={selected.has(o.id)}
-                onCheckedChange={(v) =>
-                  setSelected((s) => {
-                    const next = new Set(s);
-                    if (v === true) next.add(o.id);
-                    else next.delete(o.id);
-                    return next;
-                  })
-                }
+                onCheckedChange={(v) => {
+                  const next = new Set(selected);
+                  if (v === true) next.add(o.id);
+                  else next.delete(o.id);
+                  setSelected(next);
+                  onSelectionChange?.(next.size);
+                }}
                 className="mt-0.5"
               />
               <Label htmlFor={id} className="grid flex-1 cursor-pointer gap-0.5 font-normal">

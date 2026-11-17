@@ -1,8 +1,14 @@
 "use client";
 
-import { CheckIcon, XIcon } from "@phosphor-icons/react/dist/ssr";
+import {
+  ArrowsInSimpleIcon,
+  ArrowsOutSimpleIcon,
+  CheckIcon,
+  MinusIcon,
+  XIcon,
+} from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { stageNames } from "@/components/projects/copy";
 import { Button } from "@/components/ui/button";
 import type { RunInfo, TreeNode } from "@/lib/canvas/load";
@@ -58,6 +64,42 @@ export function barState(input: {
   };
 }
 
+export type PanelSize = "minimised" | "standard" | "expanded";
+const SIZE_KEY = "fluently.checkpointSize";
+const SIZE_EVENT = "fluently:checkpoint-size";
+
+/** AC25.5: the panel size is remembered in this browser for the signed-in person. */
+function usePanelSize(): [PanelSize, (s: PanelSize) => void] {
+  const size = useSyncExternalStore(
+    (onChange) => {
+      window.addEventListener("storage", onChange);
+      window.addEventListener(SIZE_EVENT, onChange);
+      return () => {
+        window.removeEventListener("storage", onChange);
+        window.removeEventListener(SIZE_EVENT, onChange);
+      };
+    },
+    (): PanelSize => {
+      try {
+        const v = window.localStorage.getItem(SIZE_KEY);
+        return v === "minimised" || v === "expanded" ? v : "standard";
+      } catch {
+        return "standard";
+      }
+    },
+    (): PanelSize => "standard",
+  );
+  const set = (next: PanelSize) => {
+    try {
+      window.localStorage.setItem(SIZE_KEY, next);
+    } catch {
+      // Private windows: the size still changes for this visit.
+    }
+    window.dispatchEvent(new Event(SIZE_EVENT));
+  };
+  return [size, set];
+}
+
 function elapsed(from: string | null, now: number) {
   if (!from) return "0:00";
   const s = Math.max(0, Math.floor((now - new Date(from).getTime()) / 1000));
@@ -86,7 +128,8 @@ export function CheckpointBar({
   onSendBack?: (feedback: string, replaceHuman: boolean) => Promise<boolean>;
   onRetry?: (runId: string, synthesisOnly: boolean) => Promise<void>;
 }) {
-  const [collapsed, setCollapsed] = useState(false);
+  const [size, setSize] = usePanelSize();
+  const [chosen, setChosen] = useState(0);
   const [busy, setBusy] = useState(false);
   const [now, setNow] = useState(() => Date.now());
   const runningRun = state.kind === "running" ? state.run : null;
@@ -240,91 +283,129 @@ export function CheckpointBar({
       break;
   }
 
-  if (collapsed) {
+  const sizeButton = (to: PanelSize) => {
+    const label =
+      to === "minimised"
+        ? c.panel.minimise
+        : to === "expanded"
+          ? c.panel.expand
+          : size === "minimised"
+            ? c.checkpoint.expand
+            : c.panel.standard;
+    const Icon =
+      to === "minimised" ? MinusIcon : to === "expanded" ? ArrowsOutSimpleIcon : ArrowsInSimpleIcon;
     return (
-      <div className="absolute bottom-4 left-1/2 z-10 -translate-x-1/2">
-        <Button variant="secondary" onClick={() => setCollapsed(false)}>
-          {c.checkpoint.expand}
-        </Button>
-      </div>
+      <button
+        key={to}
+        type="button"
+        onClick={() => setSize(to)}
+        className="inline-flex items-center gap-1 rounded-xs px-1.5 py-1 text-caption text-muted hover:bg-soft hover:text-ink"
+      >
+        <Icon aria-hidden="true" className="size-3.5" />
+        {label}
+      </button>
     );
-  }
+  };
+  const minimised = size === "minimised";
+  const expanded = size === "expanded";
   return (
     <section
-      aria-label={c.checkpoint.expand}
-      className="absolute bottom-4 left-1/2 z-10 grid w-[780px] max-w-[calc(100%-2rem)] -translate-x-1/2 gap-3 rounded-[10px] border border-line bg-surface p-4 shadow-elev-1 duration-base animate-in fade-in-0"
+      aria-label={c.checkpoint.panelName}
+      data-size={size}
+      className={cn(
+        "absolute left-1/2 z-10 grid -translate-x-1/2 gap-3 rounded-[10px] border border-line bg-surface p-4 shadow-elev-1 duration-base animate-in fade-in-0",
+        expanded
+          ? "top-14 bottom-4 w-[960px] max-w-[calc(100%-2rem)] content-start overflow-y-auto"
+          : "bottom-4 w-[780px] max-w-[calc(100%-2rem)]",
+        minimised && "py-2.5",
+      )}
     >
-      {state.kind === "choose" && onApprove && onSendBack ? (
-        <ResearchCheckpoint
-          opportunities={opportunities}
-          note={
-            state.partial ? (
-              <div className="flex items-center gap-3 rounded-sm bg-warn-bg px-3 py-2 text-small text-warn">
-                <span className="flex-1">
-                  {c.checkpoint.partialFail(
-                    state.run.steps
-                      .filter((s) => s.status === "failed")
-                      .map((s) => c.researchSteps[s.key] ?? s.key)
-                      .join(", "),
-                  )}
+      {minimised ? (
+        <div className="flex items-center gap-4">
+          <p aria-live="polite" className="flex-1 truncate text-small">
+            {state.kind === "choose"
+              ? `${c.checkpoint.chooseOpportunities} · ${c.checkpoint.selected(chosen)}`
+              : message}
+          </p>
+          {sizeButton("standard")}
+          {sizeButton("expanded")}
+          {state.kind === "choose" ? null : action}
+        </div>
+      ) : (
+        <div className="-my-1 flex justify-end gap-1">
+          {sizeButton("minimised")}
+          {expanded ? sizeButton("standard") : sizeButton("expanded")}
+        </div>
+      )}
+      {/* Minimised keeps the content mounted (hidden), so choices and typed feedback survive. */}
+      <div className="contents" hidden={minimised}>
+        {state.kind === "choose" && onApprove && onSendBack ? (
+          <ResearchCheckpoint
+            opportunities={opportunities}
+            note={
+              state.partial ? (
+                <div className="flex items-center gap-3 rounded-sm bg-warn-bg px-3 py-2 text-small text-warn">
+                  <span className="flex-1">
+                    {c.checkpoint.partialFail(
+                      state.run.steps
+                        .filter((s) => s.status === "failed")
+                        .map((s) => c.researchSteps[s.key] ?? s.key)
+                        .join(", "),
+                    )}
+                  </span>
+                  {retryButton(state.run.id, false, c.checkpoint.retryFailed, "secondary")}
+                </div>
+              ) : null
+            }
+            onApprove={onApprove}
+            onSendBack={onSendBack}
+            onSelectionChange={setChosen}
+            expanded={expanded}
+          />
+        ) : null}
+        <div className={cn("flex items-center gap-4", state.kind === "choose" && "hidden")}>
+          <p aria-live="polite" className="flex-1 text-small">
+            {state.kind === "ethicsRunning" || state.kind === "running" ? (
+              <span
+                aria-hidden="true"
+                className="mr-2 inline-block size-3 animate-spin rounded-full border-2 border-line-strong border-t-ink align-[-1px]"
+              />
+            ) : null}
+            {message}
+          </p>
+          {action}
+        </div>
+        {steps?.length ? (
+          <ol
+            aria-live="polite"
+            className="flex flex-wrap gap-x-5 gap-y-1.5 border-t border-line pt-3 text-caption"
+          >
+            {steps.map((s) => (
+              <li
+                key={s.key}
+                className={cn("flex items-center gap-1.5", s.status === "waiting" && "text-muted")}
+              >
+                {s.status === "done" ? (
+                  <CheckIcon aria-hidden="true" weight="bold" className="size-3 text-ok" />
+                ) : s.status === "failed" ? (
+                  <XIcon aria-hidden="true" weight="bold" className="size-3 text-bad" />
+                ) : s.status === "running" ? (
+                  <span
+                    aria-hidden="true"
+                    className="size-2.5 animate-spin rounded-full border-2 border-line-strong border-t-ink"
+                  />
+                ) : (
+                  <span aria-hidden="true" className="size-2 rounded-full bg-line-strong" />
+                )}
+                <span>
+                  {c.researchSteps[s.key] ?? s.key}: {c.stepStatus[s.status]}
+                  {s.status === "done" && s.count !== undefined ? ` · ${s.count}` : ""}
                 </span>
-                {retryButton(state.run.id, false, c.checkpoint.retryFailed, "secondary")}
-              </div>
-            ) : null
-          }
-          onApprove={onApprove}
-          onSendBack={onSendBack}
-        />
-      ) : null}
-      <div className={cn("flex items-center gap-4", state.kind === "choose" && "hidden")}>
-        <p aria-live="polite" className="flex-1 text-small">
-          {state.kind === "ethicsRunning" || state.kind === "running" ? (
-            <span
-              aria-hidden="true"
-              className="mr-2 inline-block size-3 animate-spin rounded-full border-2 border-line-strong border-t-ink align-[-1px]"
-            />
-          ) : null}
-          {message}
-        </p>
-        <button
-          type="button"
-          onClick={() => setCollapsed(true)}
-          className="text-caption text-muted hover:text-ink"
-        >
-          {c.checkpoint.collapse}
-        </button>
-        {action}
+              </li>
+            ))}
+          </ol>
+        ) : null}
       </div>
-      {steps?.length ? (
-        <ol
-          aria-live="polite"
-          className="flex flex-wrap gap-x-5 gap-y-1.5 border-t border-line pt-3 text-caption"
-        >
-          {steps.map((s) => (
-            <li
-              key={s.key}
-              className={cn("flex items-center gap-1.5", s.status === "waiting" && "text-muted")}
-            >
-              {s.status === "done" ? (
-                <CheckIcon aria-hidden="true" weight="bold" className="size-3 text-ok" />
-              ) : s.status === "failed" ? (
-                <XIcon aria-hidden="true" weight="bold" className="size-3 text-bad" />
-              ) : s.status === "running" ? (
-                <span
-                  aria-hidden="true"
-                  className="size-2.5 animate-spin rounded-full border-2 border-line-strong border-t-ink"
-                />
-              ) : (
-                <span aria-hidden="true" className="size-2 rounded-full bg-line-strong" />
-              )}
-              <span>
-                {c.researchSteps[s.key] ?? s.key}: {c.stepStatus[s.status]}
-                {s.status === "done" && s.count !== undefined ? ` · ${s.count}` : ""}
-              </span>
-            </li>
-          ))}
-        </ol>
-      ) : null}
     </section>
   );
 }

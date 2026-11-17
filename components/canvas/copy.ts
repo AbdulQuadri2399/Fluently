@@ -31,6 +31,7 @@ export const canvasCopy = {
   tabs: { canvas: "Canvas", brief: "Brief", report: "Report" },
   cost: (spent: string, cap: string) => `${spent} of ${cap} AI budget`,
   strengthLabel: (level: string) => `${level} strength`,
+  panel: { minimise: "Minimise", expand: "Expand", standard: "Standard size" },
   fit: "Fit to screen",
   zoomIn: "Zoom in",
   zoomOut: "Zoom out",
@@ -170,8 +171,8 @@ export const canvasCopy = {
       "Upload the Behavioural Design Toolkit before running research. Fluently cites every principle from it.",
     noToolkitMember: "Research is waiting for the toolkit. Ask your Fluently admin to upload it.",
     uploadToolkit: "Upload toolkit",
-    collapse: "Hide",
     expand: "Show what's next",
+    panelName: "Decision panel",
     chooseOpportunities: "Research is done. Choose which opportunities to take forward.",
     selectAtLeastOne: "Choose at least one opportunity to continue.",
     allLow:

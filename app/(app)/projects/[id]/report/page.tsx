@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { DownloadMenu } from "@/components/report/DownloadMenu";
 import { CitationCheck, ReportNotYet, ReportView } from "@/components/report/ReportView";
 import { getReport } from "@/lib/report/model";
 import { createClient } from "@/lib/supabase/server";
@@ -26,6 +27,7 @@ export default async function ReportPage({
           report={report}
           canvasHref={`/projects/${id}`}
           citationsHref={`${base}?view=citations`}
+          actions={<DownloadMenu projectId={id} />}
         />
       )}
     </main>

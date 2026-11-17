@@ -75,14 +75,6 @@ describe("SCR8 decision bar", () => {
     expect(screen.getByRole("button", { name: c.checkpoint.startResearch })).toBeInTheDocument();
   });
 
-  it("collapsed: Hide folds it to one button that brings it back", async () => {
-    bar({ kind: "readyResearch", noToolkit: null });
-    await userEvent.click(screen.getByRole("button", { name: c.checkpoint.collapse }));
-    expect(screen.queryByText(c.checkpoint.readyResearch)).not.toBeInTheDocument();
-    await userEvent.click(screen.getByRole("button", { name: c.checkpoint.expand }));
-    expect(screen.getByText(c.checkpoint.readyResearch)).toBeInTheDocument();
-  });
-
   it("intake first and ethics states link back to the brief", () => {
     bar({ kind: "intakeFirst" });
     expect(screen.getByText(c.intakeFirst)).toBeInTheDocument();

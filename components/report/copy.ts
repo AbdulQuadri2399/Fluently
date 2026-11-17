@@ -64,6 +64,7 @@ export const reportCopy = {
   downloadPdf: "PDF",
   exporting: "Preparing your file…",
   exportFailed: "Export didn't work. Try again.",
+  retry: "Try again",
   sourceKinds: {
     upload: "Client data",
     paper: "Academic papers",
