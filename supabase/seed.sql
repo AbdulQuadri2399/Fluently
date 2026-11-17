@@ -25,8 +25,8 @@ select gen_random_uuid(), u.id, u.id::text,
        'email', now(), now(), now()
 from auth.users u where u.email in ('admin@fluently.test', 'member@fluently.test');
 
-update public.members set role = 'admin', display_name = 'Dev Admin' where email = 'admin@fluently.test';
-update public.members set display_name = 'Dev Member' where email = 'member@fluently.test';
+update public.members set role = 'admin', display_name = 'Dev Admin', onboarded_at = now() where email = 'admin@fluently.test';
+update public.members set display_name = 'Dev Member', onboarded_at = now() where email = 'member@fluently.test';
 
 -- Slice 1: example projects for development (each gets an empty brief via trigger).
 insert into public.projects (id, workspace_id, name, mode, channel, client_label, status, current_stage, created_by, updated_by)
