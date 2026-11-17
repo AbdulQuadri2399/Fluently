@@ -26,13 +26,13 @@ You'll be able to see: the sign-in page, sign-up with the invite-list rule, and 
   Done when: `tests/components/SCR1-auth.test.tsx` passes one test per SCR1 state (default, loading, wrong credentials, not allowlisted, check email, reset sent, link expired, offline) asserting 03 copy; `e2e/FL1.spec.ts` 'sign up → verify via local mail catcher → sign in → lands on /projects' passes; `e2e/FF1.spec.ts` 'non-allowlisted sign-up shows auth.notAllowed' passes.
 - [x] T0.7 Placeholder `/projects` page with top bar (logo, Projects, Toolkit, Settings, help menu, account menu with Sign out) — S — Refs: 03 §1 — Depends on: T0.6
   Done when: `e2e/smoke.spec.ts` 'signed-in user sees top bar and can sign out' passes.
-- [ ] T0.8 GitHub Actions CI: install, lint, typecheck, unit/component tests, `supabase start` + `db:reset` + `test:int`, Playwright e2e, `gitleaks`, `scripts/check-toolkit-fixture.sh` (NFR9) — M — Refs: NFR5, NFR9 — Depends on: T0.2, T0.3
+- [x] T0.8 GitHub Actions CI: install, lint, typecheck, unit/component tests, `supabase start` + `db:reset` + `test:int`, Playwright e2e, `gitleaks`, `scripts/check-toolkit-fixture.sh` (NFR9) — M — Refs: NFR5, NFR9 — Depends on: T0.2, T0.3
   Done when: CI run on the branch is green (link in slice report).
 - [x] T0.9 [P] `e2e/helpers/shoot.ts` (screenshot helper at 1280 and 1024 widths, light and dark; widths changed from 1280/390 on 2026-11-16 for desktop only) and `e2e/helpers/auth.ts` (sign-in as seeded admin/member) — S — Refs: 03b — Depends on: T0.2
   Done when: `e2e/smoke.spec.ts` saves `e2e/screenshots/SCR1-default.png` in both themes.
 - [x] T0.10 `CLAUDE.md` (product line, pointer to `specs/fluently-mvp/`, stack branch and 04 link, commands, rules per tech-spec-planner §6); `.env.example` from 04 §10; Sentry init (DSN optional locally) — S — Refs: 04 §10 — Depends on: T0.1
   Done when: file exists with every command in 04 §11; `pnpm build` passes with no Sentry DSN set.
-- [ ] T0.11 Vercel project linked, preview deploy per branch, env vars set (needs user: Vercel + Supabase cloud project) — S — Refs: 04 §2 — Depends on: T0.6
+- [x] T0.11 Vercel project linked, preview deploy per branch, env vars set (needs user: Vercel + Supabase cloud project) — S — Refs: 04 §2 — Depends on: T0.6
   Done when: preview URL shows SCR1 and sign-in works against the Supabase dev project.
 
 Slice check: `pnpm lint && pnpm typecheck && pnpm test && pnpm test:int && pnpm test:e2e -- --trace off` green; CI green; preview URL live; SCR1 screenshots match 03b §5 row SCR1. **Stop for the user.**
