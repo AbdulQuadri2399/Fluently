@@ -570,6 +570,7 @@ export const stageRuns = pgTable(
     replaceHuman: boolean("replace_human").notNull().default(false),
     model: text("model"),
     inngestRunId: text("inngest_run_id"),
+    retryOf: uuid("retry_of"),
     errorCode: text("error_code"),
     startedAt: timestamp("started_at", { withTimezone: true }),
     finishedAt: timestamp("finished_at", { withTimezone: true }),

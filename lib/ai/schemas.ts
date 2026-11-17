@@ -27,3 +27,54 @@ export const ethicsSchema = z.object({
     .max(10),
 });
 export type EthicsOutput = z.infer<typeof ethicsSchema>;
+
+/** J2 findings step (AC12.2): each finding cites source handles from this run, or says it's AI inference. */
+export const findingsSchema = z.object({
+  findings: z
+    .array(
+      z.object({
+        text: z.string().min(1).max(400),
+        sourceHandles: z.array(z.string().max(12)).max(10),
+        aiInference: z.boolean(),
+        stance: z.enum(["supports", "contradicts", "neutral"]),
+      }),
+    )
+    .max(30),
+});
+export type FindingsOutput = z.infer<typeof findingsSchema>;
+
+/** J2 synthesis step (AC12.5, AC12.9, AC13.1): themes, opportunities, gaps, external principles. */
+export const synthesisSchema = z.object({
+  themes: z
+    .array(
+      z.object({
+        title: z.string().min(1).max(160),
+        summary: z.string().max(600),
+        findings: z.array(z.number().int().min(0)).min(1),
+      }),
+    )
+    .max(10),
+  opportunities: z
+    .array(
+      z.object({
+        title: z.string().min(1).max(160),
+        summary: z.string().max(600),
+        themes: z.array(z.number().int().min(0)).min(1),
+        principleKeys: z.array(z.string().max(40)).max(6),
+        contradicts: z.boolean(),
+        gapQuestion: z.string().max(400).nullable(),
+        gapMethod: z.string().max(120).nullable(),
+      }),
+    )
+    .max(8),
+  externalPrinciples: z
+    .array(
+      z.object({
+        name: z.string().min(1).max(120),
+        mechanism: z.string().max(120),
+        sourceHandle: z.string().max(12),
+      }),
+    )
+    .max(5),
+});
+export type SynthesisOutput = z.infer<typeof synthesisSchema>;

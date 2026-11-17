@@ -42,7 +42,16 @@ describe("stage engine", () => {
       .eq("id", res.data.stageRunId)
       .single();
     expect(run.data).toMatchObject({ status: "queued", stage: "research" });
-    expect((run.data?.steps as unknown[]).length).toBe(5);
+    expect((run.data?.steps as { key: string }[]).map((s) => s.key)).toEqual([
+      "toolkit",
+      "client_data",
+      "papers",
+      "web",
+      "competitors",
+      "reviews",
+      "findings",
+      "synthesis",
+    ]);
     const p = await admin.client.from("projects").select("status").eq("id", projectId).single();
     expect(p.data?.status).toBe("running");
 
@@ -62,8 +71,14 @@ describe("stage engine", () => {
       "reviews",
     ]);
     expect(groups.every((g) => g.status === "done")).toBe(true);
-    const lines = await admin.client.from("edges").select("id").eq("project_id", projectId);
-    expect(lines.data!.length).toBe(4); // 2 objectives → ethics, 2 objectives → the Evidence card
+    const card = await admin.client
+      .from("nodes")
+      .select("id")
+      .eq("project_id", projectId)
+      .eq("type", "source")
+      .single();
+    const intoCard = await admin.client.from("edges").select("id").eq("to_id", card.data!.id);
+    expect(intoCard.data!.length).toBe(2); // one line from each objective
     const after = await admin.client
       .from("projects")
       .select("status, current_stage")

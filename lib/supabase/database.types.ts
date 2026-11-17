@@ -517,14 +517,14 @@ isOneToOne: false
                   ]
                 },"stage_runs": {
                   Row: {
-                    "created_at": string,"error_code": string | null,"feedback": string | null,"finished_at": string | null,"id": string,"inngest_run_id": string | null,"model": string | null,"project_id": string,"replace_human": boolean,"stage": string,"started_at": string | null,"started_by": string,"status": string,"steps": NonNullable<Json>,"updated_at": string,"workspace_id": string
+                    "created_at": string,"error_code": string | null,"feedback": string | null,"finished_at": string | null,"id": string,"inngest_run_id": string | null,"model": string | null,"project_id": string,"replace_human": boolean,"retry_of": string | null,"stage": string,"started_at": string | null,"started_by": string,"status": string,"steps": NonNullable<Json>,"updated_at": string,"workspace_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "created_at"?: string,"error_code"?: string | null,"feedback"?: string | null,"finished_at"?: string | null,"id"?: string,"inngest_run_id"?: string | null,"model"?: string | null,"project_id": string,"replace_human"?: boolean,"stage": string,"started_at"?: string | null,"started_by": string,"status"?: string,"steps"?: NonNullable<Json>,"updated_at"?: string,"workspace_id": string
+                    "created_at"?: string,"error_code"?: string | null,"feedback"?: string | null,"finished_at"?: string | null,"id"?: string,"inngest_run_id"?: string | null,"model"?: string | null,"project_id": string,"replace_human"?: boolean,"retry_of"?: string | null,"stage": string,"started_at"?: string | null,"started_by": string,"status"?: string,"steps"?: NonNullable<Json>,"updated_at"?: string,"workspace_id": string
                   }
                   Update: {
-                    "created_at"?: string,"error_code"?: string | null,"feedback"?: string | null,"finished_at"?: string | null,"id"?: string,"inngest_run_id"?: string | null,"model"?: string | null,"project_id"?: string,"replace_human"?: boolean,"stage"?: string,"started_at"?: string | null,"started_by"?: string,"status"?: string,"steps"?: NonNullable<Json>,"updated_at"?: string,"workspace_id"?: string
+                    "created_at"?: string,"error_code"?: string | null,"feedback"?: string | null,"finished_at"?: string | null,"id"?: string,"inngest_run_id"?: string | null,"model"?: string | null,"project_id"?: string,"replace_human"?: boolean,"retry_of"?: string | null,"stage"?: string,"started_at"?: string | null,"started_by"?: string,"status"?: string,"steps"?: NonNullable<Json>,"updated_at"?: string,"workspace_id"?: string
                   }
                   Relationships: [
                     {
@@ -532,6 +532,12 @@ isOneToOne: false
       columns: ["project_id"]
 isOneToOne: false
       referencedRelation: "projects"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "stage_runs_retry_of_fkey"
+      columns: ["retry_of"]
+isOneToOne: false
+      referencedRelation: "stage_runs"
       referencedColumns: ["id"]
     },{
       foreignKeyName: "stage_runs_started_by_members_id_fk"
@@ -686,6 +692,9 @@ isOneToOne: false
                            },
 "retry_ethics":
 { Args: { "p_project": string }; Returns: string
+                           },
+"retry_research":
+{ Args: { "p_run": string,"p_synthesis_only": boolean }; Returns: string
                            },
 "save_toolkit_version":
 { Args: { "p_file_name": string,"p_principles": Json,"p_relations": Json,"p_warnings": Json }; Returns: {

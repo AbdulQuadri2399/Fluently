@@ -3,7 +3,21 @@ import { after } from "next/server";
 import { getAiClient } from "@/lib/ai";
 import { adminClient } from "@/lib/supabase/admin";
 import { ethicsGate } from "./ethics";
-import { runResearch } from "./research";
+import { searchPapers } from "@/lib/retrieval/papers";
+import { fakeResearchDeps, runResearch, type ResearchDeps } from "./research";
+
+/** Live mode uses real academic search; web steps wait for the web-search check (T6.1, 04 D17). */
+function researchDeps(): ResearchDeps {
+  const ai = getAiClient();
+  if (ai.mode === "fake") return fakeResearchDeps(ai);
+  return {
+    ai,
+    papers: (q) => searchPapers(q),
+    web: async () => {
+      throw new Error("web search not set up yet (T6.1)");
+    },
+  };
+}
 
 /**
  * Starts a background job (D2, D30). JOBS_MODE=inline (default) runs it on this server after
@@ -27,7 +41,11 @@ export function startEthicsGate(stageRunId: string) {
 export function startResearch(stageRunId: string) {
   after(async () => {
     try {
-      await runResearch(adminClient(), stageRunId, { stepDelayMs: 1500 });
+      const deps = researchDeps();
+      await runResearch(adminClient(), stageRunId, {
+        stepDelayMs: deps.ai.mode === "fake" ? 1200 : 0,
+        deps,
+      });
     } catch (e) {
       console.error("research crashed", stageRunId, e);
       await adminClient()

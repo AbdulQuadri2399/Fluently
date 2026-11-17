@@ -6,7 +6,13 @@ import {
   type AiClient,
   type UsageLogger,
 } from "./client";
-import { ETHICS_RULES, type CoachOutput, type EthicsOutput } from "./schemas";
+import {
+  ETHICS_RULES,
+  type CoachOutput,
+  type EthicsOutput,
+  type FindingsOutput,
+  type SynthesisOutput,
+} from "./schemas";
 
 /**
  * Made-up answers for tests and the prototype (D6, AI_MODE=fake). Each step has a responder
@@ -145,6 +151,14 @@ export function fakeEthics(brief: string, sector: string, flagList: string[]): E
 export const FAKE_FAIL_MARKER = "#unavailable";
 
 export const defaultResponders: Record<string, Responder> = {
+  findings: (call) => fakeFindings((call.input?.sources as SourceRef[] | undefined) ?? []),
+  synthesis: (call) =>
+    fakeSynthesis(
+      (call.input?.findings as { text: string }[] | undefined) ?? [],
+      (call.input?.principleKeys as string[] | undefined) ?? [],
+      (call.input?.services as string[] | undefined) ?? [],
+      (call.input?.externalHandle as string | null | undefined) ?? null,
+    ),
   coach: (call) => {
     if (str(call.input?.text).includes(FAKE_FAIL_MARKER)) throw new AiError("unavailable");
     return fakeCoach(str(call.input?.field), str(call.input?.text));
@@ -156,3 +170,117 @@ export const defaultResponders: Record<string, Responder> = {
       (call.input?.flagList as string[] | undefined) ?? [],
     ),
 };
+
+type SourceRef = { handle: string; type: string };
+
+/** Made-up findings: one or two per kind of source, citing real handles from this run. */
+export function fakeFindings(sources: SourceRef[]): FindingsOutput {
+  const of = (type: string) => sources.filter((s) => s.type === type).map((s) => s.handle);
+  const papers = of("paper");
+  const uploads = of("upload");
+  const desk = of("desk");
+  const comp = of("competitor");
+  const social = of("social");
+  const findings: FindingsOutput["findings"] = [];
+  const add = (
+    text: string,
+    handles: string[],
+    stance: "supports" | "contradicts" | "neutral" = "supports",
+  ) => {
+    if (handles.length) findings.push({ text, sourceHandles: handles, aiInference: false, stance });
+  };
+  add("People speed up when they can see how close they are to finishing.", papers.slice(0, 1));
+  add("Every extra step in the check loses a share of people.", [
+    ...papers.slice(1, 2),
+    ...uploads.slice(0, 1),
+  ]);
+  add("Industry reports put most drop-off at the ID photo step.", desk.slice(0, 1));
+  add(
+    "Competitors show progress through verification and let people finish later.",
+    comp.slice(0, 2),
+  );
+  add(
+    "Reviews describe getting stuck at the photo step and giving up.",
+    social.slice(0, 1).concat(social.slice(2, 3)),
+  );
+  add(
+    "Some people ask where their ID photo is stored and who sees it.",
+    social.slice(1, 2),
+    "neutral",
+  );
+  findings.push({
+    text: "People may hesitate because the check feels like a test they could fail.",
+    sourceHandles: [],
+    aiInference: true,
+    stance: "neutral",
+  });
+  return { findings };
+}
+
+/** Made-up synthesis: three themes, three opportunities, candidate principles from the toolkit. */
+export function fakeSynthesis(
+  findings: { text: string }[],
+  principleKeys: string[],
+  services: string[],
+  externalHandle: string | null,
+): SynthesisOutput {
+  const idx = (needle: string) =>
+    findings.map((f, i) => (f.text.includes(needle) ? i : -1)).filter((i) => i >= 0);
+  const effort = [...idx("extra step"), ...idx("photo step")];
+  const progress = [...idx("how close"), ...idx("Competitors show")];
+  const trust = [...idx("stored"), ...idx("test they could fail")];
+  const themes = [
+    {
+      title: "The ID step takes too much effort",
+      summary: "People give up at the photo step after failed tries.",
+      findings: effort,
+    },
+    {
+      title: "Progress isn't visible",
+      summary: "People can't tell how many steps remain.",
+      findings: progress,
+    },
+    {
+      title: "Unclear what happens to personal data",
+      summary: "Some people hesitate over where their ID goes.",
+      findings: trust,
+    },
+  ].filter((t) => t.findings.length);
+  const k = (i: number) => (principleKeys[i] ? [principleKeys[i]!] : []);
+  const opportunities = [
+    {
+      title: "Make the ID step feel shorter",
+      summary: "Cut and chunk the photo step so it feels quick.",
+      themes: [0],
+      principleKeys: [...k(0), ...k(1)],
+      contradicts: false,
+      gapQuestion: null,
+      gapMethod: null,
+    },
+    {
+      title: "Show progress through verification",
+      summary: "Let people see how close they are to finishing.",
+      themes: [1],
+      principleKeys: k(2),
+      contradicts: false,
+      gapQuestion: null,
+      gapMethod: null,
+    },
+    {
+      title: "Explain where the ID photo goes",
+      summary: "Answer the privacy question before people ask it.",
+      themes: [2],
+      principleKeys: k(3),
+      contradicts: false,
+      gapQuestion: "Do people drop out because of privacy worries, or because of effort?",
+      gapMethod: services[1] ?? services[0] ?? "Desk research",
+    },
+  ].filter((o) => o.themes.every((t) => t < themes.length));
+  return {
+    themes,
+    opportunities,
+    externalPrinciples: externalHandle
+      ? [{ name: "Endowed progress", mechanism: "Motivation", sourceHandle: externalHandle }]
+      : [],
+  };
+}
