@@ -51,6 +51,33 @@ export async function approveObjectives(
     if (error.code === "P0004") return fail("conflict");
     return fail("unavailable");
   }
+  // AC22.7: optimise projects show their current assets as a card under the objectives.
+  if (project.mode === "optimise") {
+    const { data: files } = await client
+      .from("uploads")
+      .select("id")
+      .eq("project_id", projectId)
+      .eq("kind", "asset");
+    const { data: existing } = await client
+      .from("nodes")
+      .select("id")
+      .eq("project_id", projectId)
+      .eq("type", "asset_set")
+      .is("deleted_at", null);
+    if (!existing?.length) {
+      await client.from("nodes").insert({
+        workspace_id: project.workspace_id,
+        project_id: projectId,
+        type: "asset_set",
+        stage: "intake",
+        title: "Current assets",
+        data: { uploadIds: (files ?? []).map((f) => f.id), count: files?.length ?? 0 },
+        provenance: "human",
+        created_by: me.id,
+        updated_by: me.id,
+      });
+    }
+  }
   await logEvent(client, me, "objectives_approved", { project_id: projectId });
   return ok({ stageRunId: data as string });
 }

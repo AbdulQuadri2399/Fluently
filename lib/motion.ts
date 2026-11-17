@@ -14,6 +14,11 @@ export const mi = {
   suggestionIn: "animate-in fade-in-0 slide-in-from-bottom-2 duration-base ease-emphasis",
   /** MI1 with reduced motion: fade only, quickly. */
   suggestionInReduced: "animate-in fade-in-0 duration-fast",
+  /** MI3: a card arrives during a run (fade + 8 px rise; stagger set inline). */
+  cardIn:
+    "animate-in fade-in-0 slide-in-from-bottom-2 duration-base ease-standard fill-mode-backwards",
+  /** MI3 with reduced motion: fade only. */
+  cardInReduced: "animate-in fade-in-0 duration-fast fill-mode-backwards",
   /** MI11: badge swaps to "Overridden". */
   badgeSwap: "animate-in fade-in-0 duration-fast",
 } as const;
