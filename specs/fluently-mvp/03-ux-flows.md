@@ -490,6 +490,7 @@ Format: user action → system response → resulting state (ACs).
 | newProject.create | "Create project" |
 | newProject.creating | "Creating…" |
 | common.cancel | "Cancel" |
+| common.close | "Close" (accessible name of a dialog's × button) |
 | onboarding.step1Title | "One tree, from brief to wireframe" |
 | onboarding.step1Body | "Fluently turns a brief into objectives, evidence, themes, opportunities, solutions, wireframes and tests. Each stage is a lane on one canvas, read from left to right." |
 | onboarding.step2Title | "You decide at every checkpoint" |

@@ -46,16 +46,14 @@ describe("RLS: projects, intakes, project_ratings", () => {
   });
 
   it("member cannot create a project on behalf of someone else", async () => {
-    const res = await a.client
-      .from("projects")
-      .insert({
-        workspace_id: wsA,
-        name: "Spoof",
-        mode: "new",
-        channel: "screens",
-        created_by: b.id,
-        updated_by: b.id,
-      });
+    const res = await a.client.from("projects").insert({
+      workspace_id: wsA,
+      name: "Spoof",
+      mode: "new",
+      channel: "screens",
+      created_by: b.id,
+      updated_by: b.id,
+    });
     expect(res.error).not.toBeNull();
   });
 
