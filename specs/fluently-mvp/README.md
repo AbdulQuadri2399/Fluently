@@ -27,6 +27,7 @@ Fluently is an internal web app that runs an AI-powered **Opportunity Solution T
 
 | Input | What it contributed |
 |---|---|
+| `inputs/figma-taste-notes.md` (the user's Figma taste board, 17 Nov 2026) | Nine things the user loves on Firecrawl, TheyDo and Cofounder screens (sidebar grouping, search with shortcut, account at the bottom, quiet comments, two badge types, card icons, done ticks, freshness labels, dashed connectors). Applied to the calm design screens. |
 | `inputs/mobbin-research.md` (Mobbin UI research, 16 Nov 2026) | Screen-by-screen patterns from about 90 real web apps, three design directions (A Quiet Workbench, B Research Notebook, C Colour-coded Pipeline) and the parts list. The chosen direction will be written into 03b. |
 | `docs/concept-brief.md` (Fluently.ai concept brief, agreed pre-PRD) | Everything: the pipeline and checkpoints, the evidence and principle rules, ethics rules, toolkit columns and import rules, the canvas concept, users and access, releases, MVP success criteria, open items. Where this pack goes further than the brief, it is marked `[Assumption]`. |
 
