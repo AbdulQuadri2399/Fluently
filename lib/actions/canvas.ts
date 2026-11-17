@@ -28,3 +28,8 @@ export async function updateNode(projectId: string, input: canvas.UpdateNodeInpu
   revalidatePath(`/projects/${projectId}`, "layout");
   return res;
 }
+export async function addSource(input: canvas.AddSourceInput) {
+  const res = await canvas.addSource(await createClient(), input);
+  revalidatePath(`/projects/${input.projectId}`, "layout");
+  return res;
+}

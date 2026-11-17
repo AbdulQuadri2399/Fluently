@@ -2,11 +2,12 @@
 
 import { ListIcon, TreeStructureIcon } from "@phosphor-icons/react/dist/ssr";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { useRealtimeProject } from "@/hooks/useRealtimeProject";
 import type { ActionResult } from "@/lib/actions/result";
 import type { ProjectTree } from "@/lib/canvas/load";
+import { AddSourceDialog, type AddSourceFns } from "./AddSourceDialog";
 import { barState, CheckpointBar } from "./CheckpointBar";
 import { canvasCopy as c } from "./copy";
 import { Inspector, type HistoryItem } from "./Inspector";
@@ -18,6 +19,7 @@ export type CanvasActions = {
   cancelStage: (projectId: string, runId: string) => Promise<ActionResult>;
   reorderNodes: (projectId: string, ids: string[]) => Promise<ActionResult>;
   getNodeHistory: (nodeId: string) => Promise<HistoryItem[]>;
+  addSource?: AddSourceFns;
   updateNode: (
     projectId: string,
     input: { nodeId: string; title: string; body: string | null; version: number },
@@ -48,6 +50,7 @@ export function ProjectCanvas({ tree, actions }: { tree: ProjectTree; actions: C
   );
 
   const selected = tree.nodes.find((n) => n.id === selectedId) ?? null;
+  const [adding, setAdding] = useState(false);
   const ethicsRunning = Boolean(run && run.stage === "ethics" && active);
   const state = barState({
     intakeApproved: tree.intakeApproved,
@@ -99,6 +102,7 @@ export function ProjectCanvas({ tree, actions }: { tree: ProjectTree; actions: C
           selectedId={selectedId}
           onSelect={(id) => setParam("node", id)}
           onAddCard={() => toast(c.addCardLater)}
+          onAddSource={actions.addSource ? () => setAdding(true) : undefined}
           runningRunId={active ? (run?.id ?? null) : null}
           onReorder={(_, ids) =>
             void actions.reorderNodes(tree.project.id, ids).then(() => router.refresh())
@@ -122,6 +126,17 @@ export function ProjectCanvas({ tree, actions }: { tree: ProjectTree; actions: C
             return res;
           }}
           onSeeLatest={() => router.refresh()}
+        />
+      ) : null}
+      {actions.addSource ? (
+        <AddSourceDialog
+          open={adding}
+          onOpenChange={setAdding}
+          fns={actions.addSource}
+          onAdded={() => {
+            toast(c.addSource.added);
+            router.refresh();
+          }}
         />
       ) : null}
       <CheckpointBar

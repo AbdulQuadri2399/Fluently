@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { ProjectCanvas } from "@/components/canvas/ProjectCanvas";
-import * as actions from "@/lib/actions/canvas";
+import { ProjectCanvasScreen } from "@/components/canvas/ProjectCanvasScreen";
 import { loadTree } from "@/lib/canvas/load";
 import { createClient } from "@/lib/supabase/server";
 
@@ -12,16 +11,7 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[id]"
   if (!tree) notFound();
   return (
     <Suspense>
-      <ProjectCanvas
-        tree={tree}
-        actions={{
-          startStage: actions.startStage,
-          cancelStage: actions.cancelStage,
-          reorderNodes: actions.reorderNodes,
-          getNodeHistory: actions.getNodeHistory,
-          updateNode: actions.updateNode,
-        }}
-      />
+      <ProjectCanvasScreen tree={tree} />
     </Suspense>
   );
 }

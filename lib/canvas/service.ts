@@ -92,3 +92,135 @@ export async function updateNode(
   await logEvent(client, me, "node_edited", { node_type: n?.type ?? "" });
   return ok({ version: data as number });
 }
+
+const addSourceSchema = z.discriminatedUnion("kind", [
+  z.object({
+    kind: z.literal("link"),
+    projectId: z.uuid(),
+    url: z.url({ protocol: /^https?$/ }).max(2000),
+    title: z.string().trim().max(200).optional(),
+  }),
+  z.object({ kind: z.literal("upload"), projectId: z.uuid(), uploadId: z.uuid() }),
+]);
+export type AddSourceInput = z.input<typeof addSourceSchema>;
+
+type Group = {
+  key: string;
+  title: string;
+  count: number;
+  status: string;
+  items: { id: string; title: string; sub: string; url: string | null }[];
+};
+
+/**
+ * O35 addSource (AC12.10): stores a source added by a member after research, adds it to the
+ * Evidence card's group, and marks everything built from Evidence out of date.
+ */
+export async function addSource(
+  client: Client,
+  input: AddSourceInput,
+): Promise<ActionResult<{ sourceId: string }>> {
+  const parsed = addSourceSchema.safeParse(input);
+  if (!parsed.success) return fail("validation");
+  const me = await currentMember(client);
+  if (!me) return fail("forbidden");
+  const d = parsed.data;
+  const { data: card } = await client
+    .from("nodes")
+    .select("id, data, workspace_id")
+    .eq("project_id", d.projectId)
+    .eq("type", "source")
+    .eq("stage", "research")
+    .is("deleted_at", null)
+    .limit(1)
+    .maybeSingle();
+  if (!card) return fail("not_found");
+
+  let row: {
+    source_type: string;
+    title: string;
+    url: string | null;
+    upload_id: string | null;
+    meta: { sub: string };
+  };
+  let groupKey: string;
+  if (d.kind === "link") {
+    const host = new URL(d.url).hostname.replace(/^www\./, "");
+    row = {
+      source_type: "desk",
+      title: d.title || host,
+      url: d.url,
+      upload_id: null,
+      meta: { sub: host },
+    };
+    groupKey = "web";
+  } else {
+    const { data: up } = await client
+      .from("uploads")
+      .select("id, file_name, kind")
+      .eq("id", d.uploadId)
+      .eq("project_id", d.projectId)
+      .maybeSingle();
+    if (!up || up.kind !== "client_data") return fail("validation");
+    const ext = up.file_name.split(".").pop()?.toUpperCase() ?? "File";
+    row = {
+      source_type: "upload",
+      title: up.file_name,
+      url: null,
+      upload_id: up.id,
+      meta: { sub: ext === "XLSX" ? "Spreadsheet" : ext },
+    };
+    groupKey = "client_data";
+  }
+  const { count } = await client
+    .from("sources")
+    .select("id", { count: "exact", head: true })
+    .eq("project_id", d.projectId)
+    .like("handle", "U%");
+  const { data: src, error } = await client
+    .from("sources")
+    .insert({
+      ...row,
+      workspace_id: card.workspace_id,
+      project_id: d.projectId,
+      handle: `U${(count ?? 0) + 1}`,
+      added_by: me.id,
+    })
+    .select("id")
+    .single();
+  if (error || !src) return fail("unavailable");
+
+  const data = (card.data ?? {}) as { groups?: Group[]; total?: number };
+  const groups = (data.groups ?? []).map((g) =>
+    g.key === groupKey
+      ? {
+          ...g,
+          status: "done",
+          items: [...g.items, { id: src.id, title: row.title, sub: row.meta.sub, url: row.url }],
+          count: g.items.length + 1,
+        }
+      : g,
+  );
+  await client
+    .from("nodes")
+    .update({
+      data: { ...data, groups, total: groups.reduce((n, g) => n + g.count, 0) },
+      updated_by: me.id,
+    })
+    .eq("id", card.id);
+
+  // AC12.10, AC24.4: everything built from Evidence is out of date (kept and usable).
+  const stale = new Set<string>();
+  let frontier = [card.id];
+  while (frontier.length) {
+    const { data: next } = await client.from("edges").select("to_id").in("from_id", frontier);
+    frontier = (next ?? []).map((e) => e.to_id).filter((id) => !stale.has(id));
+    frontier.forEach((id) => stale.add(id));
+  }
+  if (stale.size)
+    await client
+      .from("nodes")
+      .update({ stale: true })
+      .in("id", [...stale]);
+  return ok({ sourceId: src.id });
+}

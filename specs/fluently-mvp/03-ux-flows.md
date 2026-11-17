@@ -608,6 +608,14 @@ Format: user action → system response → resulting state (ACs).
 | edit.objectiveHint / edit.goToBrief | "Objectives are edited in the brief." / "Edit in brief" |
 | edit.ethicsHint | "The ethics check can't be edited. Change the brief and it runs again." |
 | edit.overrideHint | "An override is a record of a decision, so it can't be edited." |
+| evidence.showFewer | "Show fewer" |
+| evidence.qualitative | "Qualitative signal" (label on Reviews and forums, AC12.4) |
+| addSource.title | "Add source" |
+| addSource.linkLabel / addSource.linkTitleLabel / addSource.addLink | "Paste a link" / "Title (optional)" / "Add link" |
+| addSource.or / addSource.upload | "or" / "Upload a file" |
+| addSource.adding | "Adding…" |
+| addSource.linkInvalid | "Enter a full web address, starting with https://." |
+| addSource.added | "Source added. What was built from Evidence is now marked out of date." |
 | card.types | "Objective" / "Current assets" / "Ethics check" / "Source" / "Finding" / "Theme" / "Opportunity" / "Gap" / "Solution" / "Wireframe" / "Annotation" / "Test plan" / "Override" / "Reference" |
 | card.ethicsStatus | "Passed" / "Flagged · {n} rules" / "Checking…" / "Didn't run" / "Overridden" |
 | card.markers | "Out of date" / "Low specificity" / "Failed" / "Running" / "Flagged" / "Overridden" |

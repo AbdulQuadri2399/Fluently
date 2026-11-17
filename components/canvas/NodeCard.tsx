@@ -29,6 +29,7 @@ import type { TreeNode } from "@/lib/canvas/load";
 import { mi } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import { canvasCopy as c } from "./copy";
+import { EvidenceExpanded, type EvidenceGroup } from "./EvidenceExpanded";
 
 const ICONS: Record<string, ComponentType<{ className?: string; "aria-hidden"?: boolean }>> = {
   objective: TargetIcon,
@@ -64,10 +65,15 @@ export type CardData = {
   dimmed: boolean;
   expanded?: boolean;
   onToggle?: (id: string) => void;
+  onAddSource?: () => void;
 };
 
 /** What an expanded card shows (AC22.9, 03 SCR5 "Card expanded", MI13). */
-function Expanded({ node }: { node: TreeNode }) {
+function Expanded({ node, onAddSource }: { node: TreeNode; onAddSource?: () => void }) {
+  const evidence = (node.data as { groups?: EvidenceGroup[] }).groups;
+  if (node.type === "source" && evidence?.some((g) => Array.isArray(g.items))) {
+    return <EvidenceExpanded groups={evidence} onAddSource={onAddSource} />;
+  }
   const d = node.data as {
     reasons?: { rule: string; reason: string }[];
     reason?: string;
@@ -122,12 +128,14 @@ export function CardBody({
   selected,
   expanded = false,
   onToggle,
+  onAddSource,
 }: {
   node: TreeNode;
   running: boolean;
   selected?: boolean;
   expanded?: boolean;
   onToggle?: (id: string) => void;
+  onAddSource?: () => void;
 }) {
   const v = cardView(node, running);
   const Icon = ICONS[node.type] ?? BookOpenIcon;
@@ -215,7 +223,7 @@ export function CardBody({
       </div>
       {expanded ? (
         <div className="animate-in fade-in-0 duration-base">
-          <Expanded node={node} />
+          <Expanded node={node} onAddSource={onAddSource} />
         </div>
       ) : null}
     </div>
@@ -247,6 +255,7 @@ export function NodeCard({ data, selected }: NodeProps<Node<CardData>>) {
         selected={selected}
         expanded={data.expanded}
         onToggle={data.onToggle}
+        onAddSource={data.onAddSource}
       />
       <Handle
         type="source"
