@@ -134,6 +134,7 @@ As a strategist, I want findings grouped into themes and opportunities, each lin
 - **AC12.6** THE SYSTEM SHALL give each opportunity an evidence confidence of High, Med or Low by this rule: High = ≥3 sources of ≥2 source types that agree; Med = 2+ sources that agree, or 3+ of one type; Low = 1 source, only AI inference, or sources that contradict. The rule SHALL be computed in code from the stored links, not by the model.
 - **AC12.7** WHEN a member opens a finding, theme or opportunity THE SYSTEM SHALL show its sources with links, the confidence and the reason for it.
 - **AC12.8** WHEN a member opens *Citation check* on the Audit Report THE SYSTEM SHALL list every citation with its stored record and a link, so 20 can be spot-checked (NFR4).
+- **AC12.10** WHEN a member adds a source from the Evidence card (upload or link) after research THE SYSTEM SHALL store it as a source, mark themes built from Evidence as Out of date, and offer *Regenerate stale*. *(Added 2026-11-17.)*
 - **AC12.9** WHERE a principle from research is not in the toolkit THE SYSTEM SHALL show it as `External principle, not yet in toolkit` with its source, and add it to a "Toolkit candidates" list in SCR11 for the team's Pending Insights review.
 
 ### US13: Evidence gaps (Must) — JS2, JS5
@@ -215,7 +216,11 @@ As a strategist, I want a test plan for the approved variants, so that I can pro
 ## Canvas
 
 ### US22: The canvas is the tree (Must) — JS2, JS3
-- **AC22.1** WHEN a member opens a project THE SYSTEM SHALL show a canvas with columns in order Objectives → Sources → Themes → Opportunities → Solutions → Lo-fi → Tests, with each node in its column and connections drawn between linked nodes.
+- **AC22.1** WHEN a member opens a project THE SYSTEM SHALL show the canvas as stage **lanes** in this order: Objectives → Current screens (or Current emails; optimise mode only) → Evidence → Themes → Opportunities → Solutions → Wireframes → Tests, with each card in its stage's lane and connections drawn as dashed lines ending in a small circle at the receiving card. *(Updated 2026-11-17: lanes chosen by the user; "Sources" renamed "Evidence", "Lo-fi" renamed "Wireframes" in the interface; Current screens lane added.)*
+- **AC22.7** THE SYSTEM SHALL show the lane names in a strip pinned to the top of the canvas that stays visible while panning, and each card SHALL also show its type as an icon (with the type name on hover and focus).
+- **AC22.8** WHEN a member drags a card THE SYSTEM SHALL let it move up or down within its own lane only, and SHALL save the new order for everyone on the project.
+- **AC22.9** WHEN a member opens the Evidence card (click or Enter) THE SYSTEM SHALL expand it in place to show sources grouped by kind (Client uploads first, then Academic papers, Web and market, Competitors, Reviews and forums), each group with its count, at most 3 items per open group and `[copy: canvas.showMore]` for the rest, plus *Add source*.
+- **AC22.10** WHERE mode is `optimise` THE SYSTEM SHALL show the current assets as one card in the Current screens (or Current emails) lane, with thumbnails, connected from both objectives and into Evidence; expanding it shows each asset.
 - **AC22.2** THE SYSTEM SHALL show on each node: type, title, provenance badge (`AI`, `Edited`, `Added`), and where relevant confidence, low-specificity, stale, flagged or overridden markers, each as text plus icon (not colour alone).
 - **AC22.3** WHEN a stage is running THE SYSTEM SHALL show its column header with progress and the step currently running.
 - **AC22.4** THE SYSTEM SHALL support pan, zoom (25–200%), fit to view, a minimap, and keyboard navigation between nodes (arrow keys move focus to the nearest node in that direction; Enter opens the inspector).
@@ -236,6 +241,16 @@ As a strategist, I want a test plan for the approved variants, so that I can pro
 - **AC24.6** WHEN a member merges two or more nodes of the same type THE SYSTEM SHALL create one node with the combined links and a merged title for the member to edit, delete the originals, and mark downstream nodes stale.
 - **AC24.7** IF two members edit the same node and the second saves a stale copy THEN THE SYSTEM SHALL refuse the save, keep the second member's text in the editor, and show `[copy: canvas.editConflict]` with *See latest*.
 - **AC24.8** IF a member tries to delete an objective node THEN THE SYSTEM SHALL refuse and point them to editing the intake instead `[copy: canvas.cantDeleteObjective]`.
+
+### US30: Connect and disconnect cards (Must) — JS2, JS3 *(added 2026-11-17)*
+As a strategist, I want to draw or remove lines between cards, so that the tree reflects my judgement about what supports what.
+- **AC30.1** WHILE a member hovers or focuses a card THE SYSTEM SHALL show a connection handle on its left edge (lines arrive) and right edge (lines leave); handles are hidden otherwise.
+- **AC30.2** WHEN a member drags from a right handle THE SYSTEM SHALL highlight cards in the next lane that can accept the connection, fade all others, and create the connection when dropped on a highlighted card.
+- **AC30.3** IF the drop lands on a card that can't accept it, or on empty canvas, THEN THE SYSTEM SHALL create nothing, return the line to its handle, and for an invalid card show `[copy: canvas.cantConnect]`.
+- **AC30.4** WHEN a member hovers a line THE SYSTEM SHALL show a remove button at its midpoint; selecting a line and pressing Delete or Backspace SHALL also remove it.
+- **AC30.5** IF removing a line would leave a card without a link it needs (a theme without evidence, an opportunity without a theme, a recommendation without an opportunity) THEN THE SYSTEM SHALL keep the line and show `[copy: canvas.linkRequired]`.
+- **AC30.6** WHEN a connection is added or removed THE SYSTEM SHALL mark downstream cards Out of date (AC24.4), record the change in both cards' history, and offer *Undo* for 10 seconds.
+- **AC30.7** THE SYSTEM SHALL offer the same connect and disconnect actions without dragging, in a *Connections* section of the details panel (keyboard and screen-reader users).
 
 ### US25: Checkpoints (Must) — JS1–JS5
 - **AC25.1** WHEN a stage completes THE SYSTEM SHALL stop and show the checkpoint panel (SCR8) with: what was produced, what the member needs to decide, and actions *Approve*, *Edit* (on the canvas), *Send back with feedback*.
@@ -324,4 +339,5 @@ As an admin, I want AI usage logged by stage, so that we can keep projects under
 | JS4 | US18–US20, US29 | AC18.x–AC20.x, AC29.x | SCR5, SCR10 | FL5, FF8 |
 | JS5 | US21 | AC21.x | SCR5, SCR7 | FL6 |
 | JS2–JS4 | US22–US25 | AC22.x–AC25.x | SCR5, SCR7, SCR8 | FL3–FL6, FF10, FF11 |
+| JS2, JS3 | US30 | AC30.x | SCR5, SCR7 | FF16 |
 | JS5 | US27, US28 | AC27.x, AC28.x | SCR12, SCR5 | FF12 |
