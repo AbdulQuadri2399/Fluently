@@ -26,7 +26,7 @@ flowchart LR
   SCR3 --> SCR12[SCR12 Workspace settings]
 ```
 
-Global top bar (all signed-in screens): Fluently logo (→ SCR3), *Projects*, *Toolkit*, *Settings*, help menu (*How Fluently works* → SCR2), account menu (*Sign out*). Inside a project, a project header adds: project name, mode · channel, toolkit version, cost so far, tabs *Canvas* / *Intake* / *Report*.
+Global sidebar (all signed-in screens; changed from a top bar on 2026-11-17 with the calm direction, 03b SCR3): Fluently logo (→ Home), search (⌘K), *Home*, *Projects*, *Toolkit*, *Settings*, recent projects, *How Fluently works* (→ SCR2), account menu (*Sign out*), *Collapse*. Inside a project, a project header adds: project name, mode · channel, toolkit version, cost so far, tabs *Canvas* / *Intake* / *Report*.
 
 ## 2. Screen inventory
 
@@ -491,6 +491,12 @@ Format: user action → system response → resulting state (ACs).
 | newProject.creating | "Creating…" |
 | common.cancel | "Cancel" |
 | common.close | "Close" (accessible name of a dialog's × button) |
+| sidebar.waitingShort / sidebar.runningShort | "Decide" / "Running" (beside a project in the sidebar) |
+| sidebar.account | "Account" (accessible name of the account menu) |
+| projects.loadMore | "Load more" |
+| toolkit.upload | "Upload toolkit" |
+| time.relative | "just now" / "{n} min ago" / "{n} hours ago" / "Yesterday" / "3 Nov" (date for anything older) |
+| projects.editedBy | "{time} by {name}" |
 | onboarding.step1Title | "One tree, from brief to wireframe" |
 | onboarding.step1Body | "Fluently turns a brief into objectives, evidence, themes, opportunities, solutions, wireframes and tests. Each stage is a lane on one canvas, read from left to right." |
 | onboarding.step2Title | "You decide at every checkpoint" |

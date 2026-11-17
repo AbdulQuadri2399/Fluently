@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     const { error } = await supabase.auth.verifyOtp({ type, token_hash: tokenHash });
     if (!error) {
       return NextResponse.redirect(
-        new URL(type === "recovery" ? "/reset/update" : "/projects", origin),
+        new URL(type === "recovery" ? "/reset/update" : "/home", origin),
       );
     }
     const expiredType = type === "recovery" ? "recovery" : "signup";
@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
       const { data } = await supabase.auth.getClaims();
       const amr = (data?.claims?.amr ?? []) as Array<{ method?: string }>;
       const isRecovery = amr.some((m) => m.method === "recovery");
-      return NextResponse.redirect(new URL(isRecovery ? "/reset/update" : "/projects", origin));
+      return NextResponse.redirect(new URL(isRecovery ? "/reset/update" : "/home", origin));
     }
     // The link was opened in a different browser from the one that signed up. Supabase has
     // already confirmed the email, so the person can sign in normally.

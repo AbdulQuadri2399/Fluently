@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it } from "vitest";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { createSignedInUser, uniqueEmail } from "../helpers/supabase";
+import { createIsolatedUser } from "../helpers/supabase";
 import {
   archiveProject,
   createProject,
@@ -13,7 +13,7 @@ describe("O10 projects", () => {
   let a: { client: SupabaseClient; id: string };
 
   beforeAll(async () => {
-    a = await createSignedInUser(uniqueEmail("fluently.test"));
+    a = await createIsolatedUser();
   });
 
   it("valid create returns an id, stores mode and channel, and starts at the brief", async () => {

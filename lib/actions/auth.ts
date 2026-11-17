@@ -62,7 +62,7 @@ export async function signIn(input: SignInInput): Promise<ActionResult<{ next: s
 /** O2 signOut. */
 export async function signOut(): Promise<void> {
   const supabase = await createClient();
-  await supabase.auth.signOut();
+  await supabase.auth.signOut({ scope: "local" });
   redirect("/sign-in");
 }
 
@@ -88,7 +88,7 @@ export async function updatePassword(
   const supabase = await createClient();
   const { error } = await supabase.auth.updateUser({ password: parsed.data.password });
   if (error) return fail(error.code === "session_not_found" ? "forbidden" : "unavailable");
-  return ok({ next: "/projects" });
+  return ok({ next: "/home" });
 }
 
 /** Resend an expired confirmation or reset link (SCR1 · link expired). */

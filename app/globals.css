@@ -163,3 +163,14 @@
     outline-offset: 2px;
   }
 }
+
+/* Loading placeholders appear only if loading takes longer than 300 ms (03 SCR3). */
+@keyframes appear {
+  to {
+    opacity: 1;
+  }
+}
+@utility appear-late {
+  opacity: 0;
+  animation: appear 1ms 300ms forwards;
+}

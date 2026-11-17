@@ -35,9 +35,24 @@ function ChoiceCard({ value, title, hint }: { value: string; title: string; hint
 }
 
 /** SCR4 New project (AC7.1, AC7.2). */
-export function NewProjectDialog({ action }: { action: Action }) {
+export function NewProjectDialog({
+  action,
+  open: controlledOpen,
+  onOpenChange,
+  showTrigger = true,
+}: {
+  action: Action;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  showTrigger?: boolean;
+}) {
   const router = useRouter();
-  const [open, setOpen] = useState(false);
+  const [ownOpen, setOwnOpen] = useState(false);
+  const open = controlledOpen ?? ownOpen;
+  const setOpen = (o: boolean) => {
+    setOwnOpen(o);
+    onOpenChange?.(o);
+  };
   const [status, setStatus] = useState<"default" | "saving" | "error">("default");
   const form = useForm<CreateProjectInput>({
     resolver: zodResolver(createProjectSchema),
@@ -71,12 +86,14 @@ export function NewProjectDialog({ action }: { action: Action }) {
         }
       }}
     >
-      <DialogTrigger asChild>
-        <Button>
-          <Plus weight="bold" aria-hidden="true" />
-          {c.newProject}
-        </Button>
-      </DialogTrigger>
+      {showTrigger ? (
+        <DialogTrigger asChild>
+          <Button>
+            <Plus weight="bold" aria-hidden="true" />
+            {c.newProject}
+          </Button>
+        </DialogTrigger>
+      ) : null}
       <DialogContent aria-describedby={undefined}>
         <DialogTitle className="mb-5 text-lead font-semibold">{c.newProject}</DialogTitle>
         {status === "error" ? (

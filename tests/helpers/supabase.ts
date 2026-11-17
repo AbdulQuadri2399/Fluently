@@ -66,3 +66,30 @@ export async function ensureOtherWorkspace(): Promise<string> {
     await db.end();
   }
 }
+
+/**
+ * A signed-in user in a brand-new workspace of their own (fresh invite domain), so a test
+ * sees only the data it created, however many times the suite has run.
+ */
+export async function createIsolatedUser(): Promise<{
+  client: SupabaseClient;
+  id: string;
+  workspaceId: string;
+  domain: string;
+}> {
+  const domain = `iso${Date.now()}${Math.floor(Math.random() * 1e6)}.test`;
+  const db = sql();
+  let workspaceId: string;
+  try {
+    const [ws] = await db<{ id: string }[]>`
+      insert into public.workspaces (name) values (${`Test ${domain}`}) returning id`;
+    if (!ws) throw new Error("workspace insert failed");
+    workspaceId = ws.id;
+    await db`insert into public.allowlist_entries (workspace_id, value, kind)
+             values (${ws.id}, ${`@${domain}`}, 'domain')`;
+  } finally {
+    await db.end();
+  }
+  const user = await createSignedInUser(uniqueEmail(domain));
+  return { ...user, workspaceId, domain };
+}

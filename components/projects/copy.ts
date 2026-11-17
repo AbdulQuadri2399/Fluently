@@ -42,6 +42,12 @@ export const projectsCopy = {
   colChannel: "Channel",
   colEdited: "Edited",
   nothingWaiting: "Nothing needs you right now.",
+  loadMore: "Load more",
+  toolkitNoneYet:
+    "Upload the Behavioural Design Toolkit before running research. Fluently cites every principle from it.",
+  toolkitNoneYetMember:
+    "Research is waiting for the toolkit. Ask your Fluently admin to upload it.",
+  toolkitUpload: "Upload toolkit",
 } as const;
 
 export const stageNames: Record<string, string> = {
@@ -82,4 +88,21 @@ export function greeting(now: Date, name: string): string {
 
 export function runningLine(stage: string): string {
   return `${stageNames[stage] ?? stage} is running.`;
+}
+
+export function editedBy(time: string, name: string): string {
+  return name ? `${time} by ${name}` : time;
+}
+
+/** "just now" / "{n} min ago" / "{n} hours ago" / "Yesterday" / "3 Nov" (03 section 7, time.relative). */
+export function relativeTime(iso: string, now: Date = new Date()): string {
+  const then = new Date(iso);
+  const mins = Math.floor((now.getTime() - then.getTime()) / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins} min ago`;
+  const hours = Math.floor(mins / 60);
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  if (then.getTime() >= startOfToday) return `${hours} ${hours === 1 ? "hour" : "hours"} ago`;
+  if (then.getTime() >= startOfToday - 86400000) return "Yesterday";
+  return then.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
 }

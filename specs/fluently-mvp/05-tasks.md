@@ -47,15 +47,15 @@ You'll be able to see: the 3-step onboarding, the projects list (empty, filled, 
   Done when: `pnpm test tests/unit/tokens.test.ts` passes for the new tokens; SCR1 screenshots in both themes match 03b SCR1.
 - [x] T1.1 Migration: `projects`, `intakes`, `project_ratings` tables + RLS + indexes; seed projects — S — Refs: AC7.1, 04 §4 — Depends on: T0.3
   Done when: `tests/rls/projects.test.ts` passes (member reads/writes in own workspace; other workspace user gets 0 rows; member cannot delete, admin can).
-- [ ] T1.2 SCR2 onboarding dialog (3 steps, SVG diagrams from tokens), O4 `completeOnboarding`, help menu "How Fluently works" — M — Refs: AC2.1–AC2.3, SCR2 — Depends on: T0.7
+- [x] T1.2 SCR2 onboarding dialog (3 steps, SVG diagrams from tokens), O4 `completeOnboarding`, help menu "How Fluently works" — M — Refs: AC2.1–AC2.3, SCR2 — Depends on: T0.7
   Done when: `tests/components/SCR2-onboarding.test.tsx` passes (step 1/2/3 headings and buttons; Skip records completion); `e2e/FL1.spec.ts` extended: first sign-in shows onboarding, second does not; help menu reopens it; screenshot `SCR2-step1..3` vs 03b SCR2.
 - [x] T1.3 O10 `createProject`/`archiveProject`/`unarchiveProject` with Zod schema shared with SCR4 dialog (all SCR4 states) — S — Refs: AC7.1, AC7.2, AC7.5, SCR4 — Depends on: T1.1
   Done when: `tests/integration/O10-projects.test.ts` passes: valid create pins default toolkit version (null allowed until Slice 3), empty and 81-char names return `validation`, archive/unarchive round-trips; `tests/components/SCR4-new-project.test.tsx` covers default, invalid, saving, error.
-- [ ] T1.4 SCR3 projects list: O11 cursor pagination (25), search, Active/Archived filter, status chips, all SCR3 states (loading skeleton after 300 ms, empty first use, default, no results, error, no-toolkit banners admin/member) — M — Refs: AC7.3, AC25.4, SCR3, EC2 — Depends on: T1.3
+- [x] T1.4 SCR3 projects list: O11 cursor pagination (25), search, Active/Archived filter, status chips, all SCR3 states (loading skeleton after 300 ms, empty first use, default, no results, error, no-toolkit banners admin/member) — M — Refs: AC7.3, AC25.4, SCR3, EC2 — Depends on: T1.3
   Done when: `tests/components/SCR3-projects.test.tsx` one test per state with 03 copy; `e2e/FL2.spec.ts` step 1 'create project from empty state opens intake route'; screenshots `SCR3-*` vs 03b SCR3.
-- [ ] T1.6 [P] Desktop-only notice: below 1024 px every signed-in screen shows `app.desktopOnly`; sign-in screens unaffected — S — Refs: AC22.6, D23 — Depends on: T0.7
+- [x] T1.6 [P] Desktop-only notice: below 1024 px every signed-in screen shows `app.desktopOnly`; sign-in screens unaffected — S — Refs: AC22.6, D23 — Depends on: T0.7
   Done when: `e2e/desktop-only.spec.ts` passes: 'at 1000 px /projects shows app.desktopOnly', 'at 1024 px /projects shows the page', 'at 390 px /sign-in shows the form'; screenshot `SCR3-desktopOnly` vs 03b.
-- [ ] T1.5 [P] `logEvent` helper (O33) + `project_created` event — S — Refs: NFR13 — Depends on: T1.3
+- [x] T1.5 [P] `logEvent` helper (O33) + `project_created` event — S — Refs: NFR13 — Depends on: T1.3
   Done when: `tests/integration/events.test.ts` 'project_created recorded with mode and channel' passes.
 
 Slice check: full suite green; FL1 and FL2 step 1 pass; every SCR2/SCR3/SCR4 state renders. **Stop for the user.**

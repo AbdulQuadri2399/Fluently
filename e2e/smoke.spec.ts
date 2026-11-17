@@ -8,7 +8,7 @@ test("sign-in page responds", async ({ request }) => {
   expect(res.status()).toBe(200);
 });
 
-test("signed-in user sees top bar and can sign out", async ({ page }) => {
+test("signed-in user sees the sidebar and can sign out", async ({ page }) => {
   await signIn(page, SEEDED.member);
   const nav = page.getByRole("navigation", { name: "Main" });
   await expect(nav.getByRole("link", { name: "Projects" })).toBeVisible();
