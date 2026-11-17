@@ -93,3 +93,16 @@ export async function createIsolatedUser(): Promise<{
   const user = await createSignedInUser(uniqueEmail(domain));
   return { ...user, workspaceId, domain };
 }
+
+/** An admin in a fresh workspace, plus a way to add more members to it. */
+export async function createIsolatedAdmin() {
+  const admin = await createIsolatedUser();
+  const db = sql();
+  try {
+    await db`update public.members set role = 'admin' where id = ${admin.id}`;
+  } finally {
+    await db.end();
+  }
+  const addMember = () => createSignedInUser(uniqueEmail(admin.domain));
+  return { ...admin, addMember };
+}
