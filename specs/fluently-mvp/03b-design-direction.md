@@ -110,6 +110,7 @@ Quiet and nearly invisible. Motion shows cause and effect (a card appears becaus
 | MI12 | Any button press | Press | Scale 0.98 | fast | None | Tactile acknowledgement |
 | MI13 | Expand a card | Click / Enter | Card grows in place | base | Instant | Detail without losing your place |
 | MI14 | Drag a connection | Drag from right handle | Valid targets stay sharp, others fade | fast | Instant | Teaches the rule by doing |
+| MI15 | A stage is running (SCR5) | Stage run active | Dashed lines into the card being worked on turn ink and their dashes flow toward it | 0.9 s loop, linear | Still, ink line | Shows where the work is happening right now (user request, 2026-11-17) |
 
 ## 8. Conflicts
 Dimmed cards in trace mode fall below text contrast on purpose; they aren't interactive targets while dimmed, and the details panel lists the path as text.

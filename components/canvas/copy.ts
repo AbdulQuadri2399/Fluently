@@ -39,6 +39,26 @@ export const canvasCopy = {
   sourcesSummary: (n: number, kinds: number) =>
     `${n} ${n === 1 ? "source" : "sources"} across ${kinds} kinds`,
   sourcesCollecting: (done: number, of: number) => `Collecting sources · ${done} of ${of} kinds`,
+  expand: "Expand card",
+  collapse: "Collapse card",
+  noRulesBroken: "No rules broken.",
+  edit: {
+    edit: "Edit",
+    save: "Save",
+    saving: "Saving…",
+    saved: "Saved",
+    cancel: "Cancel",
+    titleLabel: "Title",
+    bodyLabel: "Notes",
+    seeLatest: "See latest",
+    conflict: (name: string) =>
+      `${name} changed this while you were editing. Your text is still here; see the latest version before saving.`,
+    saveFailed: "Couldn't save. Check your connection and try again.",
+    objectiveHint: "Objectives are edited in the brief.",
+    goToBrief: "Edit in brief",
+    ethicsHint: "The ethics check can't be edited. Change the brief and it runs again.",
+    overrideHint: "An override is a record of a decision, so it can't be edited.",
+  },
   addCardLater: "Adding cards by hand comes with editing, in a later build step.",
   intakeFirst: "Start with the intake. Your objectives will appear here.",
   lockedWhileRunning: (stage: string) =>

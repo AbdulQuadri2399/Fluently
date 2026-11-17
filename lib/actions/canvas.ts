@@ -23,3 +23,8 @@ export async function reorderNodes(projectId: string, ids: string[]) {
 export async function getNodeHistory(nodeId: string) {
   return canvas.nodeHistory(await createClient(), nodeId);
 }
+export async function updateNode(projectId: string, input: canvas.UpdateNodeInput) {
+  const res = await canvas.updateNode(await createClient(), input);
+  revalidatePath(`/projects/${projectId}`, "layout");
+  return res;
+}

@@ -18,6 +18,9 @@ const n = (id: string, type: string, title: string, over: Partial<TreeNode> = {}
   model: null,
   sortOrder: 0,
   createdAt: "2026-11-17T10:00:00Z",
+  stageRunId: null,
+  version: 1,
+  updatedByName: "",
   ...over,
 });
 

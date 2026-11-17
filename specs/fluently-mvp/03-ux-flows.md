@@ -600,6 +600,14 @@ Format: user action → system response → resulting state (ACs).
 | canvas.toolbar | "Fit to screen" / "Zoom in" / "Zoom out" / "List view" / "Canvas view" |
 | card.sources | "Research sources" (title) / "{n} sources across {k} kinds" / "Collecting sources · {done} of {k} kinds" |
 | canvas.addCardLater | "Adding cards by hand comes with editing, in a later build step." (prototype only, shown when + is pressed) |
+| card.expand / card.collapse | "Expand card" / "Collapse card" (accessible names of the arrow at the top-right of a card) |
+| card.noRulesBroken | "No rules broken." (expanded ethics card) |
+| edit.edit / edit.save / edit.saving / edit.saved / edit.cancel | "Edit" / "Save" / "Saving…" / "Saved" / "Cancel" |
+| edit.titleLabel / edit.bodyLabel | "Title" / "Notes" |
+| edit.seeLatest | "See latest" (with canvas.editConflict) |
+| edit.objectiveHint / edit.goToBrief | "Objectives are edited in the brief." / "Edit in brief" |
+| edit.ethicsHint | "The ethics check can't be edited. Change the brief and it runs again." |
+| edit.overrideHint | "An override is a record of a decision, so it can't be edited." |
 | card.types | "Objective" / "Current assets" / "Ethics check" / "Source" / "Finding" / "Theme" / "Opportunity" / "Gap" / "Solution" / "Wireframe" / "Annotation" / "Test plan" / "Override" / "Reference" |
 | card.ethicsStatus | "Passed" / "Flagged · {n} rules" / "Checking…" / "Didn't run" / "Overridden" |
 | card.markers | "Out of date" / "Low specificity" / "Failed" / "Running" / "Flagged" / "Overridden" |

@@ -106,6 +106,13 @@
       "when": 1794891175458,
       "tag": "20261117045255_approve_checkpoint",
       "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1794917111130,
+      "tag": "20261117120511_update_node",
+      "breakpoints": true
     }
   ]
 }

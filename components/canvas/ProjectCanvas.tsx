@@ -18,6 +18,10 @@ export type CanvasActions = {
   cancelStage: (projectId: string, runId: string) => Promise<ActionResult>;
   reorderNodes: (projectId: string, ids: string[]) => Promise<ActionResult>;
   getNodeHistory: (nodeId: string) => Promise<HistoryItem[]>;
+  updateNode: (
+    projectId: string,
+    input: { nodeId: string; title: string; body: string | null; version: number },
+  ) => Promise<ActionResult<{ version: number }>>;
 };
 
 /** SCR5 project canvas: tree or list, details panel (?node=), decision bar, live updates. */
@@ -95,6 +99,7 @@ export function ProjectCanvas({ tree, actions }: { tree: ProjectTree; actions: C
           selectedId={selectedId}
           onSelect={(id) => setParam("node", id)}
           onAddCard={() => toast(c.addCardLater)}
+          runningRunId={active ? (run?.id ?? null) : null}
           onReorder={(_, ids) =>
             void actions.reorderNodes(tree.project.id, ids).then(() => router.refresh())
           }
@@ -110,6 +115,13 @@ export function ProjectCanvas({ tree, actions }: { tree: ProjectTree; actions: C
           loadHistory={actions.getNodeHistory}
           onClose={() => setParam("node", null)}
           onSelect={(id) => setParam("node", id)}
+          projectId={tree.project.id}
+          onSave={async (input) => {
+            const res = await actions.updateNode(tree.project.id, input);
+            if (res.ok) router.refresh();
+            return res;
+          }}
+          onSeeLatest={() => router.refresh()}
         />
       ) : null}
       <CheckpointBar

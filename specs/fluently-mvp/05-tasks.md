@@ -169,7 +169,7 @@ You'll be able to see: research running live on the canvas and the research chec
   Done when: `tests/jobs/J2-research.test.ts` 'synthesis creates themes/opportunities/gaps with edges', 'unknown principle dropped', 'gap methods only from services list', 'synthesis failure keeps findings and offers retry' pass.
 - [ ] T6.7 Research checkpoint in SCR8: opportunity list, none pre-selected, all-low note, select ≥ 1, approve starts solutions (stub until Slice 9), send-back with feedback (≥ 10 chars; `replace_human` checkbox) — M — Refs: AC14.1–AC14.3, AC25.2, EC4, EC13 — Depends on: T5.6, T6.6
   Done when: `tests/components/SCR8-checkpoint.test.tsx` adds research checkpoint, nothing selected, send-back form; `e2e/FL3.spec.ts` (fake AI) and `e2e/FF5.spec.ts` pass.
-- [ ] T6.9 Expandable Evidence and Current assets cards (grouped sources, show more, thumbnails) and *Add source* after research (O35, marks themes Out of date) — M — Refs: AC22.9, AC22.10, AC12.10 — Depends on: T6.6
+- [ ] T6.9 (expand in place done early on 2026-11-17 at the user's request: every card expands, the Evidence card shows its groups; individual sources, show more, thumbnails and Add source remain) Expandable Evidence and Current assets cards (grouped sources, show more, thumbnails) and *Add source* after research (O35, marks themes Out of date) — M — Refs: AC22.9, AC22.10, AC12.10 — Depends on: T6.6
   Done when: `tests/components/SCR5-expanded-cards.test.tsx` passes (groups in order with counts, 3 items then 'Show n more', collapse); `tests/integration/O35-add-source.test.ts` passes ('new source marks themes out of date').
 - [ ] T6.10 Split, rename and move assets between Current assets cards (O36) — S — Refs: AC22.11 — Depends on: T6.9
   Done when: `tests/integration/O36-assets.test.ts` passes ('split keeps every asset in one card', 'moving the last asset removes the empty card', 'rename saves').
@@ -205,7 +205,7 @@ You'll be able to see: trace highlighting, editing in the inspector, stale marke
 
 - [ ] T8.1 `trace_path` SQL function + O26 + trace mode (dim others to 30%, thicken path, list in inspector, Esc clears) — M — Refs: AC23.1–AC23.3, MI5 — Depends on: T5.1
   Done when: `tests/integration/trace.test.ts` passes incl. 1,000-node seeded graph ≤ 300 ms; `tests/components/SCR5-trace.test.tsx` passes; MI5 reduced-motion test (instant dim).
-- [ ] T8.2 O21 `updateNode` with version check, provenance → `ai_edited`, history; SCR7 editing/saving/conflict (MI6) — M — Refs: AC24.1, AC24.7, FF10, EC6, MI6 — Depends on: T5.3
+- [x] T8.2 (done early on 2026-11-17 at the user's request; `tests/integration/O21-update-node.test.ts`, `tests/components/SCR7-inspector.test.tsx`) O21 `updateNode` with version check, provenance → `ai_edited`, history; SCR7 editing/saving/conflict (MI6) — M — Refs: AC24.1, AC24.7, FF10, EC6, MI6 — Depends on: T5.3
   Done when: `tests/integration/O21-O25-nodes.test.ts` 'edit sets ai_edited', 'stale version → conflict'; `e2e/FF10.spec.ts` (two browser contexts) passes.
 - [ ] T8.3 `mark_downstream_stale` + stale on edit/regenerate/delete/merge + toolbar `Regenerate stale (n)` (MI7); EC7 intake edit path — M — Refs: AC24.4, AC9.3, EC7, MI7 — Depends on: T8.2
   Done when: integration tests 'edit theme marks downstream stale', 'intake edit marks all stale' pass; MI7 test.

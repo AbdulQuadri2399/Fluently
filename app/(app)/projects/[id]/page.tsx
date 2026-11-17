@@ -19,6 +19,7 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[id]"
           cancelStage: actions.cancelStage,
           reorderNodes: actions.reorderNodes,
           getNodeHistory: actions.getNodeHistory,
+          updateNode: actions.updateNode,
         }}
       />
     </Suspense>

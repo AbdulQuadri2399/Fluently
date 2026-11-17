@@ -50,6 +50,8 @@ type Props = {
   onSelect: (id: string | null) => void;
   onReorder?: (id: string, laneOrder: string[]) => void;
   onAddCard?: (lane: Lane) => void;
+  /** The active stage run: lines into the cards it is producing animate (MI15). */
+  runningRunId?: string | null;
 };
 
 /** Lane names stay pinned at the top while the canvas pans (AC22.12). */
@@ -116,13 +118,35 @@ function Toolbar() {
   );
 }
 
-function Canvas({ nodes, edges, running, selectedId, onSelect, onReorder, onAddCard }: Props) {
+function Canvas({
+  nodes,
+  edges,
+  running,
+  selectedId,
+  onSelect,
+  onReorder,
+  onAddCard,
+  runningRunId = null,
+}: Props) {
   const rf = useReactFlow();
   const [viewport, setViewport] = useState<Viewport>({ x: 24, y: 0, zoom: 1 });
   const [dragged, setDragged] = useState<Record<string, number>>({});
   // The canvas measures each card and reports its size; cards passed back without it are hidden.
   const [sizes, setSizes] = useState<Record<string, { width: number; height: number }>>({});
 
+  const [expanded, setExpanded] = useState<Set<string>>(() => new Set());
+  const toggle = useCallback(
+    (id: string) =>
+      setExpanded((cur) => {
+        const next = new Set(cur);
+        if (next.has(id)) next.delete(id);
+        else next.add(id);
+        return next;
+      }),
+    [],
+  );
+
+  // Cards below an expanded card move down: the layout uses each card's measured height.
   const placed = useMemo(
     () =>
       layoutTree(
@@ -131,9 +155,10 @@ function Canvas({ nodes, edges, running, selectedId, onSelect, onReorder, onAddC
           type: n.type,
           sortOrder: n.sortOrder,
           createdAt: n.createdAt,
+          height: sizes[n.id]?.height,
         })),
       ),
-    [nodes],
+    [nodes, sizes],
   );
 
   // MI3: cards that weren't there when the canvas opened arrive with a short stagger (max 5).
@@ -145,10 +170,7 @@ function Canvas({ nodes, edges, running, selectedId, onSelect, onReorder, onAddC
 
   const laneHeight = Math.max(
     560,
-    ...LANES.map((lane) => {
-      const count = placed.filter((p) => p.lane === lane).length;
-      return TOP + count * (CARD_H + 20) + 80;
-    }),
+    ...placed.map((p) => p.y + (sizes[p.id]?.height ?? CARD_H) + 80),
   );
 
   const flowNodes: Node[] = useMemo(() => {
@@ -176,6 +198,8 @@ function Canvas({ nodes, edges, running, selectedId, onSelect, onReorder, onAddC
           isNew: added >= 0,
           delayMs: Math.min(Math.max(added, 0), 4) * 40,
           dimmed: false,
+          expanded: expanded.has(p.id),
+          onToggle: toggle,
         },
         selected: p.id === selectedId,
         ariaLabel: byId.get(p.id)!.title,
@@ -183,8 +207,9 @@ function Canvas({ nodes, edges, running, selectedId, onSelect, onReorder, onAddC
       };
     });
     return [...lanes, ...cards];
-  }, [placed, nodes, running, selectedId, dragged, fresh, laneHeight, sizes]);
+  }, [placed, nodes, running, selectedId, dragged, fresh, laneHeight, sizes, expanded, toggle]);
 
+  const runOf = useMemo(() => new Map(nodes.map((n) => [n.id, n.stageRunId])), [nodes]);
   // Lines run between lanes; cards in the same lane (objectives → ethics) sit one under the other.
   const flowEdges: Edge[] = useMemo(() => {
     const lane = new Map(placed.map((p) => [p.id, p.lane]));
@@ -197,8 +222,9 @@ function Canvas({ nodes, edges, running, selectedId, onSelect, onReorder, onAddC
         type: "dashed",
         selectable: false,
         focusable: false,
+        data: { running: runningRunId !== null && runOf.get(e.to) === runningRunId },
       }));
-  }, [edges, placed]);
+  }, [edges, placed, runningRunId, runOf]);
 
   // D24: cards move only up and down inside their lane.
   const onNodesChange = useCallback((changes: NodeChangeset) => {

@@ -5,7 +5,95 @@ import { useEffect, useState } from "react";
 import { stageNames } from "@/components/projects/copy";
 import { cardView } from "@/lib/canvas/card";
 import type { TreeEdge, TreeNode } from "@/lib/canvas/load";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import type { ActionResult } from "@/lib/actions/result";
 import { canvasCopy as c, typeNames } from "./copy";
+
+type SaveFn = NonNullable<Parameters<typeof Inspector>[0]["onSave"]>;
+
+/** SCR7 editing (AC24.1, AC24.7, MI6): title and notes; a stale copy is refused and the text kept. */
+function EditForm({
+  node,
+  onSave,
+  onSeeLatest,
+  onDone,
+}: {
+  node: TreeNode;
+  onSave: SaveFn;
+  onSeeLatest?: () => void;
+  onDone: () => void;
+}) {
+  const [title, setTitle] = useState(node.title);
+  const [body, setBody] = useState(((node.data as { body?: string }).body ?? "") as string);
+  const [state, setState] = useState<"idle" | "saving" | "conflict" | "failed">("idle");
+  return (
+    <form
+      className="grid gap-3"
+      onSubmit={async (e) => {
+        e.preventDefault();
+        setState("saving");
+        const res = await onSave({ nodeId: node.id, title, body, version: node.version }).catch(
+          () => null,
+        );
+        if (res?.ok) onDone();
+        else setState(res && !res.ok && res.code === "conflict" ? "conflict" : "failed");
+      }}
+    >
+      <div className="grid gap-1.5">
+        <Label htmlFor="edit-title">{c.edit.titleLabel}</Label>
+        <Input
+          id="edit-title"
+          value={title}
+          maxLength={200}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+      </div>
+      <div className="grid gap-1.5">
+        <Label htmlFor="edit-body">{c.edit.bodyLabel}</Label>
+        <Textarea
+          id="edit-body"
+          value={body}
+          maxLength={4000}
+          rows={4}
+          onChange={(e) => setBody(e.target.value)}
+        />
+      </div>
+      {state === "conflict" ? (
+        <div
+          role="alert"
+          className="grid justify-items-start gap-2 rounded-sm bg-warn-bg p-3 text-small text-warn"
+        >
+          {c.edit.conflict(node.updatedByName || "Someone")}
+          <Button type="button" size="sm" variant="secondary" onClick={() => onSeeLatest?.()}>
+            {c.edit.seeLatest}
+          </Button>
+        </div>
+      ) : null}
+      {state === "failed" ? (
+        <p role="alert" className="text-small text-bad">
+          {c.edit.saveFailed}
+        </p>
+      ) : null}
+      <div className="flex gap-2">
+        <Button
+          type="submit"
+          loading={state === "saving"}
+          loadingLabel={c.edit.saving}
+          disabledReason={title.trim() ? undefined : c.edit.titleLabel}
+        >
+          {c.edit.save}
+        </Button>
+        <Button type="button" variant="ghost" onClick={onDone}>
+          {c.edit.cancel}
+        </Button>
+      </div>
+    </form>
+  );
+}
 
 export type HistoryItem = { change: string; at: string; by: string };
 
@@ -19,6 +107,9 @@ export function Inspector({
   loadHistory,
   onClose,
   onSelect,
+  projectId,
+  onSave,
+  onSeeLatest,
 }: {
   node: TreeNode;
   nodes: TreeNode[];
@@ -28,8 +119,18 @@ export function Inspector({
   loadHistory: (nodeId: string) => Promise<HistoryItem[]>;
   onClose: () => void;
   onSelect: (id: string) => void;
+  projectId?: string;
+  onSave?: (input: {
+    nodeId: string;
+    title: string;
+    body: string | null;
+    version: number;
+  }) => Promise<ActionResult<{ version: number }>>;
+  onSeeLatest?: () => void;
 }) {
   const [history, setHistory] = useState<HistoryItem[] | null>(null);
+  const [editing, setEditing] = useState(false);
+  const [savedAt, setSavedAt] = useState(0);
   useEffect(() => {
     let live = true;
     loadHistory(node.id)
@@ -38,7 +139,7 @@ export function Inspector({
     return () => {
       live = false;
     };
-  }, [node.id, loadHistory]);
+  }, [node.id, loadHistory, savedAt]);
 
   const v = cardView(node, running);
   const byId = new Map(nodes.map((n) => [n.id, n]));
@@ -87,7 +188,54 @@ export function Inspector({
           <XIcon aria-hidden="true" className="size-4" />
         </button>
       </div>
-      <h2 className="text-panel font-semibold tracking-tight">{v.title}</h2>
+      {editing && onSave ? (
+        <EditForm
+          key={`${node.id}-${node.version}`}
+          node={node}
+          onSave={onSave}
+          onSeeLatest={onSeeLatest}
+          onDone={() => {
+            setEditing(false);
+            setSavedAt(Date.now());
+          }}
+        />
+      ) : (
+        <h2 className="text-panel font-semibold tracking-tight">{v.title}</h2>
+      )}
+      {!editing && (node.data as { body?: string }).body ? (
+        <p className="text-body whitespace-pre-wrap">{(node.data as { body?: string }).body}</p>
+      ) : null}
+      {!editing && onSave ? (
+        node.type === "objective" ? (
+          <p className="flex items-center justify-between gap-3 text-small text-muted">
+            {c.edit.objectiveHint}
+            {projectId ? (
+              <Button asChild size="sm" variant="secondary">
+                <Link href={`/projects/${projectId}/brief`}>{c.edit.goToBrief}</Link>
+              </Button>
+            ) : null}
+          </p>
+        ) : node.type === "ethics" ? (
+          <p className="text-small text-muted">{c.edit.ethicsHint}</p>
+        ) : node.type === "override" ? (
+          <p className="text-small text-muted">{c.edit.overrideHint}</p>
+        ) : (
+          <div>
+            <Button
+              size="sm"
+              variant="secondary"
+              disabledReason={
+                locked
+                  ? c.lockedWhileRunning(stageNames[runningStage ?? node.stage] ?? node.stage)
+                  : undefined
+              }
+              onClick={() => setEditing(true)}
+            >
+              {c.edit.edit}
+            </Button>
+          </div>
+        )
+      ) : null}
       {locked ? (
         <p role="status" className="rounded-sm bg-soft p-3 text-small text-muted">
           {c.lockedWhileRunning(stageNames[runningStage ?? node.stage] ?? node.stage)}

@@ -656,6 +656,9 @@ isOneToOne: false
                            },
 "start_stage":
 { Args: { "p_project": string,"p_stage": string }; Returns: string
+                           },
+"update_node":
+{ Args: { "p_body": string,"p_node": string,"p_title": string,"p_version": number }; Returns: number
                            }
           }
           Enums: {

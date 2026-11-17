@@ -18,6 +18,9 @@ const node = (over: Partial<TreeNode> = {}): TreeNode => ({
   model: "claude-haiku-5-5",
   sortOrder: 0,
   createdAt: "2026-11-17T10:00:00Z",
+  stageRunId: null,
+  version: 1,
+  updatedByName: "",
   ...over,
 });
 const objective: TreeNode = {
@@ -80,5 +83,120 @@ describe("SCR7 details panel", () => {
     expect(screen.getByText("Hidden costs.")).toBeInTheDocument();
     expect(screen.getByText("Mentions a surprise fee.")).toBeInTheDocument();
     expect(screen.getAllByText(c.ethicsStatus.flagged(1)).length).toBeGreaterThan(0);
+  });
+
+  it("editing (MI6): Edit → change title and notes → Save sends the version", async () => {
+    const onSave = vi.fn(async () => ({ ok: true as const, data: { version: 2 } }));
+    render(
+      <Inspector
+        node={node()}
+        nodes={[node()]}
+        edges={[]}
+        running={false}
+        runningStage={null}
+        loadHistory={history}
+        onClose={vi.fn()}
+        onSelect={vi.fn()}
+        onSave={onSave}
+      />,
+    );
+    await userEvent.click(screen.getByRole("button", { name: c.edit.edit }));
+    const title = screen.getByLabelText(c.edit.titleLabel);
+    await userEvent.clear(title);
+    await userEvent.type(title, "Sources, checked");
+    await userEvent.type(screen.getByLabelText(c.edit.bodyLabel), "Removed duplicates");
+    await userEvent.click(screen.getByRole("button", { name: c.edit.save }));
+    expect(onSave).toHaveBeenCalledWith({
+      nodeId: "s1",
+      title: "Sources, checked",
+      body: "Removed duplicates",
+      version: 1,
+    });
+    expect(screen.queryByLabelText(c.edit.titleLabel)).not.toBeInTheDocument();
+  });
+
+  it("conflict (FF10): canvas.editConflict with See latest; your text kept", async () => {
+    const onSave = vi.fn(async () => ({ ok: false as const, code: "conflict" as const }));
+    const onSeeLatest = vi.fn();
+    render(
+      <Inspector
+        node={node({ updatedByName: "Ada" })}
+        nodes={[node()]}
+        edges={[]}
+        running={false}
+        runningStage={null}
+        loadHistory={history}
+        onClose={vi.fn()}
+        onSelect={vi.fn()}
+        onSave={onSave}
+        onSeeLatest={onSeeLatest}
+      />,
+    );
+    await userEvent.click(screen.getByRole("button", { name: c.edit.edit }));
+    await userEvent.type(screen.getByLabelText(c.edit.bodyLabel), "My note");
+    await userEvent.click(screen.getByRole("button", { name: c.edit.save }));
+    expect(await screen.findByRole("alert")).toHaveTextContent(c.edit.conflict("Ada"));
+    expect(screen.getByLabelText(c.edit.bodyLabel)).toHaveValue("My note");
+    await userEvent.click(screen.getByRole("button", { name: c.edit.seeLatest }));
+    expect(onSeeLatest).toHaveBeenCalled();
+  });
+
+  it("objectives, ethics and overrides explain why they aren't edited here", () => {
+    const save = vi.fn();
+    const { unmount } = render(
+      <Inspector
+        node={objective}
+        nodes={[objective]}
+        edges={[]}
+        running={false}
+        runningStage={null}
+        loadHistory={history}
+        onClose={vi.fn()}
+        onSelect={vi.fn()}
+        onSave={save}
+        projectId="p1"
+      />,
+    );
+    expect(screen.getByText(c.edit.objectiveHint)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: c.edit.goToBrief })).toHaveAttribute(
+      "href",
+      "/projects/p1/brief",
+    );
+    expect(screen.queryByRole("button", { name: c.edit.edit })).not.toBeInTheDocument();
+    unmount();
+    render(
+      <Inspector
+        node={node({ type: "ethics", stage: "ethics" })}
+        nodes={[]}
+        edges={[]}
+        running={false}
+        runningStage={null}
+        loadHistory={history}
+        onClose={vi.fn()}
+        onSelect={vi.fn()}
+        onSave={save}
+      />,
+    );
+    expect(screen.getByText(c.edit.ethicsHint)).toBeInTheDocument();
+  });
+
+  it("locked: Edit explains it waits for the running stage", () => {
+    render(
+      <Inspector
+        node={node()}
+        nodes={[node()]}
+        edges={[]}
+        running={false}
+        runningStage="research"
+        loadHistory={history}
+        onClose={vi.fn()}
+        onSelect={vi.fn()}
+        onSave={vi.fn()}
+      />,
+    );
+    expect(screen.getByRole("button", { name: c.edit.edit })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
   });
 });

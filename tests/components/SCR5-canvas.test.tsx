@@ -1,5 +1,7 @@
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
+import { Position, ReactFlowProvider, type EdgeProps } from "@xyflow/react";
+import { DashedEdge } from "@/components/canvas/DashedEdge";
 import { CardBody } from "@/components/canvas/NodeCard";
 import { TreeCanvas } from "@/components/canvas/TreeCanvas";
 import { canvasCopy as c } from "@/components/canvas/copy";
@@ -22,6 +24,9 @@ const node = (over: Partial<TreeNode>): TreeNode => ({
   model: null,
   sortOrder: 0,
   createdAt: "2026-11-17T10:00:00Z",
+  stageRunId: null,
+  version: 1,
+  updatedByName: "",
   ...over,
 });
 
@@ -235,5 +240,70 @@ describe("SCR5 canvas", () => {
       />,
     );
     expect(screen.getByText(c.sourcesSummary(20, 2))).toBeInTheDocument();
+  });
+
+  it("MI13: a card expands in place and collapses again", () => {
+    const groups = [{ key: "papers", title: "Academic papers", count: 12, status: "done" }];
+    const flagged = node({
+      id: "e9",
+      type: "ethics",
+      stage: "ethics",
+      status: "flagged",
+      data: { reasons: [{ rule: "Hidden costs", reason: "Mentions a surprise fee." }] },
+    });
+    renderCanvas([
+      ...tree("new"),
+      node({
+        id: "s9",
+        type: "source",
+        stage: "research",
+        title: "Research sources",
+        data: { groups },
+      }),
+      flagged,
+    ]);
+    const sources = screen.getByTestId("card-s9");
+    fireEvent.click(within(sources).getByRole("button", { name: c.expand, hidden: true }));
+    expect(within(sources).getByText("Academic papers")).toBeInTheDocument();
+    expect(within(sources).getByRole("button", { name: c.collapse, hidden: true })).toHaveAttribute(
+      "aria-expanded",
+      "true",
+    );
+    fireEvent.click(within(sources).getByRole("button", { name: c.collapse, hidden: true }));
+    expect(within(sources).queryByText("Academic papers")).not.toBeInTheDocument();
+
+    const ethics = screen.getByTestId("card-e9");
+    fireEvent.click(within(ethics).getByRole("button", { name: c.expand, hidden: true }));
+    expect(within(ethics).getByText("Mentions a surprise fee.")).toBeInTheDocument();
+  });
+
+  it("MI15: a line into a card the running stage is producing flows; other lines stay still", () => {
+    const props = {
+      id: "e1",
+      source: "a",
+      target: "b",
+      sourceX: 0,
+      sourceY: 0,
+      targetX: 100,
+      targetY: 50,
+      sourcePosition: Position.Right,
+      targetPosition: Position.Left,
+    } as unknown as EdgeProps;
+    const { container, rerender } = render(
+      <ReactFlowProvider>
+        <svg>
+          <DashedEdge {...props} data={{ running: true }} />
+        </svg>
+      </ReactFlowProvider>,
+    );
+    expect(container.querySelector("path.dash-flow")).not.toBeNull();
+    rerender(
+      <ReactFlowProvider>
+        <svg>
+          <DashedEdge {...props} data={{ running: false }} />
+        </svg>
+      </ReactFlowProvider>,
+    );
+    expect(container.querySelector("path.dash-flow")).toBeNull();
   });
 });

@@ -22,13 +22,16 @@ export function DashedEdge({
     targetPosition,
   });
   const traced = Boolean((data as { traced?: boolean } | undefined)?.traced);
+  // MI15: while a stage works on the card this line feeds, the dashes flow toward it.
+  const running = Boolean((data as { running?: boolean } | undefined)?.running);
   return (
     <>
       <BaseEdge
         id={id}
         path={path}
+        className={running ? "dash-flow" : undefined}
         style={{
-          stroke: traced ? "var(--ink)" : "var(--wire)",
+          stroke: traced || running ? "var(--ink)" : "var(--wire)",
           strokeWidth: traced ? 1.75 : 1.5,
           strokeDasharray: "5 4",
         }}
