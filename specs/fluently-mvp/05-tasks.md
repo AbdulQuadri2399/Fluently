@@ -161,7 +161,7 @@ You'll be able to see: research running live on the canvas and the research chec
   Done when: `tests/unit/retrieval.test.ts` passes with recorded fixtures: maps to source rows; 429 → backoff then fallback.
 - [ ] T6.3 Migration: `sources` table + RLS; `lib/rules/citationCheck.ts` (handles only from this run) — S — Refs: D8, AC12.2, AC12.3, NFR4 — Depends on: T4.2
   Done when: `tests/unit/citationCheck.test.ts` passes: unknown handle dropped + `citation_rejected` logged; finding with no valid source becomes `AI inference` only if model labelled it so, otherwise dropped.
-- [ ] T6.4 `lib/rules/confidence.ts` (AC12.6 rule) + gap decision (AC13.1, AC13.2) — S — Refs: AC12.6, AC13.1, AC13.2, EC5 — Depends on: —
+- [x] T6.4 `lib/rules/confidence.ts` (AC12.6 rule) + gap decision (AC13.1, AC13.2) — S — Refs: AC12.6, AC13.1, AC13.2, EC5 — Depends on: —
   Done when: `tests/unit/confidence.test.ts` passes one case per rule branch (High, Med ×2, Low ×3) and contradiction → Low + gap.
 - [ ] T6.5 J2 retrieval steps: toolkit candidates (goal hierarchy), papers, desk, competitive, social (labelled qualitative signal), uploads (text/CSV/PDF/images) — M — Refs: AC12.1, AC12.4, AC11.4, EC3, EC19, EC20 — Depends on: T5.5, T6.2, T6.3
   Done when: `tests/jobs/J2-research.test.ts` 'retrieval steps write source rows and source nodes', 'failed step retried twice then failed, others continue', '0 papers completes' pass.
