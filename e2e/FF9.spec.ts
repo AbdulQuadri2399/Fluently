@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { SEEDED, signIn } from "./helpers/auth";
+import { ready } from "./helpers/ready";
 import { shoot } from "./helpers/shoot";
 
 test("FF9 invalid toolkit file: row-level errors, nothing saved (AC4.2, AC4.3)", async ({
@@ -7,6 +8,7 @@ test("FF9 invalid toolkit file: row-level errors, nothing saved (AC4.2, AC4.3)",
 }) => {
   await signIn(page, SEEDED.admin);
   await page.goto("/toolkit");
+  await ready(page);
   const versionsBefore = await page
     .getByRole("row")
     .filter({ hasText: /^Version \d+/ })

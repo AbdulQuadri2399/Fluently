@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Onboarding } from "@/components/onboarding/Onboarding";
 import { NewProjectDialog } from "@/components/projects/NewProjectDialog";
 import type { ActionResult } from "@/lib/actions/result";
@@ -31,6 +31,10 @@ export function AppShell({
 }) {
   const [onboardingOpen, setOnboardingOpen] = useState(showOnboarding);
   const [newOpen, setNewOpen] = useState(false);
+  // Marks the page as interactive (used by browser tests to avoid acting too early).
+  useEffect(() => {
+    document.body.dataset.hydrated = "true";
+  }, []);
   return (
     <>
       <div

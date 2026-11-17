@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { openNewBrief } from "./helpers/brief";
+import { ready } from "./helpers/ready";
 import { shoot } from "./helpers/shoot";
 import { freshWorkspaceAdmin } from "./helpers/workspace";
 
@@ -24,6 +25,7 @@ test("SCR5 tree: brief → ethics → canvas → research runs live → list vie
   // Toolkit needed before research (AC4.9): upload the invented one.
   const canvasUrl = page.url().replace(/\/brief$/, "");
   await page.goto("/toolkit");
+  await ready(page);
   await page.getByLabel("Upload toolkit").setInputFiles("fixtures/toolkit/sample-toolkit.csv");
   await page.getByRole("button", { name: /^Save as version \d+$/ }).click();
   await expect(page.getByText(/Toolkit version \d+ saved/)).toBeVisible();

@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { SEEDED, signIn } from "./helpers/auth";
+import { ready } from "./helpers/ready";
 import { shoot } from "./helpers/shoot";
 
 test("FL7 admin uploads the toolkit: check, preview, save as the new default (AC4.1, AC4.5)", async ({
@@ -7,6 +8,7 @@ test("FL7 admin uploads the toolkit: check, preview, save as the new default (AC
 }) => {
   await signIn(page, SEEDED.admin);
   await page.goto("/toolkit");
+  await ready(page);
   await expect(page.getByRole("heading", { name: "Toolkit", level: 1 })).toBeVisible();
   await page.getByLabel("Upload toolkit").setInputFiles("fixtures/toolkit/sample-toolkit.csv");
 

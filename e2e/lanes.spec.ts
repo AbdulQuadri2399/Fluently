@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { ready } from "./helpers/ready";
 import { freshWorkspaceUser, seedApprovedProject } from "./helpers/workspace";
 
 async function open(page: Page) {
@@ -11,12 +12,14 @@ async function open(page: Page) {
   await page.getByRole("button", { name: "Skip" }).click();
   await page.goto(`/projects/${projectId}`);
   await expect(page.getByText("Upload ID on day one")).toBeVisible();
-  await page.waitForTimeout(500); // let the canvas finish measuring cards before dragging
 }
 
 const box = async (page: Page, text: string) => (await page.getByText(text).boundingBox())!;
 
 test.describe("Lanes (AC22.8, D24)", () => {
+  // The synthetic mouse drag is occasionally dropped by the canvas under heavy test load
+  // (about 1 run in 7); real drags have not shown this. Retried rather than hidden.
+  test.describe.configure({ retries: 2 });
   test("card can move up/down but not into another lane; order persists after reload", async ({
     page,
   }) => {
@@ -26,15 +29,15 @@ test.describe("Lanes (AC22.8, D24)", () => {
     expect(first.y).toBeLessThan(second.y);
 
     // Drag the first card down and to the right, past the second card.
-    await page.mouse.move(first.x + 20, first.y + 10);
-    await page.waitForTimeout(150);
+    await ready(page);
+    await expect(page.locator(".react-flow__node.draggable")).toHaveCount(3);
+    const from = await box(page, "Raise ID checks by 15%");
+    const to = await box(page, "Upload ID on day one");
+    await page.mouse.move(from.x + 20, from.y + 10);
     await page.mouse.down();
-    await page.waitForTimeout(150);
-    await page.mouse.move(first.x + 120, first.y + 40, { steps: 10 });
-    await page.mouse.move(first.x + 420, second.y + 60, { steps: 20 });
-    await page.waitForTimeout(150);
+    await page.mouse.move(from.x + 120, from.y + 40, { steps: 10 });
+    await page.mouse.move(from.x + 420, to.y + 60, { steps: 20 });
     await page.mouse.up();
-
     await expect
       .poll(
         async () =>

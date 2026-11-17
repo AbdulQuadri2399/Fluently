@@ -132,19 +132,19 @@ You'll be able to see: the canvas with columns, objective and ethics nodes, the 
 
 - [x] T5.1 Canvas (`@xyflow/react`): stage lanes (D24) with names pinned in a strip at the top and a + per lane header (AC22.12), Current assets cards under the objectives in optimise mode, node card component with all 03b states (default, hover, selected, focused, stale, running, failed, dimmed), badges as text+icon, pan/zoom 25–200%, fit, minimap, arrow-key navigation, Enter opens inspector — M — Refs: AC22.1, AC22.2, AC22.4, 03b §6 Node card — Depends on: T4.2
   Done when: `tests/components/SCR5-canvas.test.tsx` passes: nodes placed in correct lane per type; lane strip visible after panning; Current assets cards only in optimise mode; each marker renders its text label; ArrowRight moves focus to nearest node in next column; screenshot `SCR5-default` vs 03b SCR5.
-- [ ] T5.8 Reorder cards within a lane (vertical drag only, saved `sort_order`, O34 reorderNode) — S — Refs: AC22.8, D24 — Depends on: T5.1
+- [x] T5.8 Reorder cards within a lane (vertical drag only, saved `sort_order`, O34 reorderNode) — S — Refs: AC22.8, D24 — Depends on: T5.1
   Done when: `e2e/lanes.spec.ts` passes: 'card can move up/down but not into another lane', 'order persists after reload'.
 - [x] T5.2 [P] List view (accessible alternative) with same actions; toggle in toolbar — S — Refs: NFR3, AC22.4 — Depends on: T5.1
   Done when: `tests/components/SCR5-listview.test.tsx` passes: every node reachable as a list item with its type, markers and actions.
 - [x] T5.3 SCR7 inspector: default, editing (read-only until Slice 8), locked, flagged; history list; model used — S — Refs: AC22.5, AC11.8, SCR7 — Depends on: T5.1
   Done when: `tests/components/SCR7-inspector.test.tsx` covers default, locked (copy `canvas.lockedWhileRunning`), flagged.
-- [ ] T5.4 Realtime hook `useRealtimeProject` (nodes, edges, stage_runs) with 250 ms re-layout throttle; MI3 node arrival (fade + rise, stagger 40 ms, cap 5) — M — Refs: AC11.2, AC22.3, MI3, D5 — Depends on: T5.1
+- [x] T5.4 Realtime hook `useRealtimeProject` (nodes, edges, stage_runs) with 250 ms re-layout throttle; MI3 node arrival (fade + rise, stagger 40 ms, cap 5) — M — Refs: AC11.2, AC22.3, MI3, D5 — Depends on: T5.1
   Done when: `e2e/realtime.spec.ts` 'node inserted by server appears within 5 s without reload' passes; MI3 test: new node gets enter class; reduced motion → fade-only class.
 - [x] T5.5 Stage engine: O18 `startStage` (prerequisites, `requireToolkit`, conflict if running), O19 `cancelStage` (stop within 30 s), stage_runs step updates, 30-min timeout, cancellation check before each AI call — M — Refs: AC11.1, AC11.3, AC11.7, NFR8, EC18, EC8 — Depends on: T4.6
   Done when: `tests/jobs/stage-engine.test.ts` passes: 'start queues run', 'second start → conflict', 'cancel marks cancelled and keeps nodes', 'timeout marks failed', 'run continues after its starter is deactivated (EC8)'.
-- [ ] T5.6 SCR8 checkpoint panel: ready to research, running (step list ✓/spinner/✕ with live region, elapsed, cost), partial failure, failed, cancelled, collapsed; MI4, MI8; O20 `decideCheckpoint` + `approve_checkpoint` function (approve path) — M — Refs: AC25.1, AC25.3, AC25.4, AC2.4, SCR8, MI4, MI8 — Depends on: T5.5
+- [x] T5.6 SCR8 checkpoint panel: ready to research, running (step list ✓/spinner/✕ with live region, elapsed, cost), partial failure, failed, cancelled, collapsed; MI4, MI8; O20 `decideCheckpoint` + `approve_checkpoint` function (approve path) — M — Refs: AC25.1, AC25.3, AC25.4, AC2.4, SCR8, MI4, MI8 — Depends on: T5.5
   Done when: `tests/components/SCR8-checkpoint.test.tsx` one test per listed state; `tests/integration/O20-checkpoint.test.ts` 'approve records decision and sets status'; MI4 live region announces "…: done".
-- [ ] T5.7 Project shell: header (name, mode · channel, toolkit version, cost so far, tabs Canvas/Intake/Report), intake-not-approved state, offline banner, session-expired modal (FF14), URL state `?node=` — M — Refs: AC22.6, SCR5 states, FF14, 03 §9 — Depends on: T5.1
+- [x] T5.7 Project shell: header (name, mode · channel, toolkit version, cost so far, tabs Canvas/Intake/Report), intake-not-approved state, offline banner, session-expired modal (FF14), URL state `?node=` — M — Refs: AC22.6, SCR5 states, FF14, 03 §9 — Depends on: T5.1
   Done when: `tests/components/SCR5-shell.test.tsx` covers intake first, offline, session expired; `e2e/FF14.spec.ts` 'expired session → sign in modal → text kept' passes.
 
 Slice check: suite green; seeded project renders every SCR5 state listed; a fake stage started from SCR8 shows live steps. **Stop for the user.**
