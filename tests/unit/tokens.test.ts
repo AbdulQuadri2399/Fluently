@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
-// Contrast checks for every 03b colour pair (03b §3, NFR3).
+// Contrast checks for every 03b colour pair (03b section 3, NFR3).
 const css = readFileSync("app/globals.css", "utf8");
 
 function block(selector: RegExp): Record<string, string> {
@@ -28,21 +28,14 @@ function contrast(a: string, b: string): number {
 const light = block(/:root\s*\{([^}]*)\}/);
 const dark = block(/@media \(prefers-color-scheme: dark\)\s*\{\s*:root\s*\{([^}]*)\}/);
 
-const backgrounds = ["bg", "surface", "surface-2"];
-const texts = [
-  "text",
-  "text-muted",
-  "primary",
-  "danger",
-  "success",
-  "warning",
-  "node-objectives",
-  "node-sources",
-  "node-themes",
-  "node-opportunities",
-  "node-solutions",
-  "node-lofi",
-  "node-tests",
+const backgrounds = ["paper", "canvas", "surface", "soft"];
+const texts = ["ink", "muted", "ok", "warn", "bad", "info"];
+const pastelPairs: [string, string][] = [
+  ["ok", "ok-bg"],
+  ["warn", "warn-bg"],
+  ["bad", "bad-bg"],
+  ["info", "info-bg"],
+  ["on-action", "action"],
 ];
 
 describe.each([
@@ -59,16 +52,12 @@ describe.each([
     }
   });
 
-  it("button text on primary has ≥ 4.5:1", () => {
-    expect(
-      contrast(vars["primary-foreground"] ?? "", vars["primary"] ?? ""),
-    ).toBeGreaterThanOrEqual(4.5);
+  it.each(pastelPairs)("%s on %s has >= 4.5:1", (fg, bg) => {
+    expect(contrast(vars[fg] ?? "", vars[bg] ?? "")).toBeGreaterThanOrEqual(4.5);
   });
 
-  it("button text on danger has ≥ 4.5:1", () => {
-    expect(contrast(vars["danger-foreground"] ?? "", vars["danger"] ?? "")).toBeGreaterThanOrEqual(
-      4.5,
-    );
+  it("connecting lines (wire) have >= 3:1 on the canvas", () => {
+    expect(contrast(vars["wire"] ?? "", vars["canvas"] ?? "")).toBeGreaterThanOrEqual(3);
   });
 });
 
@@ -79,7 +68,7 @@ describe("motion tokens (03b §3)", () => {
     ["duration-slow", "320ms"],
     ["ease-standard", "cubic-bezier(0.2, 0, 0, 1)"],
     ["ease-exit", "cubic-bezier(0.3, 0, 1, 1)"],
-    ["ease-emphasis", "cubic-bezier(0.05, 0.7, 0.1, 1)"],
+    ["ease-emphasis", "cubic-bezier(0.16, 1, 0.3, 1)"],
   ])("--%s is %s", (name, value) => {
     expect(css).toContain(`--${name}: ${value};`);
   });

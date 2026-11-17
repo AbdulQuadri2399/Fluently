@@ -1,7 +1,7 @@
 "use client";
 
 import { cva, type VariantProps } from "class-variance-authority";
-import { Loader2 } from "lucide-react";
+import { CircleNotch } from "@phosphor-icons/react/dist/ssr";
 import { Slot } from "radix-ui";
 import { useId, type ComponentProps, type MouseEvent } from "react";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
@@ -9,14 +9,14 @@ import { mi } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex min-h-9 items-center justify-center gap-2 whitespace-nowrap rounded-sm px-4 text-small font-medium transition-colors duration-fast ease-standard focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-40 aria-disabled:cursor-not-allowed aria-disabled:opacity-40 [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex min-h-9 items-center justify-center gap-2 whitespace-nowrap rounded-sm px-4 text-small font-medium transition-colors duration-fast ease-standard focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink disabled:opacity-40 aria-disabled:cursor-not-allowed aria-disabled:opacity-40 [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        primary: "bg-primary text-primary-foreground hover:brightness-95",
-        secondary: "border border-border bg-surface text-text hover:bg-surface-2",
-        ghost: "text-text hover:bg-surface-2",
-        danger: "bg-danger text-danger-foreground hover:brightness-95",
+        primary: "bg-action text-on-action hover:opacity-90",
+        secondary: "border border-line-strong bg-surface text-ink hover:bg-soft",
+        ghost: "text-ink hover:bg-soft",
+        danger: "bg-bad text-on-action hover:opacity-90",
       },
       size: {
         default: "h-9",
@@ -80,7 +80,7 @@ export function Button({
             {reduced ? (
               <span aria-hidden="true">…</span>
             ) : (
-              <Loader2 className="animate-spin" aria-hidden="true" />
+              <CircleNotch className="animate-spin" aria-hidden="true" />
             )}
             {loadingLabel ?? children}
           </>

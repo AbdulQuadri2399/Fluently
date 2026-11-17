@@ -6,9 +6,9 @@ export function Input({ className, type = "text", ...props }: ComponentProps<"in
     <input
       type={type}
       className={cn(
-        "h-9 w-full rounded-sm border border-border bg-surface px-3 text-small text-text placeholder:text-text-muted",
-        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",
-        "aria-invalid:border-danger disabled:opacity-40",
+        "h-9 w-full rounded-sm border border-line bg-surface px-3 text-small text-ink placeholder:text-muted",
+        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink",
+        "aria-invalid:border-bad disabled:opacity-40",
         className,
       )}
       {...props}

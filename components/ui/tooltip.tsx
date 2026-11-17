@@ -21,7 +21,7 @@ export function TooltipContent({
       <T.Content
         sideOffset={sideOffset}
         className={cn(
-          "z-50 max-w-xs rounded-sm bg-text px-2 py-1 text-caption text-bg shadow-elev-1",
+          "z-50 max-w-xs rounded-sm bg-ink px-2 py-1 text-caption text-paper shadow-elev-1",
           "data-[state=delayed-open]:animate-in data-[state=delayed-open]:fade-in-0 duration-fast",
           className,
         )}

@@ -17,7 +17,7 @@ export function DropdownMenuContent({
       <M.Content
         sideOffset={sideOffset}
         className={cn(
-          "z-50 min-w-44 rounded-md border border-border bg-surface p-1 shadow-elev-1",
+          "z-50 min-w-44 rounded-md border border-line bg-surface p-1 shadow-elev-1",
           "duration-fast data-[state=open]:animate-in data-[state=open]:fade-in-0",
           className,
         )}
@@ -31,7 +31,7 @@ export function DropdownMenuItem({ className, ...props }: ComponentProps<typeof 
   return (
     <M.Item
       className={cn(
-        "flex min-h-9 cursor-default select-none items-center gap-2 rounded-sm px-2 text-small outline-none data-[highlighted]:bg-surface-2",
+        "flex min-h-9 cursor-default select-none items-center gap-2 rounded-sm px-2 text-small outline-none data-[highlighted]:bg-soft",
         className,
       )}
       {...props}
@@ -40,9 +40,7 @@ export function DropdownMenuItem({ className, ...props }: ComponentProps<typeof 
 }
 
 export function DropdownMenuLabel({ className, ...props }: ComponentProps<typeof M.Label>) {
-  return (
-    <M.Label className={cn("px-2 py-1.5 text-caption text-text-muted", className)} {...props} />
-  );
+  return <M.Label className={cn("px-2 py-1.5 text-caption text-muted", className)} {...props} />;
 }
 
 export const DropdownMenuSeparator = (props: ComponentProps<typeof M.Separator>) => (

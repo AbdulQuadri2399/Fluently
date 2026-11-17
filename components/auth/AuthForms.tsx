@@ -52,7 +52,7 @@ const successCopy: Partial<Record<Status, string>> = {
 function AuthCard({ title, children }: { title: string; children: ReactNode }) {
   return (
     <main className="flex min-h-full flex-1 items-center justify-center px-4 py-12">
-      <div className="w-full max-w-[400px] rounded-lg border border-border bg-surface p-8">
+      <div className="w-full max-w-[400px] rounded-xl border border-line bg-surface p-8">
         <p className="mb-6 text-section font-semibold tracking-tight">Fluently</p>
         <h1 className="mb-6 text-page font-semibold">{title}</h1>
         {children}
@@ -64,10 +64,7 @@ function AuthCard({ title, children }: { title: string; children: ReactNode }) {
 function StatusMessage({ status, online }: { status: Status; online: boolean }) {
   if (!online) {
     return (
-      <p
-        role="status"
-        className="mb-4 rounded-sm border border-warning p-3 text-small text-warning"
-      >
+      <p role="status" className="mb-4 rounded-sm border border-warn p-3 text-small text-warn">
         {c.offline}
       </p>
     );
@@ -75,7 +72,7 @@ function StatusMessage({ status, online }: { status: Status; online: boolean }) 
   const alert = alertCopy[status];
   if (alert) {
     return (
-      <p role="alert" className="mb-4 rounded-sm border border-danger p-3 text-small text-danger">
+      <p role="alert" className="mb-4 rounded-sm border border-bad p-3 text-small text-bad">
         {alert}
       </p>
     );
@@ -113,7 +110,7 @@ function Field<T extends FieldValues>({
         {...form.register(name)}
       />
       {typeof error === "string" ? (
-        <p id={`${id}-error`} className="text-caption text-danger">
+        <p id={`${id}-error`} className="text-caption text-bad">
           {error}
         </p>
       ) : null}
@@ -200,10 +197,16 @@ export function SignInForm({
         </Button>
       </form>
       <div className="mt-6 flex justify-between text-small">
-        <Link className="text-primary underline-offset-4 hover:underline" href="/sign-up">
+        <Link
+          className="text-ink underline decoration-line-strong underline-offset-4 hover:decoration-ink"
+          href="/sign-up"
+        >
           {c.createAccount}
         </Link>
-        <Link className="text-primary underline-offset-4 hover:underline" href="/reset">
+        <Link
+          className="text-ink underline decoration-line-strong underline-offset-4 hover:decoration-ink"
+          href="/reset"
+        >
           {c.forgotPassword}
         </Link>
       </div>
@@ -254,7 +257,10 @@ export function SignUpForm({ action }: { action: Action<SignUpInput> }) {
         </form>
       )}
       <p className="mt-6 text-small">
-        <Link className="text-primary underline-offset-4 hover:underline" href="/sign-in">
+        <Link
+          className="text-ink underline decoration-line-strong underline-offset-4 hover:decoration-ink"
+          href="/sign-in"
+        >
           {c.haveAccount}
         </Link>
       </p>
@@ -295,7 +301,10 @@ export function ResetRequestForm({ action }: { action: Action<ResetRequestInput>
         </form>
       )}
       <p className="mt-6 text-small">
-        <Link className="text-primary underline-offset-4 hover:underline" href="/sign-in">
+        <Link
+          className="text-ink underline decoration-line-strong underline-offset-4 hover:decoration-ink"
+          href="/sign-in"
+        >
           {c.backToSignIn}
         </Link>
       </p>
@@ -392,7 +401,10 @@ export function LinkExpiredForm({
         </form>
       )}
       <p className="mt-6 text-small">
-        <Link className="text-primary underline-offset-4 hover:underline" href="/sign-in">
+        <Link
+          className="text-ink underline decoration-line-strong underline-offset-4 hover:decoration-ink"
+          href="/sign-in"
+        >
           {c.backToSignIn}
         </Link>
       </p>

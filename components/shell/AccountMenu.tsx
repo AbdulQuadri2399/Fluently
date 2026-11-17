@@ -1,6 +1,6 @@
 "use client";
 
-import { CircleUser } from "lucide-react";
+import { UserCircle } from "@phosphor-icons/react/dist/ssr";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -17,7 +17,7 @@ export function AccountMenu({ email, signOut }: { email: string; signOut: () => 
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" aria-label={c.account}>
-          <CircleUser aria-hidden="true" />
+          <UserCircle aria-hidden="true" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

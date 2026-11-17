@@ -12,12 +12,12 @@ export function RadioGroupItem({ className, ...props }: ComponentProps<typeof R.
   return (
     <R.Item
       className={cn(
-        "grid size-5 place-items-center rounded-full border border-border bg-surface data-[state=checked]:border-primary",
+        "grid size-5 place-items-center rounded-full border border-line bg-surface data-[state=checked]:border-action",
         className,
       )}
       {...props}
     >
-      <R.Indicator className="size-2.5 rounded-full bg-primary" />
+      <R.Indicator className="size-2.5 rounded-full bg-action" />
     </R.Item>
   );
 }

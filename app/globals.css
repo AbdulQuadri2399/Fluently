@@ -1,59 +1,59 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-/* Design tokens from specs/fluently-mvp/03b-design-direction.md §3.
-   Colours: every text role is checked ≥ 4.5:1 by tests/unit/tokens.test.ts. */
+/* Design tokens from specs/fluently-mvp/03b-design-direction.md section 3 (calm direction, v2).
+   Text pairs are checked >= 4.5:1 and lines >= 3:1 by tests/unit/tokens.test.ts. */
 
 :root {
-  --bg: #fafaf9;
+  --paper: #fbfbfa;
+  --canvas: #f3f3f1;
   --surface: #ffffff;
-  --surface-2: #f2f2ef;
-  --border: #e2e2dd;
-  --text: #1c1c1a;
-  --text-muted: #5c5c57;
-  --primary: #3451c7;
-  --primary-foreground: #ffffff;
-  --danger: #b42318;
-  --danger-foreground: #ffffff;
-  --success: #1f7a35;
-  --warning: #8f5200;
-  --node-objectives: #5b3cc4;
-  --node-sources: #1a63a8;
-  --node-themes: #0a6672;
-  --node-opportunities: #1f7a35;
-  --node-solutions: #b23d0a;
-  --node-lofi: #4a4f55;
-  --node-tests: #a11d4b;
+  --soft: #f7f6f3;
+  --line: #eaeaea;
+  --line-strong: #dedcd8;
+  --wire: #8e8c86;
+  --ink: #1f2123;
+  --muted: #6f6e6a;
+  --action: #111111;
+  --on-action: #ffffff;
+  --ok: #346538;
+  --ok-bg: #edf3ec;
+  --warn: #8a5d00;
+  --warn-bg: #fbf3db;
+  --bad: #9f2f2d;
+  --bad-bg: #fdebec;
+  --info: #1f6c9f;
+  --info-bg: #e1f3fe;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #121211;
-    --surface: #1b1b19;
-    --surface-2: #262623;
-    --border: #34342f;
-    --text: #f1f1ee;
-    --text-muted: #a9a9a2;
-    --primary: #8fa6ff;
-    --primary-foreground: #121211;
-    --danger: #ff8a80;
-    --danger-foreground: #121211;
-    --success: #6cd685;
-    --warning: #f5b451;
-    --node-objectives: #b49cff;
-    --node-sources: #7db8f0;
-    --node-themes: #5ccad6;
-    --node-opportunities: #6cd685;
-    --node-solutions: #ff9966;
-    --node-lofi: #b8bec5;
-    --node-tests: #ff8fb3;
+    --paper: #141413;
+    --canvas: #1b1b19;
+    --surface: #222220;
+    --soft: #2a2926;
+    --line: #33322f;
+    --line-strong: #45443f;
+    --wire: #8b8983;
+    --ink: #eeede9;
+    --muted: #a8a6a0;
+    --action: #eeede9;
+    --on-action: #141413;
+    --ok: #8fcf9a;
+    --ok-bg: #1f2d22;
+    --warn: #e6c06b;
+    --warn-bg: #332a12;
+    --bad: #f0a19c;
+    --bad-bg: #3a1f1f;
+    --info: #8cc4ef;
+    --info-bg: #16283a;
   }
 }
 
 :root {
   /* Elevation (03b §3). Dark mode relies on borders and surface lightness instead. */
-  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.06);
-  --shadow-2: 0 8px 32px rgba(0, 0, 0, 0.16);
+  --shadow-1: 0 8px 28px rgba(31, 33, 35, 0.06);
+  --shadow-2: 0 16px 48px rgba(31, 33, 35, 0.12);
 
   /* Motion (03b §3). No springs. */
   --duration-fast: 120ms;
@@ -61,57 +61,59 @@
   --duration-slow: 320ms;
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --ease-exit: cubic-bezier(0.3, 0, 1, 1);
-  --ease-emphasis: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --ease-emphasis: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --shadow-1: 0 0 0 1px var(--border);
-    --shadow-2: 0 0 0 1px var(--border);
+    --shadow-1: 0 0 0 1px var(--line);
+    --shadow-2: 0 0 0 1px var(--line);
   }
 }
 
 @theme inline {
-  --color-bg: var(--bg);
+  --color-paper: var(--paper);
+  --color-canvas: var(--canvas);
   --color-surface: var(--surface);
-  --color-surface-2: var(--surface-2);
-  --color-border: var(--border);
-  --color-text: var(--text);
-  --color-text-muted: var(--text-muted);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-danger: var(--danger);
-  --color-danger-foreground: var(--danger-foreground);
-  --color-success: var(--success);
-  --color-warning: var(--warning);
-  --color-node-objectives: var(--node-objectives);
-  --color-node-sources: var(--node-sources);
-  --color-node-themes: var(--node-themes);
-  --color-node-opportunities: var(--node-opportunities);
-  --color-node-solutions: var(--node-solutions);
-  --color-node-lofi: var(--node-lofi);
-  --color-node-tests: var(--node-tests);
+  --color-soft: var(--soft);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-wire: var(--wire);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-action: var(--action);
+  --color-on-action: var(--on-action);
+  --color-ok: var(--ok);
+  --color-ok-bg: var(--ok-bg);
+  --color-warn: var(--warn);
+  --color-warn-bg: var(--warn-bg);
+  --color-bad: var(--bad);
+  --color-bad-bg: var(--bad-bg);
+  --color-info: var(--info);
+  --color-info-bg: var(--info-bg);
 
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+  --font-sans: var(--font-geist), "Helvetica Neue", Arial, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", monospace;
 
   /* Type scale (px / line-height) */
   --text-caption: 12px;
   --text-caption--line-height: 16px;
-  --text-small: 14px;
+  --text-small: 13.5px;
   --text-small--line-height: 20px;
-  --text-body: 16px;
-  --text-body--line-height: 24px;
-  --text-section: 18px;
-  --text-section--line-height: 26px;
-  --text-page: 22px;
-  --text-page--line-height: 30px;
-  --text-report: 28px;
-  --text-report--line-height: 36px;
+  --text-body: 14px;
+  --text-body--line-height: 21px;
+  --text-lead: 16px;
+  --text-lead--line-height: 24px;
+  --text-panel: 19px;
+  --text-panel--line-height: 26px;
+  --text-page: 30px;
+  --text-page--line-height: 36px;
 
+  --radius-xs: 4px;
   --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;
 
   --shadow-elev-1: var(--shadow-1);
   --shadow-elev-2: var(--shadow-2);
@@ -147,17 +149,17 @@
 
 @layer base {
   * {
-    border-color: var(--border);
+    border-color: var(--line);
   }
   body {
-    background: var(--bg);
-    color: var(--text);
+    background: var(--paper);
+    color: var(--ink);
     font-family: var(--font-sans);
     font-size: var(--text-body);
     line-height: var(--text-body--line-height);
   }
   :focus-visible {
-    outline: 2px solid var(--primary);
+    outline: 2px solid var(--ink);
     outline-offset: 2px;
   }
 }

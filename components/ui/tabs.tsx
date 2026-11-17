@@ -8,7 +8,7 @@ export const Tabs = T.Root;
 export const TabsContent = T.Content;
 
 export function TabsList({ className, ...props }: ComponentProps<typeof T.List>) {
-  return <T.List className={cn("flex gap-4 border-b border-border", className)} {...props} />;
+  return <T.List className={cn("flex gap-4 border-b border-line", className)} {...props} />;
 }
 
 /** 03b: underline style. */
@@ -16,8 +16,8 @@ export function TabsTrigger({ className, ...props }: ComponentProps<typeof T.Tri
   return (
     <T.Trigger
       className={cn(
-        "-mb-px border-b-2 border-transparent px-1 py-2 text-small font-medium text-text-muted transition-colors duration-fast",
-        "hover:text-text data-[state=active]:border-primary data-[state=active]:text-text",
+        "-mb-px border-b-2 border-transparent px-1 py-2 text-small font-medium text-muted transition-colors duration-fast",
+        "hover:text-ink data-[state=active]:border-ink data-[state=active]:text-ink",
         className,
       )}
       {...props}
