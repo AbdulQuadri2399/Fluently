@@ -674,6 +674,19 @@ Format: user action → system response → resulting state (ACs).
 | report.exporting | "Preparing your file…" |
 | report.citationCheck | "Citation check" |
 | panel.minimise / panel.expand / panel.standard | "Minimise" / "Expand" / "Standard size" |
+| report.title | "Audit Report" |
+| report.sections | "Summary" / "Objectives" / "Sources" / "Themes" / "Opportunities" / "Evidence gaps" / "Ethics check" / "References" |
+| report.summaryText | "{sources} sources across {kinds} kinds gave {findings} findings, {themes} themes and {opportunities} opportunities: {high} high, {med} medium and {low} low confidence." |
+| report.toolkit | "Toolkit version {n}" |
+| report.goToCanvas | "Go to canvas" |
+| report.builtFrom / report.principles | "Built from" / "Candidate principles" |
+| report.affects | "Affects: {opportunity}" |
+| report.ethicsPassed / report.ethicsFlagged / report.ethicsNotRun | "Passed. No ethics rules broken." / "Flagged" / "The ethics check didn't run." |
+| report.override | "Overridden by {name}, {date}: {reason}" |
+| report.citationCheckHint | "Every citation in this report with its stored record. Open any 20 to check them." |
+| report.citationCols | "#" / "Source" / "Kind" / "Details" / "Retrieved" |
+| report.openLink / report.uploadedFile | "Open" / "Uploaded file" |
+| report.backToReport | "Back to report" |
 
 **Turning things off and undoing:** deactivating a member, removing an allowlist entry, cancelling a stage, and undoing a delete all use `[common.saveFailed]` if they fail, and leave the previous state unchanged.
 
