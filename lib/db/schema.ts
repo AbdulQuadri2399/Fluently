@@ -505,3 +505,284 @@ export const toolkitCandidates = pgTable(
     }),
   ],
 ).enableRLS();
+
+// ---------- Slice 4: brief uploads, tree cards and lines, runs, checkpoints (04 section 4) ----------
+
+const memberRead = (name: string) =>
+  pgPolicy(`${name}_select`, {
+    for: "select",
+    to: authenticatedRole,
+    using: isMember("workspace_id"),
+  });
+
+export const uploads = pgTable(
+  "uploads",
+  {
+    id: id(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "restrict" }),
+    projectId: uuid("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    kind: text("kind").notNull(),
+    storagePath: text("storage_path").notNull(),
+    fileName: text("file_name").notNull(),
+    mime: text("mime").notNull(),
+    sizeBytes: integer("size_bytes").notNull(),
+    meta: jsonb("meta").notNull().default({}),
+    uploadedBy: uuid("uploaded_by")
+      .notNull()
+      .references(() => members.id, { onDelete: "restrict" }),
+    ...timestamps(),
+  },
+  (t) => [
+    check("uploads_kind_valid", sql`${t.kind} in ('asset','client_data')`),
+    index("uploads_project_idx").on(t.projectId),
+    memberRead("uploads"),
+    pgPolicy("uploads_insert", {
+      for: "insert",
+      to: authenticatedRole,
+      withCheck: sql`public.is_member(${t.workspaceId}) and ${t.uploadedBy} = ${authUid}`,
+    }),
+    pgPolicy("uploads_delete", {
+      for: "delete",
+      to: authenticatedRole,
+      using: isMember("workspace_id"),
+    }),
+  ],
+).enableRLS();
+
+export const stageRuns = pgTable(
+  "stage_runs",
+  {
+    id: id(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "restrict" }),
+    projectId: uuid("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    stage: text("stage").notNull(),
+    status: text("status").notNull().default("queued"),
+    steps: jsonb("steps").notNull().default([]),
+    feedback: text("feedback"),
+    replaceHuman: boolean("replace_human").notNull().default(false),
+    model: text("model"),
+    inngestRunId: text("inngest_run_id"),
+    errorCode: text("error_code"),
+    startedAt: timestamp("started_at", { withTimezone: true }),
+    finishedAt: timestamp("finished_at", { withTimezone: true }),
+    startedBy: uuid("started_by")
+      .notNull()
+      .references(() => members.id, { onDelete: "restrict" }),
+    ...timestamps(),
+  },
+  (t) => [
+    check(
+      "stage_runs_stage_valid",
+      sql`${t.stage} in ('ethics','research','solutions','lofi','testplan')`,
+    ),
+    check(
+      "stage_runs_status_valid",
+      sql`${t.status} in ('queued','running','succeeded','partial','failed','cancelled','paused_cost')`,
+    ),
+    index("stage_runs_project_stage_idx").on(t.projectId, t.stage, t.createdAt),
+    // Written only by jobs (service role) and checked database functions.
+    memberRead("stage_runs"),
+  ],
+).enableRLS();
+
+export const nodes = pgTable(
+  "nodes",
+  {
+    id: id(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "restrict" }),
+    projectId: uuid("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    type: text("type").notNull(),
+    stage: text("stage").notNull(),
+    title: text("title").notNull(),
+    data: jsonb("data").notNull().default({}),
+    provenance: text("provenance").notNull().default("ai"),
+    status: text("status").notNull().default("ok"),
+    stale: boolean("stale").notNull().default(false),
+    confidence: text("confidence"),
+    lowSpecificity: boolean("low_specificity").notNull().default(false),
+    model: text("model"),
+    stageRunId: uuid("stage_run_id").references(() => stageRuns.id, { onDelete: "set null" }),
+    version: integer("version").notNull().default(1),
+    sortOrder: integer("sort_order").notNull().default(0),
+    createdBy: uuid("created_by").references(() => members.id, { onDelete: "set null" }),
+    updatedBy: uuid("updated_by").references(() => members.id, { onDelete: "set null" }),
+    deletedAt: timestamp("deleted_at", { withTimezone: true }),
+    ...timestamps(),
+  },
+  (t) => [
+    check(
+      "nodes_type_valid",
+      sql`${t.type} in ('objective','asset_set','ethics','source','finding','theme','opportunity','gap','recommendation','lofi_variant','annotation','test_plan','override','reference')`,
+    ),
+    check("nodes_provenance_valid", sql`${t.provenance} in ('ai','ai_edited','human')`),
+    check(
+      "nodes_status_valid",
+      sql`${t.status} in ('ok','failed','flagged','overridden','running')`,
+    ),
+    index("nodes_project_type_idx")
+      .on(t.projectId, t.type)
+      .where(sql`${t.deletedAt} is null`),
+    memberRead("nodes"),
+    pgPolicy("nodes_insert", {
+      for: "insert",
+      to: authenticatedRole,
+      withCheck: isMember("workspace_id"),
+    }),
+    pgPolicy("nodes_update", {
+      for: "update",
+      to: authenticatedRole,
+      using: isMember("workspace_id"),
+      withCheck: isMember("workspace_id"),
+    }),
+    pgPolicy("nodes_delete", {
+      for: "delete",
+      to: authenticatedRole,
+      using: isMember("workspace_id"),
+    }),
+  ],
+).enableRLS();
+
+export const edges = pgTable(
+  "edges",
+  {
+    id: id(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "restrict" }),
+    projectId: uuid("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    fromId: uuid("from_id")
+      .notNull()
+      .references(() => nodes.id, { onDelete: "cascade" }),
+    toId: uuid("to_id")
+      .notNull()
+      .references(() => nodes.id, { onDelete: "cascade" }),
+    kind: text("kind").notNull().default("built_from"),
+    ...timestamps(),
+  },
+  (t) => [
+    uniqueIndex("edges_from_to_unique").on(t.fromId, t.toId),
+    index("edges_from_idx").on(t.fromId),
+    index("edges_to_idx").on(t.toId),
+    memberRead("edges"),
+    pgPolicy("edges_insert", {
+      for: "insert",
+      to: authenticatedRole,
+      withCheck: isMember("workspace_id"),
+    }),
+    pgPolicy("edges_update", {
+      for: "update",
+      to: authenticatedRole,
+      using: isMember("workspace_id"),
+      withCheck: isMember("workspace_id"),
+    }),
+    pgPolicy("edges_delete", {
+      for: "delete",
+      to: authenticatedRole,
+      using: isMember("workspace_id"),
+    }),
+  ],
+).enableRLS();
+
+export const nodeHistory = pgTable(
+  "node_history",
+  {
+    id: id(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "restrict" }),
+    nodeId: uuid("node_id")
+      .notNull()
+      .references(() => nodes.id, { onDelete: "cascade" }),
+    snapshot: jsonb("snapshot").notNull(),
+    change: text("change").notNull(),
+    changedBy: uuid("changed_by").references(() => members.id, { onDelete: "set null" }),
+    ...timestamps(),
+  },
+  (t) => [
+    check(
+      "node_history_change_valid",
+      sql`${t.change} in ('created','edited','regenerated','merged','deleted','restored')`,
+    ),
+    index("node_history_node_idx").on(t.nodeId),
+    // Written by a trigger on nodes (security definer); read-only for members.
+    memberRead("node_history"),
+  ],
+).enableRLS();
+
+export const checkpoints = pgTable(
+  "checkpoints",
+  {
+    id: id(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "restrict" }),
+    projectId: uuid("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    stage: text("stage").notNull(),
+    decision: text("decision").notNull(),
+    feedback: text("feedback"),
+    selection: uuid("selection").array(),
+    decidedBy: uuid("decided_by")
+      .notNull()
+      .references(() => members.id, { onDelete: "restrict" }),
+    decidedAt: timestamp("decided_at", { withTimezone: true }).notNull().defaultNow(),
+    ...timestamps(),
+  },
+  (t) => [
+    check("checkpoints_decision_valid", sql`${t.decision} in ('approve','send_back')`),
+    index("checkpoints_project_idx").on(t.projectId, t.stage),
+    memberRead("checkpoints"),
+    pgPolicy("checkpoints_insert", {
+      for: "insert",
+      to: authenticatedRole,
+      withCheck: sql`public.is_member(${t.workspaceId}) and ${t.decidedBy} = ${authUid}`,
+    }),
+  ],
+).enableRLS();
+
+export const ethicsOverrides = pgTable(
+  "ethics_overrides",
+  {
+    id: id(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "restrict" }),
+    projectId: uuid("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    nodeId: uuid("node_id")
+      .notNull()
+      .references(() => nodes.id, { onDelete: "cascade" }),
+    rule: text("rule").notNull(),
+    reason: text("reason").notNull(),
+    decidedBy: uuid("decided_by")
+      .notNull()
+      .references(() => members.id, { onDelete: "restrict" }),
+    ...timestamps(),
+  },
+  (t) => [
+    check("ethics_overrides_reason_length", sql`char_length(${t.reason}) >= 20`),
+    index("ethics_overrides_project_idx").on(t.projectId),
+    memberRead("ethics_overrides"),
+    pgPolicy("ethics_overrides_insert", {
+      for: "insert",
+      to: authenticatedRole,
+      withCheck: sql`public.is_member(${t.workspaceId}) and ${t.decidedBy} = ${authUid}`,
+    }),
+  ],
+).enableRLS();

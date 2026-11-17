@@ -75,6 +75,114 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"checkpoints": {
+                  Row: {
+                    "created_at": string,"decided_at": string,"decided_by": string,"decision": string,"feedback": string | null,"id": string,"project_id": string,"selection": (string)[] | null,"stage": string,"updated_at": string,"workspace_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"decided_at"?: string,"decided_by": string,"decision": string,"feedback"?: string | null,"id"?: string,"project_id": string,"selection"?: (string)[] | null,"stage": string,"updated_at"?: string,"workspace_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"decided_at"?: string,"decided_by"?: string,"decision"?: string,"feedback"?: string | null,"id"?: string,"project_id"?: string,"selection"?: (string)[] | null,"stage"?: string,"updated_at"?: string,"workspace_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "checkpoints_decided_by_members_id_fk"
+      columns: ["decided_by"]
+isOneToOne: false
+      referencedRelation: "members"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "checkpoints_project_id_projects_id_fk"
+      columns: ["project_id"]
+isOneToOne: false
+      referencedRelation: "projects"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "checkpoints_workspace_id_workspaces_id_fk"
+      columns: ["workspace_id"]
+isOneToOne: false
+      referencedRelation: "workspaces"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"edges": {
+                  Row: {
+                    "created_at": string,"from_id": string,"id": string,"kind": string,"project_id": string,"to_id": string,"updated_at": string,"workspace_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"from_id": string,"id"?: string,"kind"?: string,"project_id": string,"to_id": string,"updated_at"?: string,"workspace_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"from_id"?: string,"id"?: string,"kind"?: string,"project_id"?: string,"to_id"?: string,"updated_at"?: string,"workspace_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "edges_from_id_nodes_id_fk"
+      columns: ["from_id"]
+isOneToOne: false
+      referencedRelation: "nodes"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "edges_project_id_projects_id_fk"
+      columns: ["project_id"]
+isOneToOne: false
+      referencedRelation: "projects"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "edges_to_id_nodes_id_fk"
+      columns: ["to_id"]
+isOneToOne: false
+      referencedRelation: "nodes"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "edges_workspace_id_workspaces_id_fk"
+      columns: ["workspace_id"]
+isOneToOne: false
+      referencedRelation: "workspaces"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"ethics_overrides": {
+                  Row: {
+                    "created_at": string,"decided_by": string,"id": string,"node_id": string,"project_id": string,"reason": string,"rule": string,"updated_at": string,"workspace_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"decided_by": string,"id"?: string,"node_id": string,"project_id": string,"reason": string,"rule": string,"updated_at"?: string,"workspace_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"decided_by"?: string,"id"?: string,"node_id"?: string,"project_id"?: string,"reason"?: string,"rule"?: string,"updated_at"?: string,"workspace_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "ethics_overrides_decided_by_members_id_fk"
+      columns: ["decided_by"]
+isOneToOne: false
+      referencedRelation: "members"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "ethics_overrides_node_id_nodes_id_fk"
+      columns: ["node_id"]
+isOneToOne: false
+      referencedRelation: "nodes"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "ethics_overrides_project_id_projects_id_fk"
+      columns: ["project_id"]
+isOneToOne: false
+      referencedRelation: "projects"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "ethics_overrides_workspace_id_workspaces_id_fk"
+      columns: ["workspace_id"]
+isOneToOne: false
+      referencedRelation: "workspaces"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"events": {
                   Row: {
                     "created_at": string,"id": string,"member_id": string | null,"name": string,"props": NonNullable<Json>,"updated_at": string,"workspace_id": string
@@ -147,6 +255,82 @@ isOneToOne: false
                   Relationships: [
                     {
       foreignKeyName: "members_workspace_id_workspaces_id_fk"
+      columns: ["workspace_id"]
+isOneToOne: false
+      referencedRelation: "workspaces"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"node_history": {
+                  Row: {
+                    "change": string,"changed_by": string | null,"created_at": string,"id": string,"node_id": string,"snapshot": NonNullable<Json>,"updated_at": string,"workspace_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "change": string,"changed_by"?: string | null,"created_at"?: string,"id"?: string,"node_id": string,"snapshot": NonNullable<Json>,"updated_at"?: string,"workspace_id": string
+                  }
+                  Update: {
+                    "change"?: string,"changed_by"?: string | null,"created_at"?: string,"id"?: string,"node_id"?: string,"snapshot"?: NonNullable<Json>,"updated_at"?: string,"workspace_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "node_history_changed_by_members_id_fk"
+      columns: ["changed_by"]
+isOneToOne: false
+      referencedRelation: "members"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "node_history_node_id_nodes_id_fk"
+      columns: ["node_id"]
+isOneToOne: false
+      referencedRelation: "nodes"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "node_history_workspace_id_workspaces_id_fk"
+      columns: ["workspace_id"]
+isOneToOne: false
+      referencedRelation: "workspaces"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"nodes": {
+                  Row: {
+                    "confidence": string | null,"created_at": string,"created_by": string | null,"data": NonNullable<Json>,"deleted_at": string | null,"id": string,"low_specificity": boolean,"model": string | null,"project_id": string,"provenance": string,"sort_order": number,"stage": string,"stage_run_id": string | null,"stale": boolean,"status": string,"title": string,"type": string,"updated_at": string,"updated_by": string | null,"version": number,"workspace_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "confidence"?: string | null,"created_at"?: string,"created_by"?: string | null,"data"?: NonNullable<Json>,"deleted_at"?: string | null,"id"?: string,"low_specificity"?: boolean,"model"?: string | null,"project_id": string,"provenance"?: string,"sort_order"?: number,"stage": string,"stage_run_id"?: string | null,"stale"?: boolean,"status"?: string,"title": string,"type": string,"updated_at"?: string,"updated_by"?: string | null,"version"?: number,"workspace_id": string
+                  }
+                  Update: {
+                    "confidence"?: string | null,"created_at"?: string,"created_by"?: string | null,"data"?: NonNullable<Json>,"deleted_at"?: string | null,"id"?: string,"low_specificity"?: boolean,"model"?: string | null,"project_id"?: string,"provenance"?: string,"sort_order"?: number,"stage"?: string,"stage_run_id"?: string | null,"stale"?: boolean,"status"?: string,"title"?: string,"type"?: string,"updated_at"?: string,"updated_by"?: string | null,"version"?: number,"workspace_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "nodes_created_by_members_id_fk"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "members"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "nodes_project_id_projects_id_fk"
+      columns: ["project_id"]
+isOneToOne: false
+      referencedRelation: "projects"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "nodes_stage_run_id_stage_runs_id_fk"
+      columns: ["stage_run_id"]
+isOneToOne: false
+      referencedRelation: "stage_runs"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "nodes_updated_by_members_id_fk"
+      columns: ["updated_by"]
+isOneToOne: false
+      referencedRelation: "members"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "nodes_workspace_id_workspaces_id_fk"
       columns: ["workspace_id"]
 isOneToOne: false
       referencedRelation: "workspaces"
@@ -287,6 +471,38 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"stage_runs": {
+                  Row: {
+                    "created_at": string,"error_code": string | null,"feedback": string | null,"finished_at": string | null,"id": string,"inngest_run_id": string | null,"model": string | null,"project_id": string,"replace_human": boolean,"stage": string,"started_at": string | null,"started_by": string,"status": string,"steps": NonNullable<Json>,"updated_at": string,"workspace_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"error_code"?: string | null,"feedback"?: string | null,"finished_at"?: string | null,"id"?: string,"inngest_run_id"?: string | null,"model"?: string | null,"project_id": string,"replace_human"?: boolean,"stage": string,"started_at"?: string | null,"started_by": string,"status"?: string,"steps"?: NonNullable<Json>,"updated_at"?: string,"workspace_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"error_code"?: string | null,"feedback"?: string | null,"finished_at"?: string | null,"id"?: string,"inngest_run_id"?: string | null,"model"?: string | null,"project_id"?: string,"replace_human"?: boolean,"stage"?: string,"started_at"?: string | null,"started_by"?: string,"status"?: string,"steps"?: NonNullable<Json>,"updated_at"?: string,"workspace_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "stage_runs_project_id_projects_id_fk"
+      columns: ["project_id"]
+isOneToOne: false
+      referencedRelation: "projects"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "stage_runs_started_by_members_id_fk"
+      columns: ["started_by"]
+isOneToOne: false
+      referencedRelation: "members"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "stage_runs_workspace_id_workspaces_id_fk"
+      columns: ["workspace_id"]
+isOneToOne: false
+      referencedRelation: "workspaces"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"toolkit_candidates": {
                   Row: {
                     "created_at": string,"id": string,"mechanism": string | null,"name": string,"project_id": string,"source_id": string,"updated_at": string,"workspace_id": string
@@ -339,6 +555,38 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"uploads": {
+                  Row: {
+                    "created_at": string,"file_name": string,"id": string,"kind": string,"meta": NonNullable<Json>,"mime": string,"project_id": string,"size_bytes": number,"storage_path": string,"updated_at": string,"uploaded_by": string,"workspace_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"file_name": string,"id"?: string,"kind": string,"meta"?: NonNullable<Json>,"mime": string,"project_id": string,"size_bytes": number,"storage_path": string,"updated_at"?: string,"uploaded_by": string,"workspace_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"file_name"?: string,"id"?: string,"kind"?: string,"meta"?: NonNullable<Json>,"mime"?: string,"project_id"?: string,"size_bytes"?: number,"storage_path"?: string,"updated_at"?: string,"uploaded_by"?: string,"workspace_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "uploads_project_id_projects_id_fk"
+      columns: ["project_id"]
+isOneToOne: false
+      referencedRelation: "projects"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "uploads_uploaded_by_members_id_fk"
+      columns: ["uploaded_by"]
+isOneToOne: false
+      referencedRelation: "members"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "uploads_workspace_id_workspaces_id_fk"
+      columns: ["workspace_id"]
+isOneToOne: false
+      referencedRelation: "workspaces"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"workspaces": {
                   Row: {
                     "agency_services": (string)[],"cost_cap_gbp": number,"created_at": string,"default_toolkit_version_id": string | null,"gbp_per_usd": number,"id": string,"model_prices": NonNullable<Json>,"name": string,"sector_flag_list": (string)[],"sector_refuse_list": (string)[],"stage_models": NonNullable<Json>,"updated_at": string
@@ -367,6 +615,9 @@ isOneToOne: false
           Functions: {
             "allowed_workspace_for":
 { Args: { "email": string }; Returns: string
+                           },
+"can_access_upload":
+{ Args: { "object_name": string }; Returns: boolean
                            },
 "is_admin":
 { Args: { "ws": string }; Returns: boolean

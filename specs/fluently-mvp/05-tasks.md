@@ -106,7 +106,7 @@ You'll be able to see: the intake with coaching suggestions, uploads, autosave, 
 
 - [x] T4.1 `lib/ai/`: `AiClient` interface, `AnthropicAiClient` (structured output via `output_config.format`, per-stage model/effort from workspace, refusal fallbacks for Sonnet/Opus, typed error chain → `unavailable`/`rate_limited`), `FakeAiClient` reading `tests/fixtures/ai/*.json`, usage logger writing `ai_usage` with cost (AC27.1); `AI_MODE` switch — M — Refs: D6, D7, D16, AC27.1, AC28.3, NFR10 — Depends on: T2.1
   Done when: `tests/unit/ai-client.test.ts` passes: 'logs usage on success', 'logs failed call', 'malformed JSON retried once then throws'; `tests/unit/ai-schemas.test.ts` passes.
-- [ ] T4.2 Migration: `uploads`, `nodes`, `edges`, `node_history`, `stage_runs`, `ethics_overrides` + RLS; private `uploads` bucket + storage policies — M — Refs: 04 §4 — Depends on: T1.1
+- [x] T4.2 Migration: `uploads`, `nodes`, `edges`, `node_history`, `stage_runs`, `ethics_overrides` + RLS; private `uploads` bucket + storage policies — M — Refs: 04 §4 — Depends on: T1.1
   Done when: `tests/rls/nodes.test.ts`, `tests/rls/uploads.test.ts`, `tests/rls/storage.test.ts` pass (two-user + signed-out).
 - [ ] T4.3 O12 `saveIntakeField` (versioned autosave) + O13 `coachField` (20 s timeout, low-specificity verdict) + `intake_suggestion_resolved` event — M — Refs: AC8.2–AC8.5, AC8.9 — Depends on: T4.1
   Done when: `tests/integration/O13-coach.test.ts` passes: suggestion + reason returned; fake timeout → `unavailable`; vague behavioural objective with *keep mine* sets low_specificity.
