@@ -226,8 +226,7 @@ export function BriefPage({ data, actions }: { data: BriefData; actions: BriefAc
   return (
     <main className="mx-auto grid w-full max-w-[680px] gap-8 px-6 py-11">
       <header className="grid gap-1">
-        <p className="text-small text-muted">{c.title}</p>
-        <h1 className="text-page font-semibold tracking-[-0.03em]">{project.name}</h1>
+        <h2 className="text-panel font-semibold tracking-tight">{c.title}</h2>
         <p aria-live="polite" className="h-5 text-caption text-muted">
           {saveState === "saving" ? c.saving : saveState === "saved" ? c.saved : null}
         </p>

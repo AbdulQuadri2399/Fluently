@@ -9,6 +9,9 @@ export default defineConfig({
   testDir: "e2e",
   outputDir: "test-results",
   fullyParallel: false,
+  // Two browsers at a time locally: more overloads this machine and makes timing-based checks flaky.
+  workers: process.env.CI ? 1 : 2,
+  expect: { timeout: 10_000 },
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : "list",
   use: { baseURL: `http://localhost:${PORT}`, trace: "off" },

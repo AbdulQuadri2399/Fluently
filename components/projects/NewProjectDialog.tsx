@@ -66,7 +66,7 @@ export function NewProjectDialog({
       const res = await action(values);
       if (res.ok) {
         setOpen(false);
-        router.push(`/projects/${res.data.id}`);
+        router.push(`/projects/${res.data.id}/brief`);
         return;
       }
       setStatus("error");

@@ -616,6 +616,9 @@ isOneToOne: false
             "allowed_workspace_for":
 { Args: { "email": string }; Returns: string
                            },
+"approve_checkpoint":
+{ Args: { "p_project": string,"p_selection"?: (string)[],"p_stage": string }; Returns: string
+                           },
 "approve_objectives":
 { Args: { "p_project": string }; Returns: string
                            },

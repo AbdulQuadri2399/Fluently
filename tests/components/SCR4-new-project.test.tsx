@@ -57,6 +57,6 @@ describe("SCR4 New project dialog", () => {
     expect(action).toHaveBeenCalledWith(
       expect.objectContaining({ name: "Halden onboarding", mode: "optimise", channel: "email" }),
     );
-    expect(push).toHaveBeenCalledWith("/projects/p1");
+    expect(push).toHaveBeenCalledWith("/projects/p1/brief");
   });
 });

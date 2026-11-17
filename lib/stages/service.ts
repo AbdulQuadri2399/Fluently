@@ -32,3 +32,19 @@ export async function cancelStage(client: Client, stageRunId: string): Promise<A
   const { error } = await client.rpc("cancel_stage", { p_run: stageRunId });
   return error ? fail(mapError(error.code)) : ok(undefined);
 }
+
+/** O20 decideCheckpoint, approve path (AC25.1, AC25.3). */
+export async function approveCheckpoint(
+  client: Client,
+  projectId: string,
+  stage: string,
+  selection?: string[],
+): Promise<ActionResult<{ checkpointId: string }>> {
+  const { data, error } = await client.rpc("approve_checkpoint", {
+    p_project: projectId,
+    p_stage: stage,
+    ...(selection ? { p_selection: selection } : {}),
+  });
+  if (error) return fail(mapError(error.code));
+  return ok({ checkpointId: data as string });
+}

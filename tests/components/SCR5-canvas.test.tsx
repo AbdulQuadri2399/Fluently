@@ -147,4 +147,38 @@ describe("SCR5 canvas", () => {
     );
     expect(nextFocus(placed, "o1", "ArrowRight")).toBe("s1");
   });
+
+  it("MI3: a card that arrives after opening gets the enter class; reduced motion fades only", () => {
+    const nodes = tree("new");
+    const extra = node({
+      id: "s2",
+      type: "source",
+      stage: "research",
+      title: "Web and market · 8 found",
+      data: {},
+    });
+    const view = (list: TreeNode[]) => (
+      <div style={{ width: 1200, height: 800 }}>
+        <TreeCanvas
+          nodes={list}
+          edges={[]}
+          running={false}
+          selectedId={null}
+          onSelect={() => undefined}
+        />
+      </div>
+    );
+    const { rerender, unmount } = render(view(nodes));
+    expect(screen.getByTestId("card-s1")).not.toHaveClass("animate-in");
+    rerender(view([...nodes, extra]));
+    expect(screen.getByTestId("card-s2")).toHaveClass("slide-in-from-bottom-2");
+    unmount();
+
+    reduced.value = true;
+    const second = render(view(nodes));
+    second.rerender(view([...nodes, extra]));
+    expect(screen.getByTestId("card-s2")).toHaveClass("fade-in-0");
+    expect(screen.getByTestId("card-s2")).not.toHaveClass("slide-in-from-bottom-2");
+    reduced.value = false;
+  });
 });

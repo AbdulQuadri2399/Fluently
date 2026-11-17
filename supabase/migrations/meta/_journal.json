@@ -99,6 +99,13 @@
       "when": 1794890554768,
       "tag": "20261117044234_stage_engine",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1794891175458,
+      "tag": "20261117045255_approve_checkpoint",
+      "breakpoints": true
     }
   ]
 }

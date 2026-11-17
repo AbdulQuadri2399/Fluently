@@ -45,8 +45,10 @@ export function cardView(n: TreeNode, running: boolean) {
   if (n.lowSpecificity) markers.push({ kind: "lowSpecificity", label: c.markers.lowSpecificity });
   if (n.status === "failed") markers.push({ kind: "failed", label: c.markers.failed });
   // The ethics card's status line already says flagged / overridden.
-  if (n.status === "flagged" && n.type !== "ethics") markers.push({ kind: "flagged", label: c.markers.flagged });
-  if (n.status === "overridden" && n.type !== "ethics") markers.push({ kind: "overridden", label: c.markers.overridden });
+  if (n.status === "flagged" && n.type !== "ethics")
+    markers.push({ kind: "flagged", label: c.markers.flagged });
+  if (n.status === "overridden" && n.type !== "ethics")
+    markers.push({ kind: "overridden", label: c.markers.overridden });
   if (n.status === "running" || (running && n.type === "ethics"))
     markers.push({ kind: "running", label: c.markers.running });
   const done = n.status === "ok" && !n.stale && (n.type === "ethics" || n.type === "objective");
