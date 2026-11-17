@@ -440,6 +440,68 @@ Format: user action → system response → resulting state (ACs).
 | canvas.linkRequired | "This {type} needs at least one {required}. Connect another before removing this one." |
 | canvas.removeLine | "Remove connection" (accessible name of the line's remove button) |
 
+**Added during the build (Slice 1, 2026-11-17): please confirm this wording.** Home and sidebar wording comes from the approved mock-up.
+
+| Key | Copy |
+|---|---|
+| nav.home | "Home" |
+| nav.search | "Search" (shortcut ⌘K) |
+| nav.help | "How Fluently works" |
+| nav.collapse | "Collapse" |
+| nav.expand | "Expand sidebar" |
+| home.greeting | "Good morning, {name}" / "Good afternoon, {name}" / "Good evening, {name}" |
+| home.waiting | "Waiting for you" |
+| home.running | "Running" |
+| home.recent | "Recent projects" |
+| home.review | "Review" |
+| home.open | "Open" |
+| home.columns | "Name" / "Stage" / "Channel" / "Edited" |
+| home.newProject | "New project" |
+| home.nothingWaiting | "Nothing needs you right now." |
+| stage.names | "Brief" / "Ethics check" / "Research" / "Solutions" / "Wireframes" / "Test plan" / "Complete" |
+| waiting.intake | "Approve the objectives to start." |
+| waiting.ethics | "The ethics check needs your decision." |
+| waiting.research | "Research is done. Choose which opportunities to take forward." |
+| waiting.solutions | "Solutions are ready. Choose which to turn into wireframes." |
+| waiting.lofi | "Wireframes are ready to approve." |
+| waiting.testplan | "The test plan is ready to approve." |
+| running.line | "{stage} is running." |
+| channel.names | "Screens" / "Email" |
+| projects.title | "Projects" |
+| projects.search | "Search projects" |
+| projects.filterActive | "Active" |
+| projects.filterArchived | "Archived" |
+| projects.archive | "Archive" |
+| projects.restore | "Restore" |
+| projects.archived | "Project archived." |
+| projects.restored | "Project restored." |
+| status.names | "In progress" / "Waiting for you" / "Running" / "Failed" / "Complete" / "Blocked" |
+| newProject.title | "New project" |
+| newProject.name | "Project name" |
+| newProject.mode | "What are you doing?" |
+| newProject.modeNew | "Create something new" |
+| newProject.modeNewHint | "Start from a brief with no existing design." |
+| newProject.modeOptimise | "Optimise something that exists" |
+| newProject.modeOptimiseHint | "Improve current screens or emails. You'll add them to the brief." |
+| newProject.channel | "Channel" |
+| newProject.channelScreens | "Screens and flows" |
+| newProject.channelEmail | "Email" |
+| newProject.client | "Client (optional)" |
+| newProject.create | "Create project" |
+| newProject.creating | "Creating…" |
+| common.cancel | "Cancel" |
+| onboarding.step1Title | "One tree, from brief to wireframe" |
+| onboarding.step1Body | "Fluently turns a brief into objectives, evidence, themes, opportunities, solutions, wireframes and tests. Each stage is a lane on one canvas, read from left to right." |
+| onboarding.step2Title | "You decide at every checkpoint" |
+| onboarding.step2Body | "After each stage, Fluently stops and asks you to approve, edit or send it back with feedback. Nothing moves on without you." |
+| onboarding.step3Title | "Everything traces back" |
+| onboarding.step3Body | "Select any card to see the path back to its sources, the principle behind it and both objectives. If it has no principle, it doesn't ship." |
+| onboarding.next | "Next" |
+| onboarding.back | "Back" |
+| onboarding.skip | "Skip" |
+| onboarding.start | "Start my first project" |
+| onboarding.stepOf | "Step {n} of 3" |
+
 **Turning things off and undoing:** deactivating a member, removing an allowlist entry, cancelling a stage, and undoing a delete all use `[common.saveFailed]` if they fail, and leave the previous state unchanged.
 
 ## 8. Behavioural design notes (for Fluently's own interface)

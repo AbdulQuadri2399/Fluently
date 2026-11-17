@@ -38,6 +38,7 @@ describe("O1 sign-up allowlist at the database (AC1.1, AC1.2, AC1.7, D13)", () =
     try {
       await db
         .begin(async (tx) => {
+          await tx`delete from public.projects`;
           await tx`delete from public.events`;
           await tx`delete from public.allowlist_entries`;
           await tx`delete from public.members`;

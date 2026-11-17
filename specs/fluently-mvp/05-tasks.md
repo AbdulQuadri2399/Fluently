@@ -45,7 +45,7 @@ You'll be able to see: the 3-step onboarding, the projects list (empty, filled, 
 
 - [x] T1.0 Apply the approved calm design (03b v2): tokens, Geist fonts, Phosphor icons, two badge kinds; rewrite 03b — S — Refs: 03b, T5 — Depends on: T0.5 *(added 2026-11-17)*
   Done when: `pnpm test tests/unit/tokens.test.ts` passes for the new tokens; SCR1 screenshots in both themes match 03b SCR1.
-- [ ] T1.1 Migration: `projects`, `intakes`, `project_ratings` tables + RLS + indexes; seed projects — S — Refs: AC7.1, 04 §4 — Depends on: T0.3
+- [x] T1.1 Migration: `projects`, `intakes`, `project_ratings` tables + RLS + indexes; seed projects — S — Refs: AC7.1, 04 §4 — Depends on: T0.3
   Done when: `tests/rls/projects.test.ts` passes (member reads/writes in own workspace; other workspace user gets 0 rows; member cannot delete, admin can).
 - [ ] T1.2 SCR2 onboarding dialog (3 steps, SVG diagrams from tokens), O4 `completeOnboarding`, help menu "How Fluently works" — M — Refs: AC2.1–AC2.3, SCR2 — Depends on: T0.7
   Done when: `tests/components/SCR2-onboarding.test.tsx` passes (step 1/2/3 headings and buttons; Skip records completion); `e2e/FL1.spec.ts` extended: first sign-in shows onboarding, second does not; help menu reopens it; screenshot `SCR2-step1..3` vs 03b SCR2.

@@ -27,3 +27,10 @@ from auth.users u where u.email in ('admin@fluently.test', 'member@fluently.test
 
 update public.members set role = 'admin', display_name = 'Dev Admin' where email = 'admin@fluently.test';
 update public.members set display_name = 'Dev Member' where email = 'member@fluently.test';
+
+-- Slice 1: example projects for development (each gets an empty brief via trigger).
+insert into public.projects (id, workspace_id, name, mode, channel, client_label, status, current_stage, created_by, updated_by)
+values
+  ('00000000-0000-4000-8000-0000000000c1', '00000000-0000-4000-8000-000000000001', 'Northbank KYC completion', 'optimise', 'screens', 'Northbank', 'waiting', 'research', '00000000-0000-4000-8000-0000000000a1', '00000000-0000-4000-8000-0000000000a1'),
+  ('00000000-0000-4000-8000-0000000000c2', '00000000-0000-4000-8000-000000000001', 'Lumen Energy switching emails', 'new', 'email', 'Lumen Energy', 'running', 'research', '00000000-0000-4000-8000-0000000000b1', '00000000-0000-4000-8000-0000000000b1'),
+  ('00000000-0000-4000-8000-0000000000c3', '00000000-0000-4000-8000-000000000001', 'Orla Pharmacy checkout', 'optimise', 'screens', 'Orla', 'complete', 'complete', '00000000-0000-4000-8000-0000000000a1', '00000000-0000-4000-8000-0000000000a1');

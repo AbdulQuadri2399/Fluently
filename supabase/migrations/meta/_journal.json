@@ -22,6 +22,20 @@
       "when": 1794864859749,
       "tag": "20261116213419_auth_triggers",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1794881871499,
+      "tag": "20261117021751_projects",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794881872515,
+      "tag": "20261117021752_projects_triggers",
+      "breakpoints": true
     }
   ]
 }
