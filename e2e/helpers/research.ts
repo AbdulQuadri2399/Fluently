@@ -16,6 +16,7 @@ export async function openReadyForResearch(page: Page, brief?: string) {
   await page.getByLabel("Password").fill(who.password);
   await page.getByRole("button", { name: "Sign in" }).click();
   await page.getByRole("button", { name: "Skip" }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
   await page.goto("/toolkit");
   await ready(page);
   await page.getByLabel("Upload toolkit").setInputFiles("fixtures/toolkit/sample-toolkit.csv");

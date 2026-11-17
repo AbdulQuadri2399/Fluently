@@ -43,6 +43,7 @@ async function openSeeded(page: import("@playwright/test").Page) {
   await page.getByLabel("Password").fill(who.password);
   await page.getByRole("button", { name: "Sign in" }).click();
   await page.getByRole("button", { name: "Skip" }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
   await page.goto(`/projects/${projectId}`);
   await ready(page);
   return { projectId, sourceId: src!.id as string };

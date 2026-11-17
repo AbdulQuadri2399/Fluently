@@ -171,7 +171,7 @@ You'll be able to see: research running live on the canvas and the research chec
   Done when: `tests/components/SCR8-checkpoint.test.tsx` adds research checkpoint, nothing selected, send-back form; `e2e/FL3.spec.ts` (fake AI) and `e2e/FF5.spec.ts` pass.
 - [x] T6.9 (done 2026-11-17; thumbnails on Current assets cards move to T6.10) Expandable Evidence and Current assets cards (grouped sources, show more, thumbnails) and *Add source* after research (O35, marks themes Out of date) — M — Refs: AC22.9, AC22.10, AC12.10 — Depends on: T6.6
   Done when: `tests/components/SCR5-expanded-cards.test.tsx` passes (groups in order with counts, 3 items then 'Show n more', collapse); `tests/integration/O35-add-source.test.ts` passes ('new source marks themes out of date').
-- [ ] T6.10 Split, rename and move assets between Current assets cards (O36) — S — Refs: AC22.11 — Depends on: T6.9
+- [x] T6.10 Split, rename and move assets between Current assets cards (O36) — S — Refs: AC22.11 — Depends on: T6.9
   Done when: `tests/integration/O36-assets.test.ts` passes ('split keeps every asset in one card', 'moving the last asset removes the empty card', 'rename saves').
 - [x] T6.8 [P] SCR7 shows sources with links, confidence and its reason, `Qualitative signal · n sources`, `AI inference`, `External principle` — S — Refs: AC12.4, AC12.7 — Depends on: T6.6
   Done when: `tests/components/SCR7-inspector.test.tsx` adds one test per label.

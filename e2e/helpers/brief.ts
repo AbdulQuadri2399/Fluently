@@ -12,6 +12,7 @@ export async function openNewBrief(
   await page.getByRole("button", { name: "Sign in" }).click();
   await expect(page).toHaveURL(/\/home$/);
   await page.getByRole("button", { name: "Skip" }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
   await page.getByRole("button", { name: "New project" }).click();
   await page.getByLabel("Project name").fill("E2E brief");
   if (mode === "optimise")

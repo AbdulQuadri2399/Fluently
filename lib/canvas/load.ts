@@ -108,10 +108,16 @@ export async function loadTree(client: Client, projectId: string): Promise<Proje
       .eq("kind", "asset");
     const images = (ups ?? []).filter((u) => u.mime.startsWith("image/"));
     const signed = images.length
-      ? ((await client.storage.from("uploads").createSignedUrls(images.map((u) => u.storage_path), 3600)).data ?? [])
+      ? ((
+          await client.storage.from("uploads").createSignedUrls(
+            images.map((u) => u.storage_path),
+            3600,
+          )
+        ).data ?? [])
       : [];
     const urlOf = new Map(images.map((u, i) => [u.id, signed[i]?.signedUrl ?? null]));
-    for (const u of ups ?? []) assets.set(u.id, { id: u.id, fileName: u.file_name, url: urlOf.get(u.id) ?? null });
+    for (const u of ups ?? [])
+      assets.set(u.id, { id: u.id, fileName: u.file_name, url: urlOf.get(u.id) ?? null });
   }
   return {
     project: {

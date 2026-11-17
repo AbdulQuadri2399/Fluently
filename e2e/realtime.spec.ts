@@ -11,6 +11,7 @@ test("node inserted by server appears within 5 s without reload (AC11.2, AC22.3)
   await page.getByLabel("Password").fill(who.password);
   await page.getByRole("button", { name: "Sign in" }).click();
   await page.getByRole("button", { name: "Skip" }).click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
   await page.goto(`/projects/${projectId}`);
   await expect(page.getByText("Upload ID on day one")).toBeVisible();
   await page.waitForTimeout(1000); // let the live channel connect

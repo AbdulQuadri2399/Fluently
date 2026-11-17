@@ -82,3 +82,26 @@ describe("SCR5 opened Evidence card (AC22.9)", () => {
     expect(onAddSource).toHaveBeenCalled();
   });
 });
+
+describe("SCR5 opened Current assets card (AC22.10, AC22.11)", () => {
+  it("thumbnails; select some, then Split card", async () => {
+    const { AssetsExpanded } = await import("@/components/canvas/AssetsExpanded");
+    const onSplit = vi.fn();
+    const assets = [
+      { id: "a1", fileName: "home.png", url: "https://example.org/home.png" },
+      { id: "a2", fileName: "id-step.png", url: null },
+    ];
+    render(<AssetsExpanded assets={assets} onSplit={onSplit} />);
+    expect(screen.getByRole("img", { name: "home.png" })).toBeInTheDocument();
+    expect(screen.getByText(c.assets.hint)).toBeInTheDocument();
+    const split = screen.getByRole("button", { name: c.assets.split });
+    expect(split).toBeDisabled();
+    await userEvent.click(screen.getByRole("button", { name: c.assets.select("id-step.png") }));
+    expect(screen.getByRole("button", { name: c.assets.select("id-step.png") })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    await userEvent.click(split);
+    expect(onSplit).toHaveBeenCalledWith(["a2"]);
+  });
+});

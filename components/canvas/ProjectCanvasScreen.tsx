@@ -18,6 +18,7 @@ export function ProjectCanvasScreen({ tree }: { tree: ProjectTree }) {
         reorderNodes: canvasActions.reorderNodes,
         getNodeHistory: canvasActions.getNodeHistory,
         getNodeEvidence: canvasActions.getNodeEvidence,
+        moveAssets: canvasActions.moveAssets,
         updateNode: canvasActions.updateNode,
         approveResearch: canvasActions.approveResearch,
         sendBackResearch: canvasActions.sendBackResearch,

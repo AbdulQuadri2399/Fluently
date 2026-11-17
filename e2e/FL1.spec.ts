@@ -35,6 +35,7 @@ test.describe("FL1 first sign-in and onboarding (AC1.1, AC1.3, AC1.6, AC2.1–AC
     await page.getByRole("button", { name: "Back" }).click();
     await page.getByRole("button", { name: "Skip" }).click();
     await expect(page.getByRole("dialog")).toHaveCount(0);
+    await expect(page.getByRole("dialog")).toHaveCount(0);
 
     // The help button reopens it (AC2.3).
     await page.getByRole("button", { name: "How Fluently works" }).click();

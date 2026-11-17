@@ -51,6 +51,7 @@ type Props = {
   onReorder?: (id: string, laneOrder: string[]) => void;
   onAddCard?: (lane: Lane) => void;
   onAddSource?: () => void;
+  onMoveAssets?: (uploadIds: string[], toNodeId: string | null) => void;
   /** The active stage run: lines into the cards it is producing animate (MI15). */
   runningRunId?: string | null;
 };
@@ -129,6 +130,7 @@ function Canvas({
   onAddCard,
   runningRunId = null,
   onAddSource,
+  onMoveAssets,
 }: Props) {
   const rf = useReactFlow();
   const [viewport, setViewport] = useState<Viewport>({ x: 24, y: 0, zoom: 1 });
@@ -203,6 +205,7 @@ function Canvas({
           expanded: expanded.has(p.id),
           onToggle: toggle,
           onAddSource: byId.get(p.id)!.type === "source" ? onAddSource : undefined,
+          onMoveAssets: byId.get(p.id)!.type === "asset_set" ? onMoveAssets : undefined,
         },
         selected: p.id === selectedId,
         ariaLabel: byId.get(p.id)!.title,
@@ -222,6 +225,7 @@ function Canvas({
     expanded,
     toggle,
     onAddSource,
+    onMoveAssets,
   ]);
 
   const runOf = useMemo(() => new Map(nodes.map((n) => [n.id, n.stageRunId])), [nodes]);

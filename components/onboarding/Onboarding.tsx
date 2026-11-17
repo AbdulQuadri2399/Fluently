@@ -20,10 +20,25 @@ export function Onboarding({
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onDone: (how: "finished" | "skipped") => void;
+  /** Saves that the tour was seen; the tour closes only once this has finished. */
+  onDone: (how: "finished" | "skipped") => void | Promise<void>;
 }) {
   const [step, setStep] = useState(0);
   const forward = useRef<HTMLButtonElement>(null);
+  const [saving, setSaving] = useState<null | "finished" | "skipped">(null);
+  // Wait for "tour seen" to be saved before closing, so leaving the page straight away
+  // can't cut the save off and bring the tour back.
+  async function finish(how: "finished" | "skipped") {
+    if (saving) return;
+    setSaving(how);
+    try {
+      await onDone(how);
+    } finally {
+      setSaving(null);
+      onOpenChange(false);
+      setStep(0);
+    }
+  }
   const s = c.steps[step] ?? c.steps[0];
   const Diagram = diagrams[step] ?? TreeDiagram;
   const last = step === c.steps.length - 1;
@@ -32,11 +47,8 @@ export function Onboarding({
     <Dialog
       open={open}
       onOpenChange={(o) => {
-        if (!o) {
-          onDone("skipped");
-          setStep(0);
-        }
-        onOpenChange(o);
+        if (!o) void finish("skipped");
+        else onOpenChange(o);
       }}
     >
       <DialogContent
@@ -74,11 +86,8 @@ export function Onboarding({
             {!last ? (
               <Button
                 variant="ghost"
-                onClick={() => {
-                  onDone("skipped");
-                  onOpenChange(false);
-                  setStep(0);
-                }}
+                loading={saving === "skipped"}
+                onClick={() => void finish("skipped")}
               >
                 {c.skip}
               </Button>
@@ -86,11 +95,8 @@ export function Onboarding({
             {last ? (
               <Button
                 ref={forward}
-                onClick={() => {
-                  onDone("finished");
-                  onOpenChange(false);
-                  setStep(0);
-                }}
+                loading={saving === "finished"}
+                onClick={() => void finish("finished")}
               >
                 {c.start}
               </Button>

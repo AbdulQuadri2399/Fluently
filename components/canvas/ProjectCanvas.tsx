@@ -20,6 +20,11 @@ export type CanvasActions = {
   reorderNodes: (projectId: string, ids: string[]) => Promise<ActionResult>;
   getNodeHistory: (nodeId: string) => Promise<HistoryItem[]>;
   addSource?: AddSourceFns;
+  moveAssets?: (
+    projectId: string,
+    uploadIds: string[],
+    toNodeId: string | null,
+  ) => Promise<ActionResult<{ nodeId: string }>>;
   getNodeEvidence?: (nodeId: string) => Promise<NodeEvidenceView>;
   approveResearch?: (
     projectId: string,
@@ -130,6 +135,15 @@ export function ProjectCanvas({ tree, actions }: { tree: ProjectTree; actions: C
           onSelect={(id) => setParam("node", id)}
           onAddCard={() => toast(c.addCardLater)}
           onAddSource={actions.addSource ? () => setAdding(true) : undefined}
+          onMoveAssets={
+            actions.moveAssets
+              ? (ids, to) =>
+                  void actions.moveAssets!(tree.project.id, ids, to).then((res) => {
+                    if (!res.ok) toast.error(c.edit.saveFailed);
+                    router.refresh();
+                  })
+              : undefined
+          }
           runningRunId={active ? (run?.id ?? null) : null}
           onReorder={(_, ids) =>
             void actions.reorderNodes(tree.project.id, ids).then(() => router.refresh())

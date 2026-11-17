@@ -55,8 +55,8 @@ export function AppShell({
       <Onboarding
         open={onboardingOpen}
         onOpenChange={setOnboardingOpen}
-        onDone={(how) => {
-          void completeOnboarding(how);
+        onDone={async (how) => {
+          await completeOnboarding(how).catch(() => undefined);
           if (how === "finished") setNewOpen(true);
         }}
       />

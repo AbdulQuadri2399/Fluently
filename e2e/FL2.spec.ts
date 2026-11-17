@@ -12,6 +12,7 @@ test.describe("FL2 create a project (AC7.1, AC7.3)", () => {
     await page.getByRole("button", { name: "Sign in" }).click();
     await expect(page).toHaveURL(/\/home$/);
     await page.getByRole("button", { name: "Skip" }).click();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
 
     await page
       .getByRole("navigation", { name: "Main" })

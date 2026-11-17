@@ -29,6 +29,7 @@ import type { TreeNode } from "@/lib/canvas/load";
 import { mi } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import { canvasCopy as c } from "./copy";
+import { ASSET_MIME, AssetsExpanded, type AssetThumb } from "./AssetsExpanded";
 import { EvidenceExpanded, type EvidenceGroup } from "./EvidenceExpanded";
 
 const ICONS: Record<string, ComponentType<{ className?: string; "aria-hidden"?: boolean }>> = {
@@ -67,10 +68,28 @@ export type CardData = {
   expanded?: boolean;
   onToggle?: (id: string) => void;
   onAddSource?: () => void;
+  onMoveAssets?: (uploadIds: string[], toNodeId: string | null) => void;
 };
 
 /** What an expanded card shows (AC22.9, 03 SCR5 "Card expanded", MI13). */
-function Expanded({ node, onAddSource }: { node: TreeNode; onAddSource?: () => void }) {
+function Expanded({
+  node,
+  onAddSource,
+  onMoveAssets,
+}: {
+  node: TreeNode;
+  onAddSource?: () => void;
+  onMoveAssets?: (uploadIds: string[], toNodeId: string | null) => void;
+}) {
+  if (node.type === "asset_set") {
+    const thumbs = (node.data as { assets?: AssetThumb[] }).assets ?? [];
+    return (
+      <AssetsExpanded
+        assets={thumbs}
+        onSplit={onMoveAssets ? (ids) => onMoveAssets(ids, null) : undefined}
+      />
+    );
+  }
   const evidence = (node.data as { groups?: EvidenceGroup[] }).groups;
   if (node.type === "source" && evidence?.some((g) => Array.isArray(g.items))) {
     return <EvidenceExpanded groups={evidence} onAddSource={onAddSource} />;
@@ -130,6 +149,7 @@ export function CardBody({
   expanded = false,
   onToggle,
   onAddSource,
+  onMoveAssets,
 }: {
   node: TreeNode;
   running: boolean;
@@ -137,6 +157,7 @@ export function CardBody({
   expanded?: boolean;
   onToggle?: (id: string) => void;
   onAddSource?: () => void;
+  onMoveAssets?: (uploadIds: string[], toNodeId: string | null) => void;
 }) {
   const v = cardView(node, running);
   const Icon = ICONS[node.type] ?? BookOpenIcon;
@@ -224,7 +245,7 @@ export function CardBody({
       </div>
       {expanded ? (
         <div className="animate-in fade-in-0 duration-base">
-          <Expanded node={node} onAddSource={onAddSource} />
+          <Expanded node={node} onAddSource={onAddSource} onMoveAssets={onMoveAssets} />
         </div>
       ) : null}
     </div>
@@ -243,6 +264,27 @@ export function NodeCard({ data, selected }: NodeProps<Node<CardData>>) {
         data.dimmed && "opacity-35",
       )}
       style={data.isNew ? { animationDelay: `${data.delayMs}ms` } : undefined}
+      // AC22.11: an assets card accepts screens dragged from another assets card.
+      onDragOver={
+        data.node.type === "asset_set" && data.onMoveAssets
+          ? (e) => {
+              if (e.dataTransfer.types.includes(ASSET_MIME)) e.preventDefault();
+            }
+          : undefined
+      }
+      onDrop={
+        data.node.type === "asset_set" && data.onMoveAssets
+          ? (e) => {
+              const raw = e.dataTransfer.getData(ASSET_MIME);
+              if (!raw) return;
+              e.preventDefault();
+              const ids = JSON.parse(raw) as string[];
+              const own = ((data.node.data as { uploadIds?: string[] }).uploadIds ??
+                []) as string[];
+              if (ids.some((id) => !own.includes(id))) data.onMoveAssets?.(ids, data.node.id);
+            }
+          : undefined
+      }
     >
       <Handle
         type="target"
@@ -257,6 +299,7 @@ export function NodeCard({ data, selected }: NodeProps<Node<CardData>>) {
         expanded={data.expanded}
         onToggle={data.onToggle}
         onAddSource={data.onAddSource}
+        onMoveAssets={data.onMoveAssets}
       />
       <Handle
         type="source"
