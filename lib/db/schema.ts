@@ -786,3 +786,52 @@ export const ethicsOverrides = pgTable(
     }),
   ],
 ).enableRLS();
+
+// ---------- Slice 6: sources (04 section 4, AC12.2) ----------
+
+export const sources = pgTable(
+  "sources",
+  {
+    id: id(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "restrict" }),
+    projectId: uuid("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    stageRunId: uuid("stage_run_id").references(() => stageRuns.id, { onDelete: "set null" }),
+    handle: text("handle").notNull(),
+    sourceType: text("source_type").notNull(),
+    title: text("title").notNull(),
+    url: text("url"),
+    uploadId: uuid("upload_id").references(() => uploads.id, { onDelete: "set null" }),
+    authors: text("authors").array(),
+    year: integer("year"),
+    doi: text("doi"),
+    externalId: text("external_id"),
+    excerpt: text("excerpt"),
+    meta: jsonb("meta").notNull().default({}),
+    addedBy: uuid("added_by").references(() => members.id, { onDelete: "set null" }),
+    retrievedAt: timestamp("retrieved_at", { withTimezone: true }).notNull().defaultNow(),
+    ...timestamps(),
+  },
+  (t) => [
+    check(
+      "sources_type_valid",
+      sql`${t.sourceType} in ('toolkit','paper','desk','competitor','social','upload')`,
+    ),
+    uniqueIndex("sources_run_handle_unique").on(t.stageRunId, t.handle),
+    index("sources_project_idx").on(t.projectId, t.sourceType),
+    pgPolicy("sources_select", {
+      for: "select",
+      to: authenticatedRole,
+      using: isMember("workspace_id"),
+    }),
+    // Jobs write with the service role; members add sources by hand (AC12.10) as themselves.
+    pgPolicy("sources_insert", {
+      for: "insert",
+      to: authenticatedRole,
+      withCheck: sql`public.is_member(${t.workspaceId}) and ${t.addedBy} = ${authUid}`,
+    }),
+  ],
+).enableRLS();

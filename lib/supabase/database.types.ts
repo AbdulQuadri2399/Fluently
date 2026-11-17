@@ -471,6 +471,50 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"sources": {
+                  Row: {
+                    "added_by": string | null,"authors": (string)[] | null,"created_at": string,"doi": string | null,"excerpt": string | null,"external_id": string | null,"handle": string,"id": string,"meta": NonNullable<Json>,"project_id": string,"retrieved_at": string,"source_type": string,"stage_run_id": string | null,"title": string,"updated_at": string,"upload_id": string | null,"url": string | null,"workspace_id": string,"year": number | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "added_by"?: string | null,"authors"?: (string)[] | null,"created_at"?: string,"doi"?: string | null,"excerpt"?: string | null,"external_id"?: string | null,"handle": string,"id"?: string,"meta"?: NonNullable<Json>,"project_id": string,"retrieved_at"?: string,"source_type": string,"stage_run_id"?: string | null,"title": string,"updated_at"?: string,"upload_id"?: string | null,"url"?: string | null,"workspace_id": string,"year"?: number | null
+                  }
+                  Update: {
+                    "added_by"?: string | null,"authors"?: (string)[] | null,"created_at"?: string,"doi"?: string | null,"excerpt"?: string | null,"external_id"?: string | null,"handle"?: string,"id"?: string,"meta"?: NonNullable<Json>,"project_id"?: string,"retrieved_at"?: string,"source_type"?: string,"stage_run_id"?: string | null,"title"?: string,"updated_at"?: string,"upload_id"?: string | null,"url"?: string | null,"workspace_id"?: string,"year"?: number | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "sources_added_by_members_id_fk"
+      columns: ["added_by"]
+isOneToOne: false
+      referencedRelation: "members"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "sources_project_id_projects_id_fk"
+      columns: ["project_id"]
+isOneToOne: false
+      referencedRelation: "projects"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "sources_stage_run_id_stage_runs_id_fk"
+      columns: ["stage_run_id"]
+isOneToOne: false
+      referencedRelation: "stage_runs"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "sources_upload_id_uploads_id_fk"
+      columns: ["upload_id"]
+isOneToOne: false
+      referencedRelation: "uploads"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "sources_workspace_id_workspaces_id_fk"
+      columns: ["workspace_id"]
+isOneToOne: false
+      referencedRelation: "workspaces"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"stage_runs": {
                   Row: {
                     "created_at": string,"error_code": string | null,"feedback": string | null,"finished_at": string | null,"id": string,"inngest_run_id": string | null,"model": string | null,"project_id": string,"replace_human": boolean,"stage": string,"started_at": string | null,"started_by": string,"status": string,"steps": NonNullable<Json>,"updated_at": string,"workspace_id": string
