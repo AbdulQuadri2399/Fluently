@@ -509,6 +509,35 @@ Format: user action → system response → resulting state (ACs).
 | onboarding.start | "Start my first project" |
 | onboarding.stepOf | "Step {n} of 3" |
 
+**Added during the build (Slice 2, 2026-11-17): please confirm this wording.** Settings page (SCR12).
+
+| Key | Copy |
+|---|---|
+| settings.title | "Settings" |
+| settings.allowlist / settings.allowlistHelp | "Who can join" / "People with these emails, or any email at these domains, can create an account. Removing one stops new sign-ups; existing accounts stay." |
+| settings.allowlistLabel / settings.allowlistPlaceholder / settings.add / settings.remove | "Email or domain" / "name@company.com or @company.com" / "Add" / "Remove" |
+| settings.allowlistEmpty | "No one can join yet. Add an email or a domain." |
+| settings.members | "Members" |
+| settings.roleAdmin / settings.roleMember / settings.you | "Admin" / "Member" / "You" |
+| settings.makeAdmin / settings.makeMember | "Make admin" / "Make member" |
+| settings.deactivate / settings.reactivate / settings.deactivated | "Deactivate" / "Reactivate" / "Deactivated" |
+| settings.deactivateConfirm | "Deactivate {email}? They'll be signed out and can't sign in. Their work stays in Fluently." |
+| settings.models / settings.modelsHelp | "AI models" / "The model each stage uses for new runs. Haiku is fastest and cheapest; Opus is the most thorough. Higher effort thinks longer and costs more." |
+| settings.colStage / settings.colModel / settings.colEffort | "Stage" / "Model" / "Effort" |
+| settings.stageIntake | "Brief suggestions" (the other stages use their lane names) |
+| settings.effort.low / medium / high / xhigh / max | "Low" / "Medium" / "High" / "Extra high" / "Max" |
+| settings.budget / settings.budgetHelp | "Budget" / "AI costs are charged in US dollars. Fluently shows them in pounds at this rate and pauses a project when it reaches its cap." |
+| settings.capLabel / settings.rateLabel | "Cost cap per project (£)" / "Pounds per US dollar" |
+| settings.rateInvalid | "Set a rate between 0.1 and 5." |
+| settings.services / settings.servicesHelp | "Agency services" / "Research methods Fluently can recommend in test plans, as well as desk research." |
+| settings.sectors / settings.sectorsHelp | "Sensitive sectors" / "Briefs in flagged sectors get a closer ethics check. Briefs in refused sectors are blocked." |
+| settings.flagList / settings.refuseList | "Flag for a closer check" / "Refuse" |
+| settings.addItem / settings.itemPlaceholder | "Add" / "Type and press Enter" |
+| settings.usage / settings.usageHelp | "Usage" / "AI cost per project and stage, in pounds." |
+| settings.usageEmpty | "No AI usage yet. Costs appear here once a project runs." |
+| settings.colProject / settings.colCalls / settings.colCost / settings.total | "Project" / "AI calls" / "Cost" / "Total" |
+| settings.save / settings.saving | "Save changes" / "Saving…" |
+
 **Turning things off and undoing:** deactivating a member, removing an allowlist entry, cancelling a stage, and undoing a delete all use `[common.saveFailed]` if they fail, and leave the previous state unchanged.
 
 ## 8. Behavioural design notes (for Fluently's own interface)

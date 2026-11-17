@@ -66,11 +66,11 @@ Slice check: full suite green; FL1 and FL2 step 1 pass; every SCR2/SCR3/SCR4 sta
 Goal: admins control who can join and how the AI is configured; members can see usage.
 You'll be able to see: Settings with allowlist, members, models per stage, cost cap and GBP rate, agency services, sector lists, and a usage table (empty for now).
 
-- [ ] T2.1 Migration: `ai_usage` table + RLS; workspace defaults for `stage_models` (all `claude-haiku-5-5`), `model_prices` (Haiku 5.5 $0.10/$0.50, Sonnet 5.5 $2/$10, Opus 5.5 $4/$20 per MTok; web search per 1k from the pricing page at build time, recorded in 04), services, sector lists — S — Refs: AC28.2, AC27.2 — Depends on: T0.3
+- [x] T2.1 Migration: `ai_usage` table + RLS; workspace defaults for `stage_models` (all `claude-haiku-5-5`), `model_prices` (Haiku 5.5 $0.10/$0.50, Sonnet 5.5 $2/$10, Opus 5.5 $4/$20 per MTok; web search per 1k from the pricing page at build time, recorded in 04), services, sector lists — S — Refs: AC28.2, AC27.2 — Depends on: T0.3
   Done when: `tests/rls/ai_usage.test.ts` passes (members read, nobody inserts from a user session).
-- [ ] T2.2 O5 allowlist add/remove, O6 member role/active with last-admin guard — M — Refs: AC3.1–AC3.5 — Depends on: T0.4
+- [x] T2.2 O5 allowlist add/remove, O6 member role/active with last-admin guard — M — Refs: AC3.1–AC3.5 — Depends on: T0.4
   Done when: `tests/integration/O5-allowlist.test.ts` ('add email', 'add domain', 'invalid entry → validation', 'removed entry blocks new sign-up, keeps existing account') and `tests/integration/O6-members.test.ts` ('deactivated member cannot read projects', 'last admin cannot be demoted → conflict') pass.
-- [ ] T2.3 O7 `updateWorkspaceSettings` (models + effort per stage, cost cap £1–£500, GBP rate, agency services, flag/refuse sector lists) — S — Refs: AC28.1, AC10.4, AC13.3 — Depends on: T2.1
+- [x] T2.3 O7 `updateWorkspaceSettings` (models + effort per stage, cost cap £1–£500, GBP rate, agency services, flag/refuse sector lists) — S — Refs: AC28.1, AC10.4, AC13.3 — Depends on: T2.1
   Done when: `tests/integration/O7-settings.test.ts` passes: admin saves; member gets `forbidden`; cap 0 and 501 → `validation`.
 - [ ] T2.4 SCR12 UI: admin sections and member read-only usage, all SCR12 states and copy; usage table per project/stage in GBP (`lib/ai/cost.ts` conversion) — M — Refs: AC3.6, AC27.2, SCR12 — Depends on: T2.2, T2.3
   Done when: `tests/components/SCR12-settings.test.tsx` covers default admin, default member, invalid entry, last admin, saved, save failed; `tests/unit/cost.test.ts` 'USD→GBP at configured rate, per-model prices incl. cache and web search' passes; screenshots vs 03b SCR11/SCR12 row.
