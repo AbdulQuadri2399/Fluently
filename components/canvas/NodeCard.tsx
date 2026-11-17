@@ -28,6 +28,7 @@ import { CARD_W } from "@/lib/canvas/layout";
 import type { TreeNode } from "@/lib/canvas/load";
 import { mi } from "@/lib/motion";
 import { cn } from "@/lib/utils";
+import { StrengthTag } from "./StrengthTag";
 import { canvasCopy as c } from "./copy";
 import { ASSET_MIME, AssetsExpanded, type AssetThumb } from "./AssetsExpanded";
 import { EvidenceExpanded, type EvidenceGroup } from "./EvidenceExpanded";
@@ -195,8 +196,9 @@ export function CardBody({
           <span className={cn("text-caption text-muted", !expanded && "line-clamp-2")}>
             {v.status}
           </span>
-          {others.length ? (
+          {others.length || v.tag ? (
             <span className="mt-1 flex flex-wrap gap-1">
+              {v.tag ? <StrengthTag level={v.tag.level} of={v.tag.of} /> : null}
               {others.map((m) => (
                 <span
                   key={m.kind}

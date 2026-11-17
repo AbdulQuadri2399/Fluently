@@ -69,3 +69,24 @@ describe("gaps (AC13.1, AC13.2)", () => {
     expect(needsGap(input(src("paper", "desk", "upload")))).toBe(false);
   });
 });
+
+// AC12.11: a theme's strength uses the same rule over its findings' sources.
+describe("theme strength", () => {
+  it("High: three agreeing sources of two kinds behind the theme's findings", () => {
+    expect(confidence(input(src("paper", "social", "social"))).level).toBe("High");
+  });
+  it("Med: two sources, or three of one kind", () => {
+    expect(confidence(input(src("social", "social"))).level).toBe("Med");
+    expect(confidence(input(src("desk", "desk", "desk"))).reason).toBe("med_three_one_type");
+  });
+  it("Low: one source, AI inference only, or findings that disagree", () => {
+    expect(confidence(input(src("paper"))).level).toBe("Low");
+    expect(confidence({ sources: [], aiInference: true, contradicts: false }).reason).toBe(
+      "low_ai_only",
+    );
+    expect(
+      confidence({ sources: src("paper", "desk", "upload"), aiInference: false, contradicts: true })
+        .level,
+    ).toBe("Low");
+  });
+});

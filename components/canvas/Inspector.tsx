@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import type { ActionResult } from "@/lib/actions/result";
 import { canvasCopy as c, typeNames } from "./copy";
+import { StrengthTag, type Level } from "./StrengthTag";
 
 type SaveFn = NonNullable<Parameters<typeof Inspector>[0]["onSave"]>;
 
@@ -290,9 +291,12 @@ export function Inspector({
           ))}
         </ul>
       ) : null}
-      {node.type === "opportunity" && node.confidence ? (
-        <p className="grid gap-0.5 rounded-sm bg-soft px-3 py-2 text-small">
-          <span className="font-medium">{c.checkpoint.confidenceLabel(node.confidence)}</span>
+      {(node.type === "opportunity" || node.type === "theme") && node.confidence ? (
+        <p className="grid justify-items-start gap-1 rounded-sm bg-soft px-3 py-2 text-small">
+          <StrengthTag
+            level={node.confidence as Level}
+            of={node.type === "theme" ? "strength" : "confidence"}
+          />
           <span className="text-muted">
             {c.labels.confidenceReason[
               (node.data as { confidenceReason?: string }).confidenceReason ?? ""

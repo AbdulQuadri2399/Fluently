@@ -30,6 +30,7 @@ export const typeNames: Record<string, string> = {
 export const canvasCopy = {
   tabs: { canvas: "Canvas", brief: "Brief", report: "Report" },
   cost: (spent: string, cap: string) => `${spent} of ${cap} AI budget`,
+  strengthLabel: (level: string) => `${level} strength`,
   fit: "Fit to screen",
   zoomIn: "Zoom in",
   zoomOut: "Zoom out",

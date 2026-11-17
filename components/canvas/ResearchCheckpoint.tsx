@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { canvasCopy as c } from "./copy";
+import { StrengthTag } from "./StrengthTag";
 
 export type OpportunityOption = {
   id: string;
@@ -15,8 +15,6 @@ export type OpportunityOption = {
   themes: number;
   principles: string[];
 };
-
-const TONE = { High: "ok", Med: "neutral", Low: "warn" } as const;
 
 /**
  * SCR8 research checkpoint (AC14.1–AC14.3, AC25.2, EC4, EC13): every opportunity listed with its
@@ -76,11 +74,7 @@ export function ResearchCheckpoint({
                   {o.principles.length ? ` · ${o.principles.join(", ")}` : ""}
                 </span>
               </Label>
-              {o.confidence ? (
-                <Badge kind="status" tone={TONE[o.confidence]}>
-                  {c.checkpoint.confidenceLabel(o.confidence)}
-                </Badge>
-              ) : null}
+              {o.confidence ? <StrengthTag level={o.confidence} of="confidence" /> : null}
             </li>
           );
         })}

@@ -36,7 +36,7 @@ export function cardView(n: TreeNode, running: boolean) {
   } else if (n.type === "override") {
     status = data.reason ?? status;
   } else if (n.type === "opportunity") {
-    status = n.confidence ? c.checkpoint.confidenceLabel(n.confidence) : status;
+    status = (n.data as { summary?: string }).summary || status;
   } else if (n.type === "finding") {
     const d = n.data as { aiInference?: boolean; sources?: string[]; socialCount?: number };
     status = d.aiInference
@@ -65,7 +65,20 @@ export function cardView(n: TreeNode, running: boolean) {
   const markers: Marker[] = [];
   if (n.stale) markers.push({ kind: "stale", label: c.markers.stale });
   if (n.lowSpecificity) markers.push({ kind: "lowSpecificity", label: c.markers.lowSpecificity });
-  if (n.confidence === "Low")
+  // Opportunities and themes show their level as a tag (AC12.12); cards built from a Low
+  // opportunity carry the Low confidence marker (AC13.4).
+  const level =
+    n.confidence === "High" || n.confidence === "Med" || n.confidence === "Low"
+      ? (n.confidence as "High" | "Med" | "Low")
+      : null;
+  const tag = !level
+    ? null
+    : n.type === "opportunity"
+      ? { level, of: "confidence" as const }
+      : n.type === "theme"
+        ? { level, of: "strength" as const }
+        : null;
+  if (n.confidence === "Low" && !tag)
     markers.push({ kind: "lowConfidence", label: c.markers.lowConfidence });
   if (n.status === "failed") markers.push({ kind: "failed", label: c.markers.failed });
   // The ethics card's status line already says flagged / overridden.
@@ -76,5 +89,5 @@ export function cardView(n: TreeNode, running: boolean) {
   if (n.status === "running" || (running && n.type === "ethics"))
     markers.push({ kind: "running", label: c.markers.running });
   const done = n.status === "ok" && !n.stale && (n.type === "ethics" || n.type === "objective");
-  return { title, status, markers, done, typeLabel: typeNames[n.type] ?? n.type };
+  return { title, status, markers, done, tag, typeLabel: typeNames[n.type] ?? n.type };
 }
