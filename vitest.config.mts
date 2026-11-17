@@ -19,7 +19,11 @@ export default defineConfig({
         extends: true,
         test: {
           name: "int",
-          include: ["tests/integration/**/*.test.ts", "tests/rls/**/*.test.ts"],
+          include: [
+            "tests/integration/**/*.test.ts",
+            "tests/rls/**/*.test.ts",
+            "tests/jobs/**/*.test.ts",
+          ],
           environment: "node",
           setupFiles: ["tests/int-setup.ts"],
           fileParallelism: false,
