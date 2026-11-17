@@ -85,11 +85,11 @@ You'll be able to see: Toolkit page with upload, preview (errors and warnings), 
 
 - [x] T3.1 `fixtures/toolkit/sample-toolkit.csv` and `.json`: 30 invented principles, all supported columns, incl. rows with "No source", related principles (one unknown), both Sense columns; plus `bad-missing-id.csv`, `bad-duplicate-id.csv`, `bad-missing-columns.csv` — S — Refs: NFR9 — Depends on: —
   Done when: files exist; `scripts/check-toolkit-fixture.sh` passes.
-- [ ] T3.2 Migration: `toolkit_versions`, `principles`, `principle_relations`, `toolkit_candidates` + RLS (no update/delete policies) — S — Refs: AC4.8 — Depends on: T0.3
+- [x] T3.2 Migration: `toolkit_versions`, `principles`, `principle_relations`, `toolkit_candidates` + RLS (no update/delete policies) — S — Refs: AC4.8 — Depends on: T0.3
   Done when: `tests/rls/toolkit.test.ts` passes: member reads; member insert refused; admin update/delete refused.
-- [ ] T3.3 `lib/toolkit/parse.ts`: CSV/JSON parse, required columns, ID checks, unknown columns warning, evidence level, Sense merge, related principles resolution — M — Refs: AC4.2–AC4.4, AC4.6, AC4.7 — Depends on: T3.1
+- [x] T3.3 `lib/toolkit/parse.ts`: CSV/JSON parse, required columns, ID checks, unknown columns warning, evidence level, Sense merge, related principles resolution — M — Refs: AC4.2–AC4.4, AC4.6, AC4.7 — Depends on: T3.1
   Done when: `tests/unit/toolkitParse.test.ts` passes: one test per AC4.2, AC4.3, AC4.4, AC4.6 (strong/some/none, Sense merge), AC4.7 using T3.1 fixtures.
-- [ ] T3.4 O8 preview + O9 save (atomic insert of version, principles, relations; sets workspace default) — M — Refs: AC4.1, AC4.5 — Depends on: T3.2, T3.3
+- [x] T3.4 O8 preview + O9 save (atomic insert of version, principles, relations; sets workspace default) — M — Refs: AC4.1, AC4.5 — Depends on: T3.2, T3.3
   Done when: `tests/integration/O9-toolkit.test.ts` passes: valid save creates version n+1 as default; existing project keeps old pin (AC7.4); file > 10 MB → `validation`.
 - [ ] T3.5 SCR11 UI: versions list, upload, validating, preview valid/invalid (row errors with 03 copy), saving, saved toast, empty admin/member, Toolkit candidates tab (empty state) — M — Refs: SCR11, FL7, FF9 — Depends on: T3.4
   Done when: `tests/components/SCR11-toolkit.test.tsx` one test per SCR11 state; `e2e/FL7.spec.ts` and `e2e/FF9.spec.ts` pass; screenshots vs 03b.
