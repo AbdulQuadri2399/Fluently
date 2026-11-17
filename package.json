@@ -19,6 +19,7 @@
     "db:types": "supabase gen types typescript > lib/supabase/database.types.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "1.9.0",
     "@hookform/resolvers": "7.0.6",
     "@phosphor-icons/react": "2.1.10",
     "@sentry/nextjs": "11.13.0",

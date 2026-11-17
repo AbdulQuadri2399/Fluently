@@ -104,7 +104,7 @@ Slice check: suite green; FL7 and FF9 pass. **Stop for the user.**
 Goal: a strategist writes a brief with AI coaching, approves objectives, and the brief is ethics-screened, with overrides recorded.
 You'll be able to see: the intake with coaching suggestions, uploads, autosave, approval, ethics pass/flag/refuse and override.
 
-- [ ] T4.1 `lib/ai/`: `AiClient` interface, `AnthropicAiClient` (structured output via `output_config.format`, per-stage model/effort from workspace, refusal fallbacks for Sonnet/Opus, typed error chain → `unavailable`/`rate_limited`), `FakeAiClient` reading `tests/fixtures/ai/*.json`, usage logger writing `ai_usage` with cost (AC27.1); `AI_MODE` switch — M — Refs: D6, D7, D16, AC27.1, AC28.3, NFR10 — Depends on: T2.1
+- [x] T4.1 `lib/ai/`: `AiClient` interface, `AnthropicAiClient` (structured output via `output_config.format`, per-stage model/effort from workspace, refusal fallbacks for Sonnet/Opus, typed error chain → `unavailable`/`rate_limited`), `FakeAiClient` reading `tests/fixtures/ai/*.json`, usage logger writing `ai_usage` with cost (AC27.1); `AI_MODE` switch — M — Refs: D6, D7, D16, AC27.1, AC28.3, NFR10 — Depends on: T2.1
   Done when: `tests/unit/ai-client.test.ts` passes: 'logs usage on success', 'logs failed call', 'malformed JSON retried once then throws'; `tests/unit/ai-schemas.test.ts` passes.
 - [ ] T4.2 Migration: `uploads`, `nodes`, `edges`, `node_history`, `stage_runs`, `ethics_overrides` + RLS; private `uploads` bucket + storage policies — M — Refs: 04 §4 — Depends on: T1.1
   Done when: `tests/rls/nodes.test.ts`, `tests/rls/uploads.test.ts`, `tests/rls/storage.test.ts` pass (two-user + signed-out).

@@ -1,0 +1,9 @@
+{
+  "result": "flag",
+  "reasons": [
+    {
+      "rule": "Fake urgency or scarcity",
+      "reason": "The brief asks for a countdown timer on a non-expiring offer."
+    }
+  ]
+}
