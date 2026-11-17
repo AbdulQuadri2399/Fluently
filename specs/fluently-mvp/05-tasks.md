@@ -127,8 +127,8 @@ Slice check: suite green; FL2 end to end passes with FakeAiClient; FF2–FF4 pas
 Goal: the project opens as a live canvas showing objectives and ethics, with the checkpoint panel and a generic stage runner that later stages plug into.
 You'll be able to see: the canvas with columns, objective and ethics nodes, the inspector, the checkpoint panel saying what to do next, list view.
 
-- [ ] T5.1 Canvas (`@xyflow/react`): stage lanes (D24) with names pinned in a strip at the top, Current screens lane in optimise mode, node card component with all 03b states (default, hover, selected, focused, stale, running, failed, dimmed), badges as text+icon, pan/zoom 25–200%, fit, minimap, arrow-key navigation, Enter opens inspector — M — Refs: AC22.1, AC22.2, AC22.4, 03b §6 Node card — Depends on: T4.2
-  Done when: `tests/components/SCR5-canvas.test.tsx` passes: nodes placed in correct lane per type; lane strip visible after panning; Current screens lane only in optimise mode; each marker renders its text label; ArrowRight moves focus to nearest node in next column; screenshot `SCR5-default` vs 03b SCR5.
+- [ ] T5.1 Canvas (`@xyflow/react`): stage lanes (D24) with names pinned in a strip at the top and a + per lane header (AC22.12), Current assets cards under the objectives in optimise mode, node card component with all 03b states (default, hover, selected, focused, stale, running, failed, dimmed), badges as text+icon, pan/zoom 25–200%, fit, minimap, arrow-key navigation, Enter opens inspector — M — Refs: AC22.1, AC22.2, AC22.4, 03b §6 Node card — Depends on: T4.2
+  Done when: `tests/components/SCR5-canvas.test.tsx` passes: nodes placed in correct lane per type; lane strip visible after panning; Current assets cards only in optimise mode; each marker renders its text label; ArrowRight moves focus to nearest node in next column; screenshot `SCR5-default` vs 03b SCR5.
 - [ ] T5.8 Reorder cards within a lane (vertical drag only, saved `sort_order`, O34 reorderNode) — S — Refs: AC22.8, D24 — Depends on: T5.1
   Done when: `e2e/lanes.spec.ts` passes: 'card can move up/down but not into another lane', 'order persists after reload'.
 - [ ] T5.2 [P] List view (accessible alternative) with same actions; toggle in toolbar — S — Refs: NFR3, AC22.4 — Depends on: T5.1
@@ -166,8 +166,10 @@ You'll be able to see: research running live on the canvas and the research chec
   Done when: `tests/jobs/J2-research.test.ts` 'synthesis creates themes/opportunities/gaps with edges', 'unknown principle dropped', 'gap methods only from services list', 'synthesis failure keeps findings and offers retry' pass.
 - [ ] T6.7 Research checkpoint in SCR8: opportunity list, none pre-selected, all-low note, select ≥ 1, approve starts solutions (stub until Slice 9), send-back with feedback (≥ 10 chars; `replace_human` checkbox) — M — Refs: AC14.1–AC14.3, AC25.2, EC4, EC13 — Depends on: T5.6, T6.6
   Done when: `tests/components/SCR8-checkpoint.test.tsx` adds research checkpoint, nothing selected, send-back form; `e2e/FL3.spec.ts` (fake AI) and `e2e/FF5.spec.ts` pass.
-- [ ] T6.9 Expandable Evidence and Current screens cards (grouped sources, show more, thumbnails) and *Add source* after research (O35, marks themes Out of date) — M — Refs: AC22.9, AC22.10, AC12.10 — Depends on: T6.6
+- [ ] T6.9 Expandable Evidence and Current assets cards (grouped sources, show more, thumbnails) and *Add source* after research (O35, marks themes Out of date) — M — Refs: AC22.9, AC22.10, AC12.10 — Depends on: T6.6
   Done when: `tests/components/SCR5-expanded-cards.test.tsx` passes (groups in order with counts, 3 items then 'Show n more', collapse); `tests/integration/O35-add-source.test.ts` passes ('new source marks themes out of date').
+- [ ] T6.10 Split, rename and move assets between Current assets cards (O36) — S — Refs: AC22.11 — Depends on: T6.9
+  Done when: `tests/integration/O36-assets.test.ts` passes ('split keeps every asset in one card', 'moving the last asset removes the empty card', 'rename saves').
 - [ ] T6.8 [P] SCR7 shows sources with links, confidence and its reason, `Qualitative signal · n sources`, `AI inference`, `External principle` — S — Refs: AC12.4, AC12.7 — Depends on: T6.6
   Done when: `tests/components/SCR7-inspector.test.tsx` adds one test per label.
 

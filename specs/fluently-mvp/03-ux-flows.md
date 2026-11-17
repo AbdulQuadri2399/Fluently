@@ -105,7 +105,7 @@ Copy keys in `[brackets]` are written out in §7.
 | Cost at cap | SCR8 `[cost.atCap]` | Confirm continue / admin raises cap |
 | Offline | `[common.offline]` banner; edits disabled | Wait |
 | Session expired | `[common.sessionExpired]` modal | Sign in (returns here) |
-| Card expanded | The card grows in place (Evidence: sources grouped by kind; Current screens: each asset); a collapse arrow top-right | Collapse, open a source, *Add source* |
+| Card expanded | The card grows in place (Evidence: sources grouped by kind; Current assets: each asset, draggable to another assets card); a collapse arrow top-right | Collapse, open a source, *Add source* |
 | Dragging a connection | Valid target cards in the next lane stay sharp, others fade; the line follows the pointer | Drop on a card, or release to cancel |
 | Line hovered | Line darkens; a small remove button at its midpoint | Remove the connection |
 | List view (accessibility toggle) | Nodes as nested lists by column with the same actions | Everything the canvas allows |
@@ -426,12 +426,15 @@ Format: user action → system response → resulting state (ACs).
 | nav.settings | "Settings" |
 | nav.account | "Account" (accessible name of the account menu button) |
 | nav.main | "Main" (accessible name of the top navigation) |
-| lane.objectives / lane.currentScreens / lane.currentEmails / lane.evidence / lane.themes / lane.opportunities / lane.solutions / lane.wireframes / lane.tests | "Objectives" / "Current screens" / "Current emails" / "Evidence" / "Themes" / "Opportunities" / "Solutions" / "Wireframes" / "Tests" |
+| lane.objectives / lane.evidence / lane.themes / lane.opportunities / lane.solutions / lane.wireframes / lane.tests | "Objectives" / "Evidence" / "Themes" / "Opportunities" / "Solutions" / "Wireframes" / "Tests" |
 | evidence.groups | "Client uploads" / "Academic papers" / "Web and market" / "Competitors" / "Reviews and forums" |
 | evidence.addSource | "Add source" |
 | evidence.addHint | "Upload a file or paste a link" |
 | canvas.showMore | "Show {n} more" |
-| assets.cardTitle | "{n} current screens" (email: "{n} current emails") |
+| assets.defaultName | "Current assets" |
+| assets.count | "{n} screens" / "{n} emails" / "{n} assets" (mixed) |
+| assets.split | "Split card" |
+| lane.addCard | "Add a card to {lane}" (accessible name of the + button) |
 | assets.uploadedBy | "Uploaded by {name}" |
 | canvas.cantConnect | "These two can't be connected. Lines run from one stage to the next." |
 | canvas.linkRequired | "This {type} needs at least one {required}. Connect another before removing this one." |
@@ -449,7 +452,7 @@ Format: user action → system response → resulting state (ACs).
 - **Stale, not deleted:** loss aversion; people keep their work and choose when to regenerate.
 - **Lanes, not a free canvas (user decision 2026-11-17):** left-to-right is the logic of an opportunity tree and what makes tracing readable; reordering within a lane gives control without losing structure.
 - **Connection handles only on hover:** keeps the tree calm; invalid targets fade while dragging, so the rule ("lines run from one stage to the next") is learned by doing, not by reading.
-- **What you're changing vs what you know:** current screens or emails get their own lane; client data about how they perform goes in Evidence.
+- **What you're changing vs what you know:** current assets sit under the objectives (the starting point), split into chunks the team names; client data about how they perform goes in Evidence.
 - **Confidence on everything built from weak evidence:** prevents the "laundering" of weak evidence through later stages.
 
 ## 9. Platform notes (web app)
