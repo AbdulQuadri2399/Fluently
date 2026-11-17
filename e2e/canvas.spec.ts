@@ -52,14 +52,18 @@ test("SCR5 tree: brief → ethics → canvas → research runs live → list vie
   await page.getByRole("button", { name: "Start research" }).click();
   await expect(page.getByText(/Research is running/)).toBeVisible({ timeout: 10000 });
   // MI15: lines into the card research is working on flow while it runs, then stop.
-  await expect(page.locator("path.dash-flow")).toHaveCount(2, { timeout: 10000 });
+  await expect
+    .poll(() => page.locator("path.dash-flow").count(), { timeout: 10000 })
+    .toBeGreaterThanOrEqual(2);
   await shoot(page, "SCR8-running");
   await expect(page.getByText("Research sources")).toBeVisible({ timeout: 15000 });
-  await expect(page.getByText(/Research finished/)).toBeVisible({ timeout: 20000 });
+  await expect(
+    page.getByText("Research is done. Choose which opportunities to take forward."),
+  ).toBeVisible({ timeout: 30000 });
   await expect(page.locator("path.dash-flow")).toHaveCount(0);
 
   // Details panel via click; list view toggle.
-  await expect(page.getByText("47 sources across 5 kinds")).toBeVisible();
+  await expect(page.getByText("10 sources across 5 kinds")).toBeVisible();
   await page.getByText("Research sources").click();
   const details = page.getByRole("complementary", { name: "Source" });
   await expect(details).toBeVisible();

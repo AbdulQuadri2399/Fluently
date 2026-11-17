@@ -48,3 +48,34 @@ export async function approveCheckpoint(
   if (error) return fail(mapError(error.code));
   return ok({ checkpointId: data as string });
 }
+
+/** O20 send back (AC25.2): research analysis runs again with the feedback (≥ 10 characters). */
+export async function sendBackResearch(
+  client: Client,
+  projectId: string,
+  feedback: string,
+  replaceHuman: boolean,
+): Promise<ActionResult<{ stageRunId: string }>> {
+  if ((feedback ?? "").trim().length < 10) return fail("validation");
+  const { data, error } = await client.rpc("send_back_research", {
+    p_project: projectId,
+    p_feedback: feedback,
+    p_replace_human: replaceHuman,
+  });
+  if (error) return fail(mapError(error.code));
+  return ok({ stageRunId: data as string });
+}
+
+/** Retry failed steps (AC11.5) or synthesis only (AC11.6), keeping what already worked. */
+export async function retryResearch(
+  client: Client,
+  runId: string,
+  synthesisOnly: boolean,
+): Promise<ActionResult<{ stageRunId: string }>> {
+  const { data, error } = await client.rpc("retry_research", {
+    p_run: runId,
+    p_synthesis_only: synthesisOnly,
+  });
+  if (error) return fail(mapError(error.code));
+  return ok({ stageRunId: data as string });
+}

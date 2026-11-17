@@ -701,6 +701,9 @@ isOneToOne: false
               "version_id": string,"version_number": number
             }[]
                            },
+"send_back_research":
+{ Args: { "p_feedback": string,"p_project": string,"p_replace_human": boolean }; Returns: string
+                           },
 "set_member_active":
 { Args: { "is_active": boolean,"member_id": string }; Returns: undefined
                            },

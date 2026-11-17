@@ -21,6 +21,7 @@ const node = (over: Partial<TreeNode> = {}): TreeNode => ({
   stageRunId: null,
   version: 1,
   updatedByName: "",
+  confidence: null,
   ...over,
 });
 const objective: TreeNode = {

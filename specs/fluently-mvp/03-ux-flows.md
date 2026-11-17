@@ -634,7 +634,18 @@ Format: user action → system response → resulting state (ACs).
 | checkpoint.researchDone | "Research finished. Themes and opportunities arrive in the next build step." (prototype only) |
 | checkpoint.collapse / checkpoint.expand | "Hide" / "Show what's next" |
 | step.status | "Done" / "Running" / "Didn't work" / "Waiting" |
-| research.steps | "Client data" / "Academic papers" / "Web and market" / "Competitors" / "Reviews and forums" |
+| research.steps | "Toolkit principles" / "Client data" / "Academic papers" / "Web and market" / "Competitors" / "Reviews and forums" / "Findings" / "Themes and opportunities" |
+| checkpoint.chooseOpportunities | "Research is done. Choose which opportunities to take forward." |
+| checkpoint.approveSolutions / checkpoint.approving | "Approve and generate solutions" / "Approving…" |
+| checkpoint.sendBack / checkpoint.feedbackLabel / checkpoint.sendBackSubmit / checkpoint.sending | "Send back with feedback" / "What should change?" / "Send back" / "Sending…" |
+| checkpoint.replaceHuman | "Also replace cards people added or edited" |
+| checkpoint.retryFailed / checkpoint.retrySynthesis | "Retry failed steps" / "Retry synthesis" |
+| checkpoint.themesCount / checkpoint.confidenceLabel / checkpoint.selected | "{n} themes" / "{level} confidence" / "{n} selected" |
+| card.markers (added) | "Low confidence" |
+| finding.labels | "AI inference" / "Qualitative signal · {n} sources" / "{n} sources" |
+| gap.status | "Open question · {method}" |
+| confidence.reasons | High: "Three or more sources of at least two kinds agree." · Med: "Two or more sources agree." / "Three or more sources, all of one kind." · Low: "Only one source." / "Only AI inference, no stored source." / "The sources disagree." |
+| checkpoint.solutionsNext | "Opportunities chosen. Solutions arrive in a later build step." (prototype only) |
 
 **Turning things off and undoing:** deactivating a member, removing an allowlist entry, cancelling a stage, and undoing a delete all use `[common.saveFailed]` if they fail, and leave the previous state unchanged.
 

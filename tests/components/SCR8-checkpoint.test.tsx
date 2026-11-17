@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { barState, CheckpointBar, type BarState } from "@/components/canvas/CheckpointBar";
 import { canvasCopy as c } from "@/components/canvas/copy";
+import type { OpportunityOption } from "@/components/canvas/ResearchCheckpoint";
 import type { RunInfo, TreeNode } from "@/lib/canvas/load";
 
 const run = (status: string, steps: RunInfo["steps"] = []): RunInfo => ({
@@ -56,10 +57,10 @@ describe("SCR8 decision bar", () => {
     expect(onCancel).toHaveBeenCalledWith("r1");
   });
 
-  it("partial failure: stage.partialFail names the steps; Try again", () => {
+  it("partial failure: stage.partialFail names the steps; Retry failed steps", () => {
     bar({ kind: "partial", run: run("partial", steps) });
     expect(screen.getByText(c.checkpoint.partialFail("Web and market"))).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: c.checkpoint.retry })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: c.checkpoint.retryFailed })).toBeInTheDocument();
   });
 
   it("failed: stage.failed; Try again", () => {
@@ -117,6 +118,79 @@ describe("SCR8 decision bar", () => {
     expect(barState({ ...base, hasToolkit: false, nodes: ethics("ok") })).toEqual({
       kind: "readyResearch",
       noToolkit: "member",
+    });
+  });
+
+  describe("research checkpoint (AC14.1–AC14.3, AC25.2, EC4)", () => {
+    const opportunities = [
+      {
+        id: "o1",
+        title: "Make the ID step feel shorter",
+        confidence: "High" as const,
+        themes: 2,
+        principles: ["P001", "P002"],
+      },
+      {
+        id: "o2",
+        title: "Explain where the ID photo goes",
+        confidence: "Low" as const,
+        themes: 1,
+        principles: [],
+      },
+    ];
+    function checkpoint(opps: OpportunityOption[] = opportunities) {
+      const onApprove = vi.fn(async () => true);
+      const onSendBack = vi.fn(async () => true);
+      const onRetry = vi.fn(async () => undefined);
+      render(
+        <CheckpointBar
+          projectId="p1"
+          state={{ kind: "choose", run: run("succeeded"), partial: false }}
+          onStart={async () => undefined}
+          onCancel={async () => undefined}
+          opportunities={opps}
+          onApprove={onApprove}
+          onSendBack={onSendBack}
+          onRetry={onRetry}
+        />,
+      );
+      return { onApprove, onSendBack };
+    }
+
+    it("lists every opportunity with confidence, themes and principles; nothing selected", async () => {
+      const { onApprove } = checkpoint();
+      expect(screen.getByText(c.checkpoint.chooseOpportunities)).toBeInTheDocument();
+      expect(screen.getByText("High confidence")).toBeInTheDocument();
+      expect(screen.getByText("2 themes · P001, P002")).toBeInTheDocument();
+      expect(
+        screen.getAllByRole("checkbox").every((b) => b.getAttribute("aria-checked") === "false"),
+      ).toBe(true);
+      const approve = screen.getByRole("button", { name: c.checkpoint.approveSolutions });
+      expect(approve).toHaveAttribute("aria-disabled", "true");
+      expect(screen.getAllByText(c.checkpoint.selectAtLeastOne).length).toBeGreaterThan(0);
+      await userEvent.click(screen.getByLabelText(/Make the ID step feel shorter/));
+      expect(screen.getByText(c.checkpoint.selected(1))).toBeInTheDocument();
+      await userEvent.click(approve);
+      expect(onApprove).toHaveBeenCalledWith(["o1"]);
+    });
+
+    it("all Low: checkpoint.allLow note, still selectable", () => {
+      checkpoint(opportunities.map((o) => ({ ...o, confidence: "Low" as const })));
+      expect(screen.getByText(c.checkpoint.allLow)).toBeInTheDocument();
+    });
+
+    it("send back needs 10+ characters; can also replace people's cards", async () => {
+      const { onSendBack } = checkpoint();
+      await userEvent.click(screen.getByRole("button", { name: c.checkpoint.sendBack }));
+      await userEvent.type(screen.getByLabelText(c.checkpoint.feedbackLabel), "Too vague");
+      expect(screen.getByRole("button", { name: c.checkpoint.sendBackSubmit })).toHaveAttribute(
+        "aria-disabled",
+        "true",
+      );
+      await userEvent.type(screen.getByLabelText(c.checkpoint.feedbackLabel), ", focus on trust");
+      await userEvent.click(screen.getByText(c.checkpoint.replaceHuman));
+      await userEvent.click(screen.getByRole("button", { name: c.checkpoint.sendBackSubmit }));
+      expect(onSendBack).toHaveBeenCalledWith("Too vague, focus on trust", true);
     });
   });
 });

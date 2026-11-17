@@ -51,6 +51,7 @@ const ICONS: Record<string, ComponentType<{ className?: string; "aria-hidden"?: 
 const MARKER_TONE: Record<Marker["kind"], string> = {
   stale: "bg-warn-bg text-warn",
   lowSpecificity: "bg-warn-bg text-warn",
+  lowConfidence: "bg-warn-bg text-warn",
   failed: "bg-bad-bg text-bad",
   flagged: "bg-bad-bg text-bad",
   overridden: "bg-info-bg text-info",

@@ -33,3 +33,30 @@ export async function addSource(input: canvas.AddSourceInput) {
   revalidatePath(`/projects/${input.projectId}`, "layout");
   return res;
 }
+export async function approveResearch(projectId: string, selection: string[]) {
+  const res = await stages.approveCheckpoint(
+    await createClient(),
+    projectId,
+    "research",
+    selection,
+  );
+  revalidatePath(`/projects/${projectId}`, "layout");
+  return res;
+}
+export async function sendBackResearch(projectId: string, feedback: string, replaceHuman: boolean) {
+  const res = await stages.sendBackResearch(
+    await createClient(),
+    projectId,
+    feedback,
+    replaceHuman,
+  );
+  if (res.ok) startResearch(res.data.stageRunId);
+  revalidatePath(`/projects/${projectId}`, "layout");
+  return res;
+}
+export async function retryResearch(projectId: string, runId: string, synthesisOnly: boolean) {
+  const res = await stages.retryResearch(await createClient(), runId, synthesisOnly);
+  if (res.ok) startResearch(res.data.stageRunId);
+  revalidatePath(`/projects/${projectId}`, "layout");
+  return res;
+}

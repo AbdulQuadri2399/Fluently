@@ -228,4 +228,48 @@ describe("J2 research", () => {
     );
     expect((await nodes(projectId, "opportunity")).length).toBeGreaterThan(0);
   });
+
+  it("send back records feedback, reuses sources, keeps people's cards unless asked (AC25.2, EC13)", async () => {
+    const { projectId, runId } = await startedRun();
+    await runResearch(db, runId);
+    const [theme] = await nodes(projectId, "theme");
+    await admin.client.from("nodes").insert({
+      workspace_id: admin.workspaceId,
+      project_id: projectId,
+      type: "theme",
+      stage: "research",
+      title: "A theme a person added",
+      provenance: "human",
+      created_by: admin.id,
+    });
+    expect(
+      (
+        await admin.client.rpc("send_back_research", {
+          p_project: projectId,
+          p_feedback: "short",
+          p_replace_human: false,
+        })
+      ).error,
+    ).not.toBeNull();
+    const back = await admin.client.rpc("send_back_research", {
+      p_project: projectId,
+      p_feedback: "Focus on trust, not effort",
+      p_replace_human: false,
+    });
+    expect(back.error).toBeNull();
+    const cp = await admin.client
+      .from("checkpoints")
+      .select("decision, feedback")
+      .eq("project_id", projectId)
+      .eq("stage", "research");
+    expect(cp.data).toEqual([{ decision: "send_back", feedback: "Focus on trust, not effort" }]);
+    const papers = vi.fn(async () => []);
+    expect(
+      await runResearch(db, back.data as string, { deps: { ...fakeResearchDeps(), papers } }),
+    ).toBe("succeeded");
+    expect(papers).not.toHaveBeenCalled();
+    const themes = await nodes(projectId, "theme");
+    expect(themes.some((t) => t.title === "A theme a person added")).toBe(true);
+    expect(themes.some((t) => t.id === theme!.id)).toBe(false); // the AI's earlier theme was replaced
+  });
 });

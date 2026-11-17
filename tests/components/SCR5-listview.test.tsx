@@ -21,6 +21,7 @@ const n = (id: string, type: string, title: string, over: Partial<TreeNode> = {}
   stageRunId: null,
   version: 1,
   updatedByName: "",
+  confidence: null,
   ...over,
 });
 

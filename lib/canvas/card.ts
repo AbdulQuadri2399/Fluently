@@ -2,7 +2,8 @@ import { canvasCopy as c, typeNames } from "@/components/canvas/copy";
 import type { TreeNode } from "./load";
 
 export type Marker = {
-  kind: "stale" | "lowSpecificity" | "failed" | "running" | "flagged" | "overridden";
+  kind:
+    "stale" | "lowSpecificity" | "lowConfidence" | "failed" | "running" | "flagged" | "overridden";
   label: string;
 };
 
@@ -34,6 +35,19 @@ export function cardView(n: TreeNode, running: boolean) {
               : c.ethicsStatus.passed;
   } else if (n.type === "override") {
     status = data.reason ?? status;
+  } else if (n.type === "opportunity") {
+    status = n.confidence ? c.checkpoint.confidenceLabel(n.confidence) : status;
+  } else if (n.type === "finding") {
+    const d = n.data as { aiInference?: boolean; sources?: string[]; socialCount?: number };
+    status = d.aiInference
+      ? c.labels.aiInference
+      : d.socialCount && d.socialCount === (d.sources?.length ?? 0)
+        ? c.labels.qualitative(d.socialCount)
+        : c.labels.sources(d.sources?.length ?? 0);
+  } else if (n.type === "theme") {
+    status = (n.data as { summary?: string }).summary || status;
+  } else if (n.type === "gap") {
+    status = c.labels.gapMethod((n.data as { method?: string }).method ?? "");
   } else if (n.type === "asset_set") {
     const count = (n.data as { count?: number }).count ?? 0;
     status = count === 1 ? "1 asset" : `${count} assets`;
@@ -51,6 +65,8 @@ export function cardView(n: TreeNode, running: boolean) {
   const markers: Marker[] = [];
   if (n.stale) markers.push({ kind: "stale", label: c.markers.stale });
   if (n.lowSpecificity) markers.push({ kind: "lowSpecificity", label: c.markers.lowSpecificity });
+  if (n.confidence === "Low")
+    markers.push({ kind: "lowConfidence", label: c.markers.lowConfidence });
   if (n.status === "failed") markers.push({ kind: "failed", label: c.markers.failed });
   // The ethics card's status line already says flagged / overridden.
   if (n.status === "flagged" && n.type !== "ethics")

@@ -20,6 +20,7 @@ export type TreeNode = {
   stageRunId: string | null;
   version: number;
   updatedByName: string;
+  confidence: string | null;
 };
 export type TreeEdge = { id: string; from: string; to: string };
 export type RunStep = {
@@ -73,7 +74,7 @@ export async function loadTree(client: Client, projectId: string): Promise<Proje
     client
       .from("nodes")
       .select(
-        "id, type, stage, title, data, status, stale, low_specificity, provenance, model, sort_order, created_at, stage_run_id, version, editor:members!nodes_updated_by_members_id_fk(display_name, email)",
+        "id, type, stage, title, data, status, stale, low_specificity, provenance, model, sort_order, created_at, stage_run_id, version, confidence, editor:members!nodes_updated_by_members_id_fk(display_name, email)",
       )
       .eq("project_id", projectId)
       .is("deleted_at", null),
@@ -124,6 +125,7 @@ export async function loadTree(client: Client, projectId: string): Promise<Proje
       createdAt: n.created_at,
       stageRunId: n.stage_run_id,
       version: n.version,
+      confidence: n.confidence,
       updatedByName: (() => {
         const e = Array.isArray(n.editor) ? n.editor[0] : n.editor;
         return e?.display_name || e?.email || "";

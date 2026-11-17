@@ -18,6 +18,9 @@ export function ProjectCanvasScreen({ tree }: { tree: ProjectTree }) {
         reorderNodes: canvasActions.reorderNodes,
         getNodeHistory: canvasActions.getNodeHistory,
         updateNode: canvasActions.updateNode,
+        approveResearch: canvasActions.approveResearch,
+        sendBackResearch: canvasActions.sendBackResearch,
+        retryResearch: canvasActions.retryResearch,
         addSource: {
           addLink: (url, title) =>
             canvasActions.addSource({ kind: "link", projectId, url, title: title || undefined }),

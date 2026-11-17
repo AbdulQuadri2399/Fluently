@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import type { RunInfo, TreeNode } from "@/lib/canvas/load";
 import { cn } from "@/lib/utils";
 import { canvasCopy as c } from "./copy";
+import { ResearchCheckpoint, type OpportunityOption } from "./ResearchCheckpoint";
 
 export type BarState =
   | { kind: "intakeFirst" }
@@ -19,7 +20,9 @@ export type BarState =
   | { kind: "partial"; run: RunInfo }
   | { kind: "failed"; run: RunInfo }
   | { kind: "cancelled"; run: RunInfo }
-  | { kind: "researchDone" };
+  | { kind: "researchDone" }
+  | { kind: "choose"; run: RunInfo; partial: boolean }
+  | { kind: "solutionsNext" };
 
 /** Works out what the decision bar should say from the project's state (SCR8). */
 export function barState(input: {
@@ -35,10 +38,15 @@ export function barState(input: {
   if (run && (run.status === "queued" || run.status === "running")) {
     return run.stage === "ethics" ? { kind: "ethicsRunning" } : { kind: "running", run };
   }
+  if (input.currentStage === "solutions") return { kind: "solutionsNext" };
   const ethics = input.nodes.find((n) => n.type === "ethics");
   if (!ethics || ethics.status === "failed") return { kind: "ethicsFailed" };
   if (ethics.status === "flagged") return { kind: "ethicsWaiting" };
   if (run?.stage === "research") {
+    const hasOpportunities = input.nodes.some((n) => n.type === "opportunity");
+    if ((run.status === "succeeded" || run.status === "partial") && hasOpportunities) {
+      return { kind: "choose", run, partial: run.status === "partial" };
+    }
     if (run.status === "succeeded") return { kind: "researchDone" };
     if (run.status === "partial") return { kind: "partial", run };
     if (run.status === "failed") return { kind: "failed", run };
@@ -62,11 +70,21 @@ export function CheckpointBar({
   state,
   onStart,
   onCancel,
+  opportunities = [],
+  hasFindings = false,
+  onApprove,
+  onSendBack,
+  onRetry,
 }: {
   projectId: string;
   state: BarState;
   onStart: () => Promise<void>;
   onCancel: (runId: string) => Promise<void>;
+  opportunities?: OpportunityOption[];
+  hasFindings?: boolean;
+  onApprove?: (selection: string[]) => Promise<boolean>;
+  onSendBack?: (feedback: string, replaceHuman: boolean) => Promise<boolean>;
+  onRetry?: (runId: string, synthesisOnly: boolean) => Promise<void>;
 }) {
   const [collapsed, setCollapsed] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -99,6 +117,27 @@ export function CheckpointBar({
       onClick={async () => {
         setBusy(true);
         await onStart();
+        setBusy(false);
+      }}
+    >
+      {label}
+    </Button>
+  );
+
+  const retryButton = (
+    runId: string,
+    synthesisOnly: boolean,
+    label: string,
+    variant: "primary" | "secondary" = "primary",
+  ) => (
+    <Button
+      key={label}
+      variant={variant}
+      loading={busy}
+      loadingLabel={c.checkpoint.starting}
+      onClick={async () => {
+        setBusy(true);
+        await onRetry?.(runId, synthesisOnly);
         setBusy(false);
       }}
     >
@@ -169,12 +208,28 @@ export function CheckpointBar({
           .join(", "),
       );
       steps = state.run.steps;
-      action = start(c.checkpoint.retry);
+      action = retryButton(state.run.id, false, c.checkpoint.retryFailed);
       break;
     case "failed":
       message = c.checkpoint.failed(stageNames[state.run.stage] ?? state.run.stage);
       steps = state.run.steps;
-      action = start(c.checkpoint.retry);
+      action =
+        state.run.stage === "research" && onRetry ? (
+          <span className="flex gap-2">
+            {hasFindings
+              ? retryButton(state.run.id, true, c.checkpoint.retrySynthesis, "secondary")
+              : null}
+            {retryButton(state.run.id, false, c.checkpoint.retry)}
+          </span>
+        ) : (
+          start(c.checkpoint.retry)
+        );
+      break;
+    case "solutionsNext":
+      message = c.checkpoint.solutionsNext;
+      break;
+    case "choose":
+      message = "";
       break;
     case "cancelled":
       message = c.checkpoint.cancelled(stageNames[state.run.stage] ?? state.run.stage);
@@ -199,7 +254,29 @@ export function CheckpointBar({
       aria-label={c.checkpoint.expand}
       className="absolute bottom-4 left-1/2 z-10 grid w-[780px] max-w-[calc(100%-2rem)] -translate-x-1/2 gap-3 rounded-[10px] border border-line bg-surface p-4 shadow-elev-1 duration-base animate-in fade-in-0"
     >
-      <div className="flex items-center gap-4">
+      {state.kind === "choose" && onApprove && onSendBack ? (
+        <ResearchCheckpoint
+          opportunities={opportunities}
+          note={
+            state.partial ? (
+              <div className="flex items-center gap-3 rounded-sm bg-warn-bg px-3 py-2 text-small text-warn">
+                <span className="flex-1">
+                  {c.checkpoint.partialFail(
+                    state.run.steps
+                      .filter((s) => s.status === "failed")
+                      .map((s) => c.researchSteps[s.key] ?? s.key)
+                      .join(", "),
+                  )}
+                </span>
+                {retryButton(state.run.id, false, c.checkpoint.retryFailed, "secondary")}
+              </div>
+            ) : null
+          }
+          onApprove={onApprove}
+          onSendBack={onSendBack}
+        />
+      ) : null}
+      <div className={cn("flex items-center gap-4", state.kind === "choose" && "hidden")}>
         <p aria-live="polite" className="flex-1 text-small">
           {state.kind === "ethicsRunning" || state.kind === "running" ? (
             <span

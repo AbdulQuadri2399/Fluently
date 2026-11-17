@@ -20,6 +20,20 @@ export type CanvasActions = {
   reorderNodes: (projectId: string, ids: string[]) => Promise<ActionResult>;
   getNodeHistory: (nodeId: string) => Promise<HistoryItem[]>;
   addSource?: AddSourceFns;
+  approveResearch?: (
+    projectId: string,
+    selection: string[],
+  ) => Promise<ActionResult<{ checkpointId: string }>>;
+  sendBackResearch?: (
+    projectId: string,
+    feedback: string,
+    replaceHuman: boolean,
+  ) => Promise<ActionResult<{ stageRunId: string }>>;
+  retryResearch?: (
+    projectId: string,
+    runId: string,
+    synthesisOnly: boolean,
+  ) => Promise<ActionResult<{ stageRunId: string }>>;
   updateNode: (
     projectId: string,
     input: { nodeId: string; title: string; body: string | null; version: number },
@@ -51,6 +65,18 @@ export function ProjectCanvas({ tree, actions }: { tree: ProjectTree; actions: C
 
   const selected = tree.nodes.find((n) => n.id === selectedId) ?? null;
   const [adding, setAdding] = useState(false);
+  const opportunities = tree.nodes
+    .filter((n) => n.type === "opportunity")
+    .sort((a, b) => a.sortOrder - b.sortOrder)
+    .map((o) => ({
+      id: o.id,
+      title: o.title,
+      confidence: (o.confidence as "High" | "Med" | "Low" | null) ?? null,
+      themes: tree.edges.filter(
+        (e) => e.to === o.id && tree.nodes.find((n) => n.id === e.from)?.type === "theme",
+      ).length,
+      principles: ((o.data as { principles?: string[] }).principles ?? []).slice(0, 3),
+    }));
   const ethicsRunning = Boolean(run && run.stage === "ethics" && active);
   const state = barState({
     intakeApproved: tree.intakeApproved,
@@ -150,6 +176,34 @@ export function ProjectCanvas({ tree, actions }: { tree: ProjectTree; actions: C
           await actions.cancelStage(tree.project.id, runId);
           router.refresh();
         }}
+        opportunities={opportunities}
+        hasFindings={tree.nodes.some((n) => n.type === "finding")}
+        onApprove={
+          actions.approveResearch
+            ? async (selection) => {
+                const res = await actions.approveResearch!(tree.project.id, selection);
+                router.refresh();
+                return res.ok;
+              }
+            : undefined
+        }
+        onSendBack={
+          actions.sendBackResearch
+            ? async (feedback, replace) => {
+                const res = await actions.sendBackResearch!(tree.project.id, feedback, replace);
+                router.refresh();
+                return res.ok;
+              }
+            : undefined
+        }
+        onRetry={
+          actions.retryResearch
+            ? async (runId, synthesisOnly) => {
+                await actions.retryResearch!(tree.project.id, runId, synthesisOnly);
+                router.refresh();
+              }
+            : undefined
+        }
       />
     </div>
   );

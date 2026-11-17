@@ -65,12 +65,18 @@ export type ResearchDeps = {
   backoffMs?: number[];
 };
 
+export const FAKE_FAIL_PAPERS = "#fail-papers";
+
 export function fakeResearchDeps(
   ai: AiClient = new FakeAiClient(async () => undefined),
 ): ResearchDeps {
   return {
     ai,
-    papers: () => fakeSearchPapers(),
+    // Fake mode only: a brief containing FAKE_FAIL_PAPERS makes the papers step fail (FF5 demos and tests).
+    papers: async (query) => {
+      if (query.includes(FAKE_FAIL_PAPERS)) throw new Error("made-up failure");
+      return fakeSearchPapers();
+    },
     web: (step) => fakeWebSearch(step),
     backoffMs: [0, 0],
   };
@@ -492,7 +498,7 @@ export async function runResearch(
       .update({ deleted_at: new Date(now()).toISOString() })
       .eq("project_id", projectId)
       .in("type", ["finding", "theme", "opportunity", "gap"])
-      .eq("provenance", "ai")
+      .in("provenance", run.replace_human ? ["ai", "ai_edited", "human"] : ["ai"])
       .is("deleted_at", null);
     const stanceOf = new Map(out.findings.map((f) => [f.text, f.stance]));
     const byHandle = new Map((allSources ?? []).map((s) => [s.handle, s]));
@@ -585,7 +591,7 @@ export async function runResearch(
         step: "synthesis",
         system:
           "Group the findings into themes (by index), then up to 8 opportunities (by theme index), each with candidate principles chosen only from the listed toolkit keys. For opportunities with weak or conflicting evidence, give the open question and a method from the listed services or 'Desk research'. List principles from sources that aren't in the toolkit as external principles.",
-        prompt: `Brief: ${brief}\n\nFindings:\n${findingNodes.map((f, i) => `${i}. ${f.text} [${f.handles.join(", ") || "AI inference"}]`).join("\n")}\n\nToolkit keys: ${principleKeys.join(", ")}\nServices: ${services.join(", ")}`,
+        prompt: `Brief: ${brief}${run.feedback ? `\n\nThe team sent this back with feedback: ${run.feedback}` : ""}\n\nFindings:\n${findingNodes.map((f, i) => `${i}. ${f.text} [${f.handles.join(", ") || "AI inference"}]`).join("\n")}\n\nToolkit keys: ${principleKeys.join(", ")}\nServices: ${services.join(", ")}`,
         schema: synthesisSchema,
         settings,
         input: {
