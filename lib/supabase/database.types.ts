@@ -616,6 +616,9 @@ isOneToOne: false
             "allowed_workspace_for":
 { Args: { "email": string }; Returns: string
                            },
+"approve_objectives":
+{ Args: { "p_project": string }; Returns: string
+                           },
 "can_access_upload":
 { Args: { "object_name": string }; Returns: boolean
                            },
@@ -627,6 +630,9 @@ isOneToOne: false
                            },
 "is_member":
 { Args: { "ws": string }; Returns: boolean
+                           },
+"record_override":
+{ Args: { "p_node": string,"p_reason": string }; Returns: string
                            },
 "save_toolkit_version":
 { Args: { "p_file_name": string,"p_principles": Json,"p_relations": Json,"p_warnings": Json }; Returns: {
