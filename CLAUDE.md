@@ -21,6 +21,7 @@ Next.js 16 App Router (`proxy.ts` replaces middleware; Cache Components off, D21
 - Integration + RLS tests (needs local Supabase): `pnpm test:int`
 - End-to-end: `pnpm test:e2e -- --trace off` (builds and serves on port 3100)
 - Bootstrap admin for a new environment: `pnpm tsx scripts/set-bootstrap-admin.ts`
+- Deploy the prototype: `vercel deploy --prod` (project `fluently`, team `cowry-test-10`; live at https://fluently-psi.vercel.app). Apply new migrations to the hosted database before deploying code that needs them (see 04 D25).
 - Seeded accounts: `admin@fluently.test` / `member@fluently.test`, password `password-dev-123`
 
 ## Talking to the user

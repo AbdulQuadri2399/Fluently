@@ -1,0 +1,10 @@
+.env*
+!.env.example
+node_modules
+.next
+supabase/.temp
+supabase/.branches
+test-results
+playwright-report
+e2e/screenshots
+results.sarif
