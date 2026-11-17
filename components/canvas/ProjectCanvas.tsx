@@ -3,6 +3,7 @@
 import { ListIcon, TreeStructureIcon } from "@phosphor-icons/react/dist/ssr";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
+import { toast } from "sonner";
 import { useRealtimeProject } from "@/hooks/useRealtimeProject";
 import type { ActionResult } from "@/lib/actions/result";
 import type { ProjectTree } from "@/lib/canvas/load";
@@ -36,9 +37,10 @@ export function ProjectCanvas({ tree, actions }: { tree: ProjectTree; actions: C
       if (value) next.set(key, value);
       else next.delete(key);
       const qs = next.toString();
-      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+      // Only the address changes; Next keeps useSearchParams in step without a server round trip.
+      window.history.replaceState(null, "", qs ? `${pathname}?${qs}` : pathname);
     },
-    [params, pathname, router],
+    [params, pathname],
   );
 
   const selected = tree.nodes.find((n) => n.id === selectedId) ?? null;
@@ -92,6 +94,7 @@ export function ProjectCanvas({ tree, actions }: { tree: ProjectTree; actions: C
           running={ethicsRunning}
           selectedId={selectedId}
           onSelect={(id) => setParam("node", id)}
+          onAddCard={() => toast(c.addCardLater)}
           onReorder={(_, ids) =>
             void actions.reorderNodes(tree.project.id, ids).then(() => router.refresh())
           }

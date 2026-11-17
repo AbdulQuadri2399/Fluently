@@ -181,4 +181,59 @@ describe("SCR5 canvas", () => {
     expect(screen.getByTestId("card-s2")).not.toHaveClass("slide-in-from-bottom-2");
     reduced.value = false;
   });
+
+  it("each lane name has a + to add a card (AC22.12)", async () => {
+    const onAddCard = vi.fn();
+    render(
+      <div style={{ width: 1200, height: 800 }}>
+        <TreeCanvas
+          nodes={tree("new")}
+          edges={[]}
+          running={false}
+          selectedId={null}
+          onSelect={() => undefined}
+          onAddCard={onAddCard}
+        />
+      </div>,
+    );
+    for (const lane of [
+      "Objectives",
+      "Evidence",
+      "Themes",
+      "Opportunities",
+      "Solutions",
+      "Wireframes",
+      "Tests",
+    ]) {
+      expect(screen.getByRole("button", { name: c.addCard(lane) })).toBeInTheDocument();
+    }
+    screen.getByRole("button", { name: c.addCard("Themes") }).click();
+    expect(onAddCard).toHaveBeenCalledWith("themes");
+  });
+
+  it("the grouped Evidence card summarises its sources", () => {
+    const groups = [
+      { key: "papers", title: "Academic papers", count: 12, status: "done" },
+      { key: "web", title: "Web and market", count: 8, status: "running" },
+    ];
+    const { unmount } = render(
+      <CardBody
+        node={node({ type: "source", title: "Research sources", data: { groups } })}
+        running={false}
+      />,
+    );
+    expect(screen.getByText(c.sourcesCollecting(1, 2))).toBeInTheDocument();
+    unmount();
+    render(
+      <CardBody
+        node={node({
+          type: "source",
+          title: "Research sources",
+          data: { groups: groups.map((g) => ({ ...g, status: "done" })) },
+        })}
+        running={false}
+      />,
+    );
+    expect(screen.getByText(c.sourcesSummary(20, 2))).toBeInTheDocument();
+  });
 });

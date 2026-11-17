@@ -46,7 +46,10 @@ export function Inspector({
     .filter((e) => e.from === node.id || e.to === node.id)
     .map((e) => byId.get(e.from === node.id ? e.to : e.from))
     .filter((n): n is TreeNode => Boolean(n));
-  const data = node.data as { reasons?: { rule: string; reason: string }[] };
+  const data = node.data as {
+    reasons?: { rule: string; reason: string }[];
+    groups?: { key: string; title: string; count: number; status: string }[];
+  };
   const locked =
     node.status === "running" || (runningStage !== null && node.stage === runningStage);
   const props: [string, string][] = [
@@ -104,6 +107,18 @@ export function Inspector({
           {data.reasons.map((r, i) => (
             <li key={i}>
               <span className="font-medium">{r.rule}.</span> {r.reason}
+            </li>
+          ))}
+        </ul>
+      ) : null}
+      {data.groups?.length ? (
+        <ul className="grid gap-1.5 rounded-md bg-soft p-3 text-small">
+          {data.groups.map((g) => (
+            <li key={g.key} className="flex justify-between gap-3">
+              <span>{g.title}</span>
+              <span className="font-mono text-[12.5px] text-muted">
+                {g.status === "done" ? g.count : (c.stepStatus[g.status] ?? g.status)}
+              </span>
             </li>
           ))}
         </ul>

@@ -67,14 +67,73 @@ export async function runResearch(
     .eq("type", "objective")
     .is("deleted_at", null);
 
-  for (const step of steps) {
+  // One Evidence card for the whole run (03b: sources fold into one Evidence card). Each step
+  // fills in its group as it finishes; a re-run reuses the same card.
+  type Group = { key: string; title: string; count: number; status: Step["status"] };
+  const groups: Group[] = steps.map((s) => ({
+    key: s.key,
+    title: STEP_TITLES[s.key] ?? s.key,
+    count: s.count ?? 0,
+    status: s.status,
+  }));
+  const cardData = () => ({ groups, note: "Made-up results for the prototype." });
+  const { data: existing } = await db
+    .from("nodes")
+    .select("id")
+    .eq("project_id", run.project_id)
+    .eq("type", "source")
+    .eq("stage", "research")
+    .is("deleted_at", null)
+    .limit(1)
+    .maybeSingle();
+  let cardId = existing?.id ?? null;
+  if (cardId) {
+    await db
+      .from("nodes")
+      .update({ data: cardData(), stage_run_id: runId, stale: false })
+      .eq("id", cardId);
+  } else {
+    const { data: card } = await db
+      .from("nodes")
+      .insert({
+        workspace_id: run.workspace_id,
+        project_id: run.project_id,
+        type: "source",
+        stage: "research",
+        title: "Research sources",
+        data: cardData(),
+        provenance: "ai",
+        stage_run_id: runId,
+        sort_order: 0,
+        created_by: run.started_by,
+      })
+      .select("id")
+      .single();
+    cardId = card?.id ?? null;
+    if (cardId && objectives?.length) {
+      await db.from("edges").insert(
+        objectives.map((o) => ({
+          workspace_id: run.workspace_id,
+          project_id: run.project_id,
+          from_id: o.id,
+          to_id: cardId!,
+        })),
+      );
+    }
+  }
+  const saveCard = () =>
+    cardId ? db.from("nodes").update({ data: cardData() }).eq("id", cardId) : Promise.resolve();
+
+  for (const [i, step] of steps.entries()) {
     if (step.status === "done") continue;
     const { data: latest } = await db.from("stage_runs").select("status").eq("id", runId).single();
     if (latest?.status === "cancelled") return finish("cancelled");
     if (now() - started > RUN_TIMEOUT_MS) return finish("failed", "timeout");
 
     step.status = "running";
+    groups[i]!.status = "running";
     await save();
+    await saveCard();
     if (opts.stepDelayMs) await new Promise((r) => setTimeout(r, opts.stepDelayMs));
 
     let count = FAKE_COUNTS[step.key] ?? 0;
@@ -86,35 +145,11 @@ export async function runResearch(
         .eq("kind", "client_data");
       count = files ?? 0;
     }
-    const { data: card } = await db
-      .from("nodes")
-      .insert({
-        workspace_id: run.workspace_id,
-        project_id: run.project_id,
-        type: "source",
-        stage: "research",
-        title: `${STEP_TITLES[step.key]} · ${count} found`,
-        data: { step: step.key, count, note: "Made-up result for the prototype." },
-        provenance: "ai",
-        stage_run_id: runId,
-        sort_order: steps.indexOf(step),
-        created_by: run.started_by,
-      })
-      .select("id")
-      .single();
-    if (card && objectives?.length) {
-      await db.from("edges").insert(
-        objectives.map((o) => ({
-          workspace_id: run.workspace_id,
-          project_id: run.project_id,
-          from_id: o.id,
-          to_id: card.id,
-        })),
-      );
-    }
     step.status = "done";
     step.count = count;
+    groups[i] = { ...groups[i]!, status: "done", count };
     await save();
+    await saveCard();
   }
   return finish("succeeded");
 }

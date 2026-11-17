@@ -598,6 +598,8 @@ Format: user action → system response → resulting state (ACs).
 | project.tabs | "Canvas" / "Brief" / "Report" (03 section 1 said "Intake"; "Brief" matches the rest of the app) |
 | project.cost | "£{spent} of £{cap} AI budget" |
 | canvas.toolbar | "Fit to screen" / "Zoom in" / "Zoom out" / "List view" / "Canvas view" |
+| card.sources | "Research sources" (title) / "{n} sources across {k} kinds" / "Collecting sources · {done} of {k} kinds" |
+| canvas.addCardLater | "Adding cards by hand comes with editing, in a later build step." (prototype only, shown when + is pressed) |
 | card.types | "Objective" / "Current assets" / "Ethics check" / "Source" / "Finding" / "Theme" / "Opportunity" / "Gap" / "Solution" / "Wireframe" / "Annotation" / "Test plan" / "Override" / "Reference" |
 | card.ethicsStatus | "Passed" / "Flagged · {n} rules" / "Checking…" / "Didn't run" / "Overridden" |
 | card.markers | "Out of date" / "Low specificity" / "Failed" / "Running" / "Flagged" / "Overridden" |

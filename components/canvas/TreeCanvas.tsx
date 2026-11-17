@@ -49,10 +49,17 @@ type Props = {
   selectedId: string | null;
   onSelect: (id: string | null) => void;
   onReorder?: (id: string, laneOrder: string[]) => void;
+  onAddCard?: (lane: Lane) => void;
 };
 
 /** Lane names stay pinned at the top while the canvas pans (AC22.12). */
-function LaneStrip({ viewport }: { viewport: Viewport }) {
+function LaneStrip({
+  viewport,
+  onAddCard,
+}: {
+  viewport: Viewport;
+  onAddCard?: (lane: Lane) => void;
+}) {
   return (
     <div
       data-testid="lane-strip"
@@ -65,6 +72,15 @@ function LaneStrip({ viewport }: { viewport: Viewport }) {
           style={{ left: laneX(lane) * viewport.zoom + viewport.x, width: LANE_W * viewport.zoom }}
         >
           <span className="truncate">{laneNames[lane]}</span>
+          <button
+            type="button"
+            aria-label={c.addCard(laneNames[lane]!)}
+            title={c.addCard(laneNames[lane]!)}
+            onClick={() => onAddCard?.(lane)}
+            className="pointer-events-auto ml-auto grid size-6 shrink-0 place-items-center rounded-xs text-muted hover:bg-soft hover:text-ink"
+          >
+            <PlusIcon aria-hidden="true" className="size-3.5" />
+          </button>
         </div>
       ))}
     </div>
@@ -100,10 +116,12 @@ function Toolbar() {
   );
 }
 
-function Canvas({ nodes, edges, running, selectedId, onSelect, onReorder }: Props) {
+function Canvas({ nodes, edges, running, selectedId, onSelect, onReorder, onAddCard }: Props) {
   const rf = useReactFlow();
   const [viewport, setViewport] = useState<Viewport>({ x: 24, y: 0, zoom: 1 });
   const [dragged, setDragged] = useState<Record<string, number>>({});
+  // The canvas measures each card and reports its size; cards passed back without it are hidden.
+  const [sizes, setSizes] = useState<Record<string, { width: number; height: number }>>({});
 
   const placed = useMemo(
     () =>
@@ -143,6 +161,7 @@ function Canvas({ nodes, edges, running, selectedId, onSelect, onReorder }: Prop
       selectable: false,
       focusable: false,
       zIndex: -1,
+      ...(sizes[`lane-${lane}`] ? { measured: sizes[`lane-${lane}`] } : {}),
     }));
     const byId = new Map(nodes.map((n) => [n.id, n]));
     const cards: Node<CardData>[] = placed.map((p) => {
@@ -160,10 +179,11 @@ function Canvas({ nodes, edges, running, selectedId, onSelect, onReorder }: Prop
         },
         selected: p.id === selectedId,
         ariaLabel: byId.get(p.id)!.title,
+        ...(sizes[p.id] ? { measured: sizes[p.id] } : {}),
       };
     });
     return [...lanes, ...cards];
-  }, [placed, nodes, running, selectedId, dragged, fresh, laneHeight]);
+  }, [placed, nodes, running, selectedId, dragged, fresh, laneHeight, sizes]);
 
   // Lines run between lanes; cards in the same lane (objectives → ethics) sit one under the other.
   const flowEdges: Edge[] = useMemo(() => {
@@ -183,11 +203,14 @@ function Canvas({ nodes, edges, running, selectedId, onSelect, onReorder }: Prop
   // D24: cards move only up and down inside their lane.
   const onNodesChange = useCallback((changes: NodeChangeset) => {
     const next: Record<string, number> = {};
+    const measured: Record<string, { width: number; height: number }> = {};
     for (const ch of changes.toArray()) {
       if (ch.type === "position" && ch.position && !ch.id.startsWith("lane-"))
         next[ch.id] = Math.max(TOP, ch.position.y);
+      if (ch.type === "dimensions" && ch.dimensions) measured[ch.id] = ch.dimensions;
     }
     if (Object.keys(next).length) setDragged((d) => ({ ...d, ...next }));
+    if (Object.keys(measured).length) setSizes((d) => ({ ...d, ...measured }));
   }, []);
 
   const onDragStop = useCallback(
@@ -236,7 +259,7 @@ function Canvas({ nodes, edges, running, selectedId, onSelect, onReorder }: Prop
 
   return (
     <div className="relative h-full w-full" onKeyDownCapture={onKeyDown}>
-      <LaneStrip viewport={viewport} />
+      <LaneStrip viewport={viewport} onAddCard={onAddCard} />
       <ReactFlow
         nodes={flowNodes}
         edges={flowEdges}
@@ -248,6 +271,11 @@ function Canvas({ nodes, edges, running, selectedId, onSelect, onReorder }: Prop
         onPaneClick={() => onSelect(null)}
         onViewportChange={setViewport}
         defaultViewport={{ x: 24, y: 44, zoom: 1 }}
+        // The canvas can't be moved further than the tree's edges, so cards never leave the view.
+        translateExtent={[
+          [-160, -80],
+          [laneX("tests") + LANE_W + 160, laneHeight + 160],
+        ]}
         minZoom={0.25}
         maxZoom={2}
         nodesConnectable={false}

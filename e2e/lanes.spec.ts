@@ -54,4 +54,27 @@ test.describe("Lanes (AC22.8, D24)", () => {
       (await box(page, "Upload ID on day one")).y,
     );
   });
+
+  test("dragging the background can't push the cards out of view", async ({ page }) => {
+    await open(page);
+    await ready(page);
+    // Drag on the empty part of the Objectives lane, far up and to the right.
+    await page.mouse.move(400, 650);
+    await page.mouse.down();
+    await page.mouse.move(1200, 80, { steps: 15 });
+    await page.mouse.up();
+    const inView = await page.evaluate(
+      () =>
+        [...document.querySelectorAll(".react-flow__node-card")].filter((n) => {
+          const r = n.getBoundingClientRect();
+          return (
+            r.right > 240 &&
+            r.left < window.innerWidth &&
+            r.bottom > 110 &&
+            r.top < window.innerHeight
+          );
+        }).length,
+    );
+    expect(inView).toBeGreaterThan(0);
+  });
 });

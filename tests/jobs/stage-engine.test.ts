@@ -49,10 +49,21 @@ describe("stage engine", () => {
     expect(await runResearch(db, res.data.stageRunId)).toBe("succeeded");
     const cards = await admin.client
       .from("nodes")
-      .select("title")
+      .select("title, data")
       .eq("project_id", projectId)
       .eq("type", "source");
-    expect(cards.data).toHaveLength(5);
+    expect(cards.data).toHaveLength(1);
+    const groups = (cards.data![0]!.data as { groups: { key: string; status: string }[] }).groups;
+    expect(groups.map((g) => g.key)).toEqual([
+      "client_data",
+      "papers",
+      "web",
+      "competitors",
+      "reviews",
+    ]);
+    expect(groups.every((g) => g.status === "done")).toBe(true);
+    const lines = await admin.client.from("edges").select("id").eq("project_id", projectId);
+    expect(lines.data!.length).toBe(4); // 2 objectives → ethics, 2 objectives → the Evidence card
     const after = await admin.client
       .from("projects")
       .select("status, current_stage")

@@ -38,7 +38,15 @@ export function cardView(n: TreeNode, running: boolean) {
     const count = (n.data as { count?: number }).count ?? 0;
     status = count === 1 ? "1 asset" : `${count} assets`;
   } else if (n.type === "source") {
-    status = data.note ?? status;
+    const groups = (n.data as { groups?: { count: number; status: string }[] }).groups;
+    if (groups) {
+      const total = groups.reduce((sum, g) => sum + (g.count ?? 0), 0);
+      const done = groups.filter((g) => g.status === "done").length;
+      status =
+        done < groups.length
+          ? c.sourcesCollecting(done, groups.length)
+          : c.sourcesSummary(total, groups.length);
+    } else status = data.note ?? status;
   }
   const markers: Marker[] = [];
   if (n.stale) markers.push({ kind: "stale", label: c.markers.stale });

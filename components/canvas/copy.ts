@@ -36,6 +36,10 @@ export const canvasCopy = {
   listView: "List view",
   canvasView: "Canvas view",
   addCard: (lane: string) => `Add a card to ${lane}`,
+  sourcesSummary: (n: number, kinds: number) =>
+    `${n} ${n === 1 ? "source" : "sources"} across ${kinds} kinds`,
+  sourcesCollecting: (done: number, of: number) => `Collecting sources · ${done} of ${of} kinds`,
+  addCardLater: "Adding cards by hand comes with editing, in a later build step.",
   intakeFirst: "Start with the intake. Your objectives will appear here.",
   lockedWhileRunning: (stage: string) =>
     `This is being worked on right now. You can edit it once ${stage} finishes.`,

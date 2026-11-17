@@ -52,12 +52,15 @@ test("SCR5 tree: brief → ethics → canvas → research runs live → list vie
   await page.getByRole("button", { name: "Start research" }).click();
   await expect(page.getByText(/Research is running/)).toBeVisible({ timeout: 10000 });
   await shoot(page, "SCR8-running");
-  await expect(page.getByText("Academic papers · 12 found")).toBeVisible({ timeout: 15000 });
+  await expect(page.getByText("Research sources")).toBeVisible({ timeout: 15000 });
   await expect(page.getByText(/Research finished/)).toBeVisible({ timeout: 20000 });
 
   // Details panel via click; list view toggle.
-  await page.getByText("Academic papers · 12 found").click();
-  await expect(page.getByRole("complementary", { name: "Source" })).toBeVisible();
+  await expect(page.getByText("47 sources across 5 kinds")).toBeVisible();
+  await page.getByText("Research sources").click();
+  const details = page.getByRole("complementary", { name: "Source" });
+  await expect(details).toBeVisible();
+  await expect(details.getByText("Academic papers")).toBeVisible();
   await expect(page).toHaveURL(/node=/);
   await shoot(page, "SCR7-default");
   await page.getByRole("button", { name: "List view" }).click();
