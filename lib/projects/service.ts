@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { fail, ok, type ActionResult } from "@/lib/actions/result";
+import { logEvent } from "@/lib/events/log";
 import type { Database } from "@/lib/supabase/database.types";
 import {
   createProjectSchema,
@@ -64,6 +65,11 @@ export async function createProject(
     .select("id")
     .single();
   if (error || !data) return fail("unavailable");
+  await logEvent(client, me, "project_created", {
+    project_id: data.id,
+    mode: parsed.data.mode,
+    channel: parsed.data.channel,
+  });
   return ok({ id: data.id });
 }
 
