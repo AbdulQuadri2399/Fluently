@@ -83,7 +83,7 @@ Slice check: suite green; a member account can't see admin controls (e2e `e2e/se
 Goal: an admin can upload the toolkit as a validated, versioned, read-only snapshot.
 You'll be able to see: Toolkit page with upload, preview (errors and warnings), saved versions.
 
-- [ ] T3.1 `fixtures/toolkit/sample-toolkit.csv` and `.json`: 30 invented principles, all supported columns, incl. rows with "No source", related principles (one unknown), both Sense columns; plus `bad-missing-id.csv`, `bad-duplicate-id.csv`, `bad-missing-columns.csv` — S — Refs: NFR9 — Depends on: —
+- [x] T3.1 `fixtures/toolkit/sample-toolkit.csv` and `.json`: 30 invented principles, all supported columns, incl. rows with "No source", related principles (one unknown), both Sense columns; plus `bad-missing-id.csv`, `bad-duplicate-id.csv`, `bad-missing-columns.csv` — S — Refs: NFR9 — Depends on: —
   Done when: files exist; `scripts/check-toolkit-fixture.sh` passes.
 - [ ] T3.2 Migration: `toolkit_versions`, `principles`, `principle_relations`, `toolkit_candidates` + RLS (no update/delete policies) — S — Refs: AC4.8 — Depends on: T0.3
   Done when: `tests/rls/toolkit.test.ts` passes: member reads; member insert refused; admin update/delete refused.
