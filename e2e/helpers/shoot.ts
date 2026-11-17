@@ -8,12 +8,16 @@ const THEMES = ["light", "dark"] as const;
  * Saves e2e/screenshots/<name>-<theme>-<width>.png for each theme and width,
  * for comparison with the matching 03b §5 row. Restores the original viewport.
  */
-export async function shoot(page: Page, name: string): Promise<string[]> {
+export async function shoot(
+  page: Page,
+  name: string,
+  opts: { widths?: readonly number[] } = {},
+): Promise<string[]> {
   const original = page.viewportSize();
   const files: string[] = [];
   for (const theme of THEMES) {
     await page.emulateMedia({ colorScheme: theme });
-    for (const width of WIDTHS) {
+    for (const width of opts.widths ?? WIDTHS) {
       await page.setViewportSize({ width, height: 800 });
       const file = `e2e/screenshots/${name}-${theme}-${width}.png`;
       await page.screenshot({ path: file, fullPage: true });
