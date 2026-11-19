@@ -2,7 +2,7 @@
 export const reportCopy = {
   title: "Audit Report",
   notYet: "The Audit Report appears once research finishes.",
-  hasStale: "Some parts of this report are out of date. Regenerate them on the canvas.",
+  hasStale: "Some parts of this report are out of date. Update them on the canvas.",
   goToCanvas: "Go to canvas",
   sections: {
     summary: "Summary",

@@ -48,7 +48,9 @@ test("Slice 8: trace, add, connect, delete with undo, merge, regenerate stale (A
   await themePanel.getByRole("button", { name: "Connect", exact: true }).click();
   await expect(page.getByText("Connected.")).toBeVisible();
   await expect(card(page, "Make the ID step feel shorter").getByText("Out of date")).toBeVisible();
-  await expect(page.getByRole("button", { name: /^Regenerate stale \(\d+\)$/ })).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: /^Update out-of-date cards \(\d+\)$/ }),
+  ).toBeVisible();
 
   // Removing the only link a theme has is refused.
   await themePanel.getByRole("button", { name: /^Remove connection: Every extra step/ }).click();

@@ -95,12 +95,12 @@ export const canvasCopy = {
     locked: (stage: string) =>
       `This is being worked on right now. You can edit it once ${stage} finishes.`,
     saveFailed: "Couldn't save. Check your connection and try again.",
-    staleRegenerate: (n: number) => `Regenerate stale (${n})`,
-    staleTitle: "Regenerate out-of-date cards",
+    staleRegenerate: (n: number) => `Update out-of-date cards (${n})`,
+    staleTitle: "Update out-of-date cards",
     staleBody:
-      "Research analysis runs again from the sources you have. Cards people added or edited are kept.",
-    staleFeedback: "Regenerate the cards that are out of date after recent changes.",
-    staleConfirm: "Regenerate",
+      "Fluently will redo the analysis from the sources it already has. Anything people added or edited stays as it is.",
+    staleFeedback: "Update the cards that are out of date after recent changes.",
+    staleConfirm: "Update",
   },
   trace: {
     button: "Trace",
@@ -283,7 +283,7 @@ export const canvasCopy = {
     sendBackSubmit: "Send back",
     sending: "Sending…",
     retryFailed: "Retry failed steps",
-    retrySynthesis: "Retry synthesis",
+    retrySynthesis: "Retry themes and opportunities",
     themesCount: (n: number) => `${n} ${n === 1 ? "theme" : "themes"}`,
     confidenceLabel: (level: string) => `${level} confidence`,
     solutionsNext: "Opportunities chosen. Solutions arrive in a later build step.",

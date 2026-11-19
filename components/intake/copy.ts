@@ -66,7 +66,7 @@ export const intakeCopy = {
   editBrief: "Edit brief",
   goToCanvas: "Go to canvas",
   editWarnsStale:
-    "Changing the brief will mark everything built from it as out of date. You can regenerate those parts afterwards.",
+    "Changing the brief will mark everything built from it as out of date. You can update those parts afterwards.",
   editConfirm: "Edit anyway",
   cancel: "Cancel",
 } as const;

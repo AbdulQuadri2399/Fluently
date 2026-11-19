@@ -99,7 +99,7 @@ Copy keys in `[brackets]` are written out in §7.
 | Stage partially failed | SCR8 `[stage.partialFail]` listing failed steps | *Retry failed steps*, continue |
 | Stage failed | SCR8 `[stage.failed]` | *Retry*, *Get help* (copies error ID) |
 | Checkpoint waiting | SCR8 with decision content | Approve, edit, send back |
-| Stale nodes present | Stale marker on nodes; toolbar *Regenerate stale (n)* | Regenerate, ignore |
+| Stale nodes present | Stale marker on nodes; toolbar *Update out-of-date cards (n)* | Update, ignore |
 | Trace mode | Path highlighted, others dimmed at 30% opacity | Escape to clear |
 | Cost near cap | Header chip `[cost.nearCap]` | — |
 | Cost at cap | SCR8 `[cost.atCap]` | Confirm continue / admin raises cap |
@@ -361,7 +361,7 @@ Format: user action → system response → resulting state (ACs).
 | intake.needsSector | "Choose the client's sector so we can check it against our ethics rules." |
 | intake.needsAssets | "Add at least one current screen or email so Fluently knows what to optimise." |
 | intake.figmaLinkInvalid | "That doesn't look like a Figma link. It should start with https://www.figma.com/." |
-| intake.editWarnsStale | "Changing the intake will mark everything built from it as out of date. You can regenerate those parts afterwards." |
+| intake.editWarnsStale | "Changing the brief will mark everything built from it as out of date. You can update those parts afterwards." |
 | intake.uploadPrivacyHint | "Remove names, emails and other personal details before uploading. Uploads stay inside your workspace." |
 | upload.typeOrSize | "\"{file}\" can't be added. Use {types} up to {size}." |
 | upload.tooMany | "You can add up to {n} files here." |
@@ -389,7 +389,7 @@ Format: user action → system response → resulting state (ACs).
 | lofi.renderFailed | "This wireframe didn't render. The other variants are fine." |
 | lofi.samePrinciple | "These two variants rest on the same principle. Regenerate one for a real comparison." |
 | report.notYet | "The Audit Report appears once research finishes." |
-| report.hasStale | "Some parts of this report are out of date. Regenerate them on the canvas." |
+| report.hasStale | "Some parts of this report are out of date. Update them on the canvas." |
 | report.exportFailed | "Export didn't work. Try again." |
 | testplan.needsBaseline | "What's the current rate for {metric}? Fluently needs it to size the test, and won't guess." |
 | testplan.baselineInvalid | "Enter a percentage between 0.1 and 99.9." |
@@ -643,7 +643,7 @@ Format: user action → system response → resulting state (ACs).
 | checkpoint.approveSolutions / checkpoint.approving | "Approve and generate solutions" / "Approving…" |
 | checkpoint.sendBack / checkpoint.feedbackLabel / checkpoint.sendBackSubmit / checkpoint.sending | "Send back with feedback" / "What should change?" / "Send back" / "Sending…" |
 | checkpoint.replaceHuman | "Also replace cards people added or edited" |
-| checkpoint.retryFailed / checkpoint.retrySynthesis | "Retry failed steps" / "Retry synthesis" |
+| checkpoint.retryFailed / checkpoint.retrySynthesis | "Retry failed steps" / "Retry themes and opportunities" |
 | checkpoint.themesCount / checkpoint.confidenceLabel / checkpoint.selected | "{n} themes" / "{level} confidence" / "{n} selected" |
 | card.markers (added) | "Low confidence" |
 | finding.labels | "AI inference" / "Qualitative signal · {n} sources" / "{n} sources" |
@@ -705,12 +705,12 @@ Format: user action → system response → resulting state (ACs).
 | editing.connections / editing.builtFromLabel / editing.leadsTo | "Connections" / "Built from" / "Leads to" |
 | editing.addConnection / editing.chooseCard / editing.connect | "Add a connection" / "Choose a card" / "Connect" |
 | editing.connected / editing.disconnected / editing.alreadyConnected | "Connected." / "Connection removed." / "These two are already connected." |
-| editing.staleRegenerate / editing.staleTitle / editing.staleBody / editing.staleConfirm | "Regenerate stale ({n})" / "Regenerate out-of-date cards" / "Research analysis runs again from the sources you have. Cards people added or edited are kept." / "Regenerate" |
+| editing.staleRegenerate / editing.staleTitle / editing.staleBody / editing.staleConfirm | "Update out-of-date cards ({n})" / "Update out-of-date cards" / "Fluently will redo the analysis from the sources it already has. Anything people added or edited stays as it is." / "Update" (changed 2026-11-19: no "stale" or "regenerate" in anything people read) |
 | trace.button / trace.clear | "Trace" / "Clear trace" (details panel) |
 | trace.title / trace.hint | "Path back to the evidence" / "Cards not on this path are dimmed. Press Esc to clear." (added 2026-11-19 with Slice 8; please confirm) |
 | trace.failed | "Couldn't trace this card. Try again." |
 | brief.goToCanvas | "Go to canvas" (main button on the approved brief; added 2026-11-19, icebox IB14) |
-| brief.editBrief / brief.editWarnsStale | "Edit brief" / "Changing the brief will mark everything built from it as out of date. You can regenerate those parts afterwards." (user decision 2026-11-19: people see "brief", never "intake") |
+| brief.editBrief / brief.editWarnsStale | "Edit brief" / "Changing the brief will mark everything built from it as out of date. You can update those parts afterwards." (user decision 2026-11-19: people see "brief", never "intake") |
 | canvas.intakeFirst | "Start with the brief. Your objectives will appear here." |
 
 **Added for project management (2026-11-17, from icebox IB5): please confirm this wording.** A "…" menu on each projects-list row and beside the project name in the project header.
