@@ -7,7 +7,11 @@ export type ErrorCode =
   | "unavailable"
   | "rate_limited"
   | "cost_cap"
-  | "unconfirmed";
+  | "unconfirmed"
+  | "locked"
+  | "cant_connect"
+  | "link_required"
+  | "cant_delete_objective";
 
 export type ActionResult<T = void> = { ok: true; data: T } | { ok: false; code: ErrorCode };
 

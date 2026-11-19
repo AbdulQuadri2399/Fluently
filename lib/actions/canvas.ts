@@ -86,3 +86,34 @@ export async function getRunActivity(runId: string) {
 export async function getTrace(nodeId: string) {
   return canvas.getTrace(await createClient(), nodeId);
 }
+
+export async function addNode(input: canvas.AddNodeInput) {
+  const res = await canvas.addNode(await createClient(), input);
+  revalidatePath(`/projects/${input.projectId}`, "layout");
+  return res;
+}
+export async function deleteNode(projectId: string, nodeId: string) {
+  const res = await canvas.deleteNode(await createClient(), nodeId);
+  revalidatePath(`/projects/${projectId}`, "layout");
+  return res;
+}
+export async function restoreNode(projectId: string, nodeId: string) {
+  const res = await canvas.restoreNode(await createClient(), nodeId);
+  revalidatePath(`/projects/${projectId}`, "layout");
+  return res;
+}
+export async function mergeNodes(projectId: string, nodeIds: string[], title: string) {
+  const res = await canvas.mergeNodes(await createClient(), { nodeIds, title });
+  revalidatePath(`/projects/${projectId}`, "layout");
+  return res;
+}
+export async function connectNodes(projectId: string, fromId: string, toId: string) {
+  const res = await canvas.connectNodes(await createClient(), fromId, toId);
+  revalidatePath(`/projects/${projectId}`, "layout");
+  return res;
+}
+export async function disconnectEdge(projectId: string, edgeId: string) {
+  const res = await canvas.disconnectEdge(await createClient(), edgeId);
+  revalidatePath(`/projects/${projectId}`, "layout");
+  return res;
+}

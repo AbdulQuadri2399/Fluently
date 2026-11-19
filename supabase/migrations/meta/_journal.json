@@ -176,6 +176,13 @@
       "when": 1795077884809,
       "tag": "20261119084444_trace_path",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1795078195567,
+      "tag": "20261119084955_tree_editing",
+      "breakpoints": true
     }
   ]
 }

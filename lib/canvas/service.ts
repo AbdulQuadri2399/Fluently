@@ -348,3 +348,107 @@ export async function getTrace(client: Client, nodeId: string): Promise<ActionRe
   if (!ids.includes(nodeId)) return fail("not_found");
   return ok(ids);
 }
+
+// ---------- Slice 8: add, delete, merge, connect (O22, O23, O24, O34) ----------
+
+function editError(error: { code?: string }): ActionResult<never> {
+  switch (error.code) {
+    case "P0002":
+      return fail("not_found");
+    case "P0003":
+      return fail("conflict");
+    case "P0004":
+      return fail("locked");
+    case "P0006":
+      return fail("cant_connect");
+    case "P0007":
+      return fail("link_required");
+    case "P0008":
+      return fail("cant_delete_objective");
+    case "22023":
+      return fail("validation");
+    case "42501":
+      return fail("forbidden");
+    default:
+      return fail("unavailable");
+  }
+}
+
+export const addNodeSchema = z.object({
+  projectId: z.uuid(),
+  type: z.enum(["finding", "theme", "opportunity", "gap"]),
+  title: z.string().trim().min(1).max(200),
+  body: z.string().max(4000).optional(),
+  links: z.array(z.uuid()).min(1).max(20),
+});
+export type AddNodeInput = z.input<typeof addNodeSchema>;
+
+/** O22 addNode (AC24.2): a card a person adds, with the links its type needs. */
+export async function addNode(
+  client: Client,
+  input: AddNodeInput,
+): Promise<ActionResult<{ id: string }>> {
+  const parsed = addNodeSchema.safeParse(input);
+  if (!parsed.success) return fail("validation");
+  const { data, error } = await client.rpc("add_node", {
+    p_project: parsed.data.projectId,
+    p_type: parsed.data.type,
+    p_title: parsed.data.title,
+    p_body: (parsed.data.body ?? "") as string,
+    p_links: parsed.data.links,
+  });
+  if (error) return editError(error);
+  return ok({ id: data as string });
+}
+
+/** O23 deleteNode (AC24.5, AC24.8): how many cards were built from it comes back for the toast. */
+export async function deleteNode(
+  client: Client,
+  nodeId: string,
+): Promise<ActionResult<{ dependents: number }>> {
+  const { data, error } = await client.rpc("delete_node", { p_node: nodeId });
+  if (error) return editError(error);
+  return ok({ dependents: data as number });
+}
+
+/** O23 undoDelete (AC24.5): within 60 seconds. */
+export async function restoreNode(client: Client, nodeId: string): Promise<ActionResult> {
+  const { error } = await client.rpc("restore_node", { p_node: nodeId });
+  return error ? editError(error) : ok(undefined);
+}
+
+/** O24 mergeNodes (AC24.6): same type only; one new card with all the links. */
+export async function mergeNodes(
+  client: Client,
+  input: { nodeIds: string[]; title: string },
+): Promise<ActionResult<{ id: string }>> {
+  const parsed = z
+    .object({ nodeIds: z.array(z.uuid()).min(2).max(10), title: z.string().trim().min(1).max(200) })
+    .safeParse(input);
+  if (!parsed.success) return fail("validation");
+  const { data, error } = await client.rpc("merge_nodes", {
+    p_nodes: parsed.data.nodeIds,
+    p_title: parsed.data.title,
+  });
+  if (error) return editError(error);
+  return ok({ id: data as string });
+}
+
+/** O34 connectNodes (AC30.2, AC30.6). */
+export async function connectNodes(
+  client: Client,
+  fromId: string,
+  toId: string,
+): Promise<ActionResult<{ edgeId: string }>> {
+  if (!z.uuid().safeParse(fromId).success || !z.uuid().safeParse(toId).success)
+    return fail("validation");
+  const { data, error } = await client.rpc("connect_nodes", { p_from: fromId, p_to: toId });
+  if (error) return editError(error);
+  return ok({ edgeId: data as string });
+}
+
+/** O34 disconnectNodes (AC30.4, AC30.5). */
+export async function disconnectEdge(client: Client, edgeId: string): Promise<ActionResult> {
+  const { error } = await client.rpc("disconnect_edge", { p_edge: edgeId });
+  return error ? editError(error) : ok(undefined);
+}

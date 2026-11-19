@@ -707,7 +707,10 @@ isOneToOne: false
             [_ in never]: never
           }
           Functions: {
-            "allowed_workspace_for":
+            "add_node":
+{ Args: { "p_body": string,"p_links": (string)[],"p_project": string,"p_title": string,"p_type": string }; Returns: string
+                           },
+"allowed_workspace_for":
 { Args: { "email": string }; Returns: string
                            },
 "approve_checkpoint":
@@ -719,11 +722,23 @@ isOneToOne: false
 "can_access_upload":
 { Args: { "object_name": string }; Returns: boolean
                            },
+"can_connect":
+{ Args: { "p_from": string,"p_to": string }; Returns: boolean
+                           },
 "cancel_stage":
 { Args: { "p_run": string }; Returns: undefined
                            },
 "confirm_over_cap":
 { Args: { "p_run": string }; Returns: string
+                           },
+"connect_nodes":
+{ Args: { "p_from": string,"p_to": string }; Returns: string
+                           },
+"delete_node":
+{ Args: { "p_node": string }; Returns: number
+                           },
+"disconnect_edge":
+{ Args: { "p_edge": string }; Returns: undefined
                            },
 "is_admin":
 { Args: { "ws": string }; Returns: boolean
@@ -734,6 +749,12 @@ isOneToOne: false
 "is_member":
 { Args: { "ws": string }; Returns: boolean
                            },
+"mark_downstream_stale":
+{ Args: { "p_from": (string)[] }; Returns: number
+                           },
+"merge_nodes":
+{ Args: { "p_nodes": (string)[],"p_title": string }; Returns: string
+                           },
 "move_assets":
 { Args: { "p_project": string,"p_to": string,"p_uploads": (string)[] }; Returns: string
                            },
@@ -742,6 +763,9 @@ isOneToOne: false
                            },
 "record_override":
 { Args: { "p_node": string,"p_reason": string }; Returns: string
+                           },
+"restore_node":
+{ Args: { "p_node": string }; Returns: undefined
                            },
 "retry_ethics":
 { Args: { "p_project": string }; Returns: string
@@ -762,6 +786,9 @@ isOneToOne: false
                            },
 "set_member_role":
 { Args: { "member_id": string,"new_role": string }; Returns: undefined
+                           },
+"stage_is_running":
+{ Args: { "p_project": string,"p_stage": string }; Returns: boolean
                            },
 "start_stage":
 { Args: { "p_project": string,"p_stage": string }; Returns: string
