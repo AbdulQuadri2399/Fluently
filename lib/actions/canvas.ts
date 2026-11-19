@@ -83,3 +83,6 @@ export async function confirmOverCap(projectId: string, runId: string) {
 export async function getRunActivity(runId: string) {
   return canvas.runActivity(await createClient(), runId);
 }
+export async function getTrace(nodeId: string) {
+  return canvas.getTrace(await createClient(), nodeId);
+}

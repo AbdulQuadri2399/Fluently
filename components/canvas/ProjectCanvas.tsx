@@ -2,13 +2,14 @@
 
 import { ListIcon, TreeStructureIcon } from "@phosphor-icons/react/dist/ssr";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useRealtimeProject } from "@/hooks/useRealtimeProject";
 import type { ActionResult } from "@/lib/actions/result";
 import { formatGbp } from "@/lib/ai/cost";
 import type { ProjectTree } from "@/lib/canvas/load";
 import type { RunActivity } from "@/lib/canvas/service";
+import { LANES, laneOf } from "@/lib/canvas/layout";
 import { ActivityPanel } from "./ActivityPanel";
 import { RaiseCapDialog } from "./RaiseCapDialog";
 import { AddSourceDialog, type AddSourceFns } from "./AddSourceDialog";
@@ -49,6 +50,7 @@ export type CanvasActions = {
     input: { nodeId: string; title: string; body: string | null; version: number },
   ) => Promise<ActionResult<{ version: number }>>;
   getRunActivity?: (runId: string) => Promise<RunActivity>;
+  getTrace?: (nodeId: string) => Promise<ActionResult<string[]>>;
   confirmOverCap?: (
     projectId: string,
     runId: string,
@@ -82,17 +84,62 @@ export function ProjectCanvas({
   const active = Boolean(run && (run.status === "queued" || run.status === "running"));
   useRealtimeProject(tree.project.id, active);
 
-  const setParam = useCallback(
-    (key: string, value: string | null) => {
+  const setParams = useCallback(
+    (updates: Record<string, string | null>) => {
       const next = new URLSearchParams(params.toString());
-      if (value) next.set(key, value);
-      else next.delete(key);
+      for (const [key, value] of Object.entries(updates)) {
+        if (value) next.set(key, value);
+        else next.delete(key);
+      }
       const qs = next.toString();
       // Only the address changes; Next keeps useSearchParams in step without a server round trip.
       window.history.replaceState(null, "", qs ? `${pathname}?${qs}` : pathname);
     },
     [params, pathname],
   );
+  const setParam = useCallback(
+    (key: string, value: string | null) => setParams({ [key]: value }),
+    [setParams],
+  );
+  // Choosing another card, or none, ends trace mode (AC23.3).
+  const selectCard = useCallback(
+    (id: string | null) => setParams({ node: id, trace: null }),
+    [setParams],
+  );
+
+  // Trace mode (AC23.1, AC23.3, MI5): the card ids on the path back to the objectives.
+  const traceId = params.get("trace");
+  const [trace, setTrace] = useState<{ id: string; ids: string[] } | null>(null);
+  const getTrace = actions.getTrace;
+  useEffect(() => {
+    if (!traceId || !getTrace) return;
+    let live = true;
+    void getTrace(traceId).then((res) => {
+      if (!live) return;
+      if (res.ok) setTrace({ id: traceId, ids: res.data });
+      else {
+        toast.error(c.trace.failed);
+        setParams({ trace: null });
+      }
+    });
+    return () => {
+      live = false;
+    };
+    // The tree changing under a trace (new lines, deleted cards) re-reads the path.
+  }, [traceId, getTrace, tree.edges.length, tree.nodes.length, setParams]);
+  const tracing = Boolean(traceId && trace?.id === traceId);
+  const tracePath = useMemo(() => (tracing && trace ? new Set(trace.ids) : null), [tracing, trace]);
+  // Listed from the traced card back to the objectives (AC23.1): later lanes first.
+  const traceNodes = useMemo(() => {
+    if (!tracePath) return null;
+    return tree.nodes
+      .filter((n) => tracePath.has(n.id))
+      .sort(
+        (a, b) =>
+          LANES.indexOf(laneOf(b.type)) - LANES.indexOf(laneOf(a.type)) ||
+          a.sortOrder - b.sortOrder,
+      );
+  }, [tracePath, tree.nodes]);
 
   const selected = tree.nodes.find((n) => n.id === selectedId) ?? null;
   const [adding, setAdding] = useState(false);
@@ -148,7 +195,7 @@ export function ProjectCanvas({
             nodes={tree.nodes}
             running={ethicsRunning}
             selectedId={selectedId}
-            onSelect={(id) => setParam("node", id)}
+            onSelect={(id) => selectCard(id)}
           />
         </div>
       ) : (
@@ -157,7 +204,7 @@ export function ProjectCanvas({
           edges={tree.edges}
           running={ethicsRunning}
           selectedId={selectedId}
-          onSelect={(id) => setParam("node", id)}
+          onSelect={(id) => selectCard(id)}
           onAddCard={() => toast(c.addCardLater)}
           onAddSource={actions.addSource ? () => setAdding(true) : undefined}
           onMoveAssets={
@@ -170,6 +217,7 @@ export function ProjectCanvas({
               : undefined
           }
           runningRunId={active ? (run?.id ?? null) : null}
+          tracePath={tracePath}
           onReorder={(_, ids) =>
             void actions.reorderNodes(tree.project.id, ids).then(() => router.refresh())
           }
@@ -184,8 +232,8 @@ export function ProjectCanvas({
           runningStage={active ? (run?.stage ?? null) : null}
           loadHistory={actions.getNodeHistory}
           loadEvidence={actions.getNodeEvidence}
-          onClose={() => setParam("node", null)}
-          onSelect={(id) => setParam("node", id)}
+          onClose={() => selectCard(null)}
+          onSelect={(id) => selectCard(id)}
           projectId={tree.project.id}
           onSave={async (input) => {
             const res = await actions.updateNode(tree.project.id, input);
@@ -193,6 +241,10 @@ export function ProjectCanvas({
             return res;
           }}
           onSeeLatest={() => router.refresh()}
+          onTrace={
+            actions.getTrace ? (on) => setParams({ trace: on ? selected.id : null }) : undefined
+          }
+          tracePath={tracing && selected.id === traceId ? traceNodes : null}
         />
       ) : null}
       {actions.addSource ? (

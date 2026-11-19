@@ -694,6 +694,9 @@ Format: user action → system response → resulting state (ACs).
 | report.citationCols | "#" / "Source" / "Kind" / "Details" / "Retrieved" |
 | report.openLink / report.uploadedFile | "Open" / "Uploaded file" |
 | report.backToReport | "Back to report" |
+| trace.button / trace.clear | "Trace" / "Clear trace" (details panel) |
+| trace.title / trace.hint | "Path back to the evidence" / "Cards not on this path are dimmed. Press Esc to clear." (added 2026-11-19 with Slice 8; please confirm) |
+| trace.failed | "Couldn't trace this card. Try again." |
 | brief.goToCanvas | "Go to canvas" (main button on the approved brief; added 2026-11-19, icebox IB14) |
 | brief.editBrief / brief.editWarnsStale | "Edit brief" / "Changing the brief will mark everything built from it as out of date. You can regenerate those parts afterwards." (user decision 2026-11-19: people see "brief", never "intake") |
 | canvas.intakeFirst | "Start with the brief. Your objectives will appear here." |

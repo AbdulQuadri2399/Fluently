@@ -47,6 +47,13 @@ export const canvasCopy = {
     saving: "Saving…",
   },
   panel: { minimise: "Minimise", expand: "Expand", standard: "Standard size" },
+  trace: {
+    button: "Trace",
+    clear: "Clear trace",
+    title: "Path back to the evidence",
+    hint: "Cards not on this path are dimmed. Press Esc to clear.",
+    failed: "Couldn't trace this card. Try again.",
+  },
   activity: {
     open: "See what it's doing",
     title: "What Fluently is doing",

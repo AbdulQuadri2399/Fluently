@@ -54,6 +54,8 @@ type Props = {
   onMoveAssets?: (uploadIds: string[], toNodeId: string | null) => void;
   /** The active stage run: lines into the cards it is producing animate (MI15). */
   runningRunId?: string | null;
+  /** Trace mode (MI5, AC23.1): cards on the path stay, the rest fade; path lines turn ink. */
+  tracePath?: Set<string> | null;
 };
 
 /** Lane names stay pinned at the top while the canvas pans (AC22.12). */
@@ -131,6 +133,7 @@ function Canvas({
   runningRunId = null,
   onAddSource,
   onMoveAssets,
+  tracePath = null,
 }: Props) {
   const rf = useReactFlow();
   const [viewport, setViewport] = useState<Viewport>({ x: 24, y: 0, zoom: 1 });
@@ -201,7 +204,7 @@ function Canvas({
           running,
           isNew: added >= 0,
           delayMs: Math.min(Math.max(added, 0), 4) * 40,
-          dimmed: false,
+          dimmed: tracePath ? !tracePath.has(p.id) : false,
           expanded: expanded.has(p.id),
           onToggle: toggle,
           onAddSource: byId.get(p.id)!.type === "source" ? onAddSource : undefined,
@@ -226,6 +229,7 @@ function Canvas({
     toggle,
     onAddSource,
     onMoveAssets,
+    tracePath,
   ]);
 
   const runOf = useMemo(() => new Map(nodes.map((n) => [n.id, n.stageRunId])), [nodes]);
@@ -241,9 +245,12 @@ function Canvas({
         type: "dashed",
         selectable: false,
         focusable: false,
-        data: { running: runningRunId !== null && runOf.get(e.to) === runningRunId },
+        data: {
+          running: runningRunId !== null && runOf.get(e.to) === runningRunId,
+          traced: Boolean(tracePath?.has(e.from) && tracePath.has(e.to)),
+        },
       }));
-  }, [edges, placed, runningRunId, runOf]);
+  }, [edges, placed, runningRunId, runOf, tracePath]);
 
   // D24: cards move only up and down inside their lane.
   const onNodesChange = useCallback((changes: NodeChangeset) => {

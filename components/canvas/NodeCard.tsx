@@ -263,7 +263,7 @@ export function NodeCard({ data, selected }: NodeProps<Node<CardData>>) {
       className={cn(
         "group",
         data.isNew && (reduced ? mi.cardInReduced : mi.cardIn),
-        data.dimmed && "opacity-35",
+        data.dimmed && "pointer-events-none opacity-35",
       )}
       style={data.isNew ? { animationDelay: `${data.delayMs}ms` } : undefined}
       // AC22.11: an assets card accepts screens dragged from another assets card.

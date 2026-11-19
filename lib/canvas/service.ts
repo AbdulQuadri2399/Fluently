@@ -339,3 +339,12 @@ export async function runActivity(client: Client, runId: string): Promise<RunAct
     })),
   };
 }
+
+/** O26 getTrace (AC23.1, AC23.2): ids of the card and everything it rests on, back to the objectives. */
+export async function getTrace(client: Client, nodeId: string): Promise<ActionResult<string[]>> {
+  const { data, error } = await client.rpc("trace_path", { p_node: nodeId });
+  if (error) return fail("unavailable");
+  const ids = (data ?? []) as unknown as string[];
+  if (!ids.includes(nodeId)) return fail("not_found");
+  return ok(ids);
+}

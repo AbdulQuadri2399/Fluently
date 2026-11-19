@@ -15,6 +15,7 @@ export function ProjectCanvasScreen({ tree, budget }: { tree: ProjectTree; budge
       budget={budget}
       actions={{
         getRunActivity: canvasActions.getRunActivity,
+        getTrace: canvasActions.getTrace,
         confirmOverCap: canvasActions.confirmOverCap,
         raiseProjectCap: canvasActions.raiseProjectCap,
         startStage: canvasActions.startStage,

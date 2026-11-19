@@ -118,6 +118,8 @@ export function Inspector({
   projectId,
   onSave,
   onSeeLatest,
+  onTrace,
+  tracePath = null,
 }: {
   node: TreeNode;
   nodes: TreeNode[];
@@ -136,6 +138,10 @@ export function Inspector({
     version: number;
   }) => Promise<ActionResult<{ version: number }>>;
   onSeeLatest?: () => void;
+  /** Starts (true) or clears (false) trace mode for this card (AC23.1, AC23.3). */
+  onTrace?: (on: boolean) => void;
+  /** Cards on the traced path, in order from this card back to the objectives. */
+  tracePath?: TreeNode[] | null;
 }) {
   const [history, setHistory] = useState<HistoryItem[] | null>(null);
   const [editing, setEditing] = useState(false);
@@ -353,6 +359,39 @@ export function Inspector({
           </div>
         ))}
       </dl>
+      {onTrace ? (
+        <div className="grid gap-2">
+          <Button
+            variant="secondary"
+            size="sm"
+            className="justify-self-start"
+            onClick={() => onTrace(!tracePath)}
+          >
+            {tracePath ? c.trace.clear : c.trace.button}
+          </Button>
+          {tracePath ? (
+            <section aria-label={c.trace.title} className="grid gap-2">
+              <h3 className="text-small font-medium">{c.trace.title}</h3>
+              <p className="text-caption text-muted">{c.trace.hint}</p>
+              <ol className="grid gap-1">
+                {tracePath.map((n, i) => (
+                  <li key={n.id} className="grid grid-cols-[1.25rem_1fr] items-baseline gap-1">
+                    <span className="font-mono text-caption text-muted">{i + 1}</span>
+                    <button
+                      type="button"
+                      onClick={() => onSelect(n.id)}
+                      className="min-w-0 truncate rounded-sm px-1 py-0.5 text-left text-small hover:bg-soft"
+                    >
+                      <span className="text-muted">{typeNames[n.type] ?? n.type} · </span>
+                      {cardView(n, running).title}
+                    </button>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          ) : null}
+        </div>
+      ) : null}
       {linked.length ? (
         <details open className="grid gap-2">
           <summary className="cursor-pointer text-small font-medium">
