@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import type { ActionResult } from "@/lib/actions/result";
 import { canvasCopy as c, typeNames } from "./copy";
+import { ConnectionsSection, DeleteCardSection } from "./CardActions";
 import { StrengthTag, type Level } from "./StrengthTag";
 
 type SaveFn = NonNullable<Parameters<typeof Inspector>[0]["onSave"]>;
@@ -120,6 +121,9 @@ export function Inspector({
   onSeeLatest,
   onTrace,
   tracePath = null,
+  onDelete,
+  onConnect,
+  onDisconnect,
 }: {
   node: TreeNode;
   nodes: TreeNode[];
@@ -142,6 +146,9 @@ export function Inspector({
   onTrace?: (on: boolean) => void;
   /** Cards on the traced path, in order from this card back to the objectives. */
   tracePath?: TreeNode[] | null;
+  onDelete?: (nodeId: string) => Promise<boolean>;
+  onConnect?: (fromId: string, toId: string) => Promise<boolean>;
+  onDisconnect?: (edgeId: string) => Promise<boolean>;
 }) {
   const [history, setHistory] = useState<HistoryItem[] | null>(null);
   const [editing, setEditing] = useState(false);
@@ -392,7 +399,17 @@ export function Inspector({
           ) : null}
         </div>
       ) : null}
-      {linked.length ? (
+      {onConnect && onDisconnect ? (
+        <ConnectionsSection
+          node={node}
+          nodes={nodes}
+          edges={edges}
+          disabled={locked}
+          onConnect={onConnect}
+          onDisconnect={onDisconnect}
+          onSelect={onSelect}
+        />
+      ) : linked.length ? (
         <details open className="grid gap-2">
           <summary className="cursor-pointer text-small font-medium">
             {c.inspector.connected}
@@ -423,6 +440,15 @@ export function Inspector({
           ))}
         </ul>
       </details>
+      {onDelete ? (
+        <DeleteCardSection
+          node={node}
+          nodes={nodes}
+          edges={edges}
+          disabled={locked}
+          onDelete={onDelete}
+        />
+      ) : null}
     </aside>
   );
 }

@@ -66,6 +66,8 @@ export type CardData = {
   isNew: boolean;
   delayMs: number;
   dimmed: boolean;
+  /** Lines can be dragged from and to this card (AC30.1). */
+  canConnect?: boolean;
   expanded?: boolean;
   onToggle?: (id: string) => void;
   onAddSource?: () => void;
@@ -291,8 +293,8 @@ export function NodeCard({ data, selected }: NodeProps<Node<CardData>>) {
       <Handle
         type="target"
         position={Position.Left}
-        isConnectable={false}
-        className="!size-2 !border-wire !bg-surface opacity-0 group-hover:opacity-100"
+        isConnectable={Boolean(data.canConnect)}
+        className="!size-2 !border-wire !bg-surface opacity-0 group-focus-within:opacity-100 group-hover:opacity-100"
       />
       <CardBody
         node={data.node}
@@ -306,8 +308,8 @@ export function NodeCard({ data, selected }: NodeProps<Node<CardData>>) {
       <Handle
         type="source"
         position={Position.Right}
-        isConnectable={false}
-        className="!size-2 !border-wire !bg-surface opacity-0 group-hover:opacity-100"
+        isConnectable={Boolean(data.canConnect)}
+        className="!size-2 !border-wire !bg-surface opacity-0 group-focus-within:opacity-100 group-hover:opacity-100"
       />
     </div>
   );

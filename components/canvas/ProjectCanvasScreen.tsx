@@ -16,6 +16,12 @@ export function ProjectCanvasScreen({ tree, budget }: { tree: ProjectTree; budge
       actions={{
         getRunActivity: canvasActions.getRunActivity,
         getTrace: canvasActions.getTrace,
+        addNode: canvasActions.addNode,
+        deleteNode: canvasActions.deleteNode,
+        restoreNode: canvasActions.restoreNode,
+        mergeNodes: canvasActions.mergeNodes,
+        connectNodes: canvasActions.connectNodes,
+        disconnectEdge: canvasActions.disconnectEdge,
         confirmOverCap: canvasActions.confirmOverCap,
         raiseProjectCap: canvasActions.raiseProjectCap,
         startStage: canvasActions.startStage,

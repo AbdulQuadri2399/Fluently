@@ -219,20 +219,20 @@ Slice check: suite green; report renders on seeded and live projects; A1–A3 re
 Goal: any item can be traced back to evidence and objectives, and people can edit, add, delete, merge and regenerate nodes with stale marking.
 You'll be able to see: trace highlighting, editing in the inspector, stale markers, undo.
 
-- [ ] T8.1 `trace_path` SQL function + O26 + trace mode (dim others to 30%, thicken path, list in inspector, Esc clears) — M — Refs: AC23.1–AC23.3, MI5 — Depends on: T5.1
+- [x] T8.1 (done 2026-11-19; `tests/integration/trace.test.ts`, `tests/components/SCR5-trace.test.tsx`, `e2e/editing.spec.ts`) `trace_path` SQL function + O26 + trace mode (dim others to 30%, thicken path, list in inspector, Esc clears) — M — Refs: AC23.1–AC23.3, MI5 — Depends on: T5.1
   Done when: `tests/integration/trace.test.ts` passes incl. 1,000-node seeded graph ≤ 300 ms; `tests/components/SCR5-trace.test.tsx` passes; MI5 reduced-motion test (instant dim).
 - [x] T8.2 (done early on 2026-11-17 at the user's request; `tests/integration/O21-update-node.test.ts`, `tests/components/SCR7-inspector.test.tsx`) O21 `updateNode` with version check, provenance → `ai_edited`, history; SCR7 editing/saving/conflict (MI6) — M — Refs: AC24.1, AC24.7, FF10, EC6, MI6 — Depends on: T5.3
   Done when: `tests/integration/O21-O25-nodes.test.ts` 'edit sets ai_edited', 'stale version → conflict'; `e2e/FF10.spec.ts` (two browser contexts) passes.
-- [ ] T8.3 `mark_downstream_stale` + stale on edit/regenerate/delete/merge + toolbar `Regenerate stale (n)` (MI7); EC7 intake edit path — M — Refs: AC24.4, AC9.3, EC7, MI7 — Depends on: T8.2
+- [x] T8.3 (done 2026-11-19: out of date marking on edit, delete, merge, connect and disconnect; *Regenerate stale (n)* re-runs the research analysis and keeps people's cards; `tests/integration/O22-O25-nodes.test.ts`) `mark_downstream_stale` + stale on edit/regenerate/delete/merge + toolbar `Regenerate stale (n)` (MI7); EC7 intake edit path — M — Refs: AC24.4, AC9.3, EC7, MI7 — Depends on: T8.2
   Done when: integration tests 'edit theme marks downstream stale', 'intake edit marks all stale' pass; MI7 test.
-- [ ] T8.4 O22 `addNode` (type/column rules, required links, principle picker combobox), O23 delete with confirm/undo 10 s (MI9), objective delete refused — M — Refs: AC24.2, AC24.5, AC24.8, FF11, EC22, MI9 — Depends on: T8.3
+- [x] T8.4 (done 2026-11-19 for research cards; the principle picker waits for Slice 9 recommendations; `tests/integration/O22-O25-nodes.test.ts`, `tests/components/SCR7-editing.test.tsx`, `e2e/editing.spec.ts`) O22 `addNode` (type/column rules, required links, principle picker combobox), O23 delete with confirm/undo 10 s (MI9), objective delete refused — M — Refs: AC24.2, AC24.5, AC24.8, FF11, EC22, MI9 — Depends on: T8.3
   Done when: integration tests for add (missing link → validation), delete + undo, objective refused; `e2e/FF11.spec.ts` passes.
-- [ ] T8.5 O24 `mergeNodes` (multi-select, same type, union of edges) + O25 `regenerateNode` (J6, history, feedback) + regenerate failed state — M — Refs: AC24.3, AC24.6, EC16 — Depends on: T8.3
+- [ ] T8.5 (merge done 2026-11-19, `tests/integration/O22-O25-nodes.test.ts`; regenerating a single card with feedback is still open) O24 `mergeNodes` (multi-select, same type, union of edges) + O25 `regenerateNode` (J6, history, feedback) + regenerate failed state — M — Refs: AC24.3, AC24.6, EC16 — Depends on: T8.3
   Done when: `tests/jobs/J6-regenerate.test.ts` and merge integration test pass; SCR7 multi-select and regenerate-failed states have component tests.
-- [ ] T8.6 Send back with feedback for any stage: re-run with feedback, keep human/edited nodes unless `replace_human` — S — Refs: AC25.2, EC13 — Depends on: T6.7
+- [ ] T8.6 (open: only the research stage exists to send back; revisit once Slice 9 adds solutions) Send back with feedback for any stage: re-run with feedback, keep human/edited nodes unless `replace_human` — S — Refs: AC25.2, EC13 — Depends on: T6.7
   Done when: `tests/jobs/stage-engine.test.ts` 'send back keeps human nodes' and 'replace_human replaces them' pass.
 
-- [ ] T8.7 Connect and disconnect cards: hover handles, valid-target highlighting, midpoint remove button, Delete key, required-link guard, Undo, and the Connections section in the details panel (O34) — M — Refs: AC30.1–AC30.7, FF16, D24 — Depends on: T8.3
+- [ ] T8.7 (done 2026-11-19: drag a line from a handle with valid targets highlighted, Connections section in the details panel, link-required guard, Undo; still open: the remove button on the middle of a line and the Delete key) Connect and disconnect cards: hover handles, valid-target highlighting, midpoint remove button, Delete key, required-link guard, Undo, and the Connections section in the details panel (O34) — M — Refs: AC30.1–AC30.7, FF16, D24 — Depends on: T8.3
   Done when: `tests/integration/O34-connections.test.ts` passes ('theme→opportunity allowed', 'theme→wireframe refused with cant_connect', 'removing last opportunity link refused with link_required', 'connect marks downstream out of date'); `e2e/FF16.spec.ts` passes; keyboard-only connect via the details panel passes in `e2e/a11y.spec.ts`.
 
 Slice check: suite green; FF10, FF11, FF16 pass; trace works on seeded graph. **Stop for the user.**

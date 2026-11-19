@@ -382,7 +382,7 @@ Format: user action → system response → resulting state (ACs).
 | canvas.deleteConfirm | "Delete this {type}? {n} items built from it will be marked out of date." |
 | canvas.deleted | "{type} deleted." (with *Undo*) |
 | canvas.editConflict | "{name} changed this while you were editing. Your text is still here; see the latest version before saving." |
-| canvas.cantDeleteObjective | "Objectives can't be deleted. Change them in the intake instead." |
+| canvas.cantDeleteObjective | "Objectives can't be deleted. Change them in the brief instead." |
 | node.regenerateFailed | "Couldn't regenerate this. The previous version is unchanged." |
 | rec.needsPrinciple | "Choose at least one principle. Every recommendation needs one." |
 | rec.noneValid | "No recommendation for this opportunity passed the principle check. Regenerate, or add one yourself." |
@@ -694,6 +694,18 @@ Format: user action → system response → resulting state (ACs).
 | report.citationCols | "#" / "Source" / "Kind" / "Details" / "Retrieved" |
 | report.openLink / report.uploadedFile | "Open" / "Uploaded file" |
 | report.backToReport | "Back to report" |
+| editing.addTitle / editing.add / editing.adding | "Add a {type}" / "Add card" / "Adding…" |
+| editing.builtFrom / editing.chooseOne / editing.noneToLink | "Built from" / "Choose at least one {required} to build this from." / "There are no {required} cards to build this from yet." |
+| editing.addLater | "Adding cards to this column comes in a later build step." |
+| editing.delete / editing.deleteConfirm | "Delete" / "Delete this {type}? {n} items built from it will be marked out of date." (as canvas.deleteConfirm) |
+| editing.undo / editing.restored / editing.undoLate | "Undo" / "Restored." / "It's been too long to undo this." |
+| editing.selectedCount / editing.merge | "{n} cards selected" / "Merge" |
+| editing.mergeTitle / editing.mergeHint / editing.mergeLabel | "Merge cards" / "Makes one new card with all their connections. The originals are removed." / "Title of the merged card" |
+| editing.mergeSameType / editing.merged / editing.clearSelection | "Merge works on cards of the same type." / "Cards merged." / "Clear selection" |
+| editing.connections / editing.builtFromLabel / editing.leadsTo | "Connections" / "Built from" / "Leads to" |
+| editing.addConnection / editing.chooseCard / editing.connect | "Add a connection" / "Choose a card" / "Connect" |
+| editing.connected / editing.disconnected / editing.alreadyConnected | "Connected." / "Connection removed." / "These two are already connected." |
+| editing.staleRegenerate / editing.staleTitle / editing.staleBody / editing.staleConfirm | "Regenerate stale ({n})" / "Regenerate out-of-date cards" / "Research analysis runs again from the sources you have. Cards people added or edited are kept." / "Regenerate" |
 | trace.button / trace.clear | "Trace" / "Clear trace" (details panel) |
 | trace.title / trace.hint | "Path back to the evidence" / "Cards not on this path are dimmed. Press Esc to clear." (added 2026-11-19 with Slice 8; please confirm) |
 | trace.failed | "Couldn't trace this card. Try again." |

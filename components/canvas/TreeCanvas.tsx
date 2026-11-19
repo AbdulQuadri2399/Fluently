@@ -26,6 +26,7 @@ import {
 } from "@/lib/canvas/layout";
 import type { TreeEdge, TreeNode } from "@/lib/canvas/load";
 import { canvasCopy as c, laneNames } from "./copy";
+import { canConnect } from "@/lib/canvas/connect";
 import { DashedEdge } from "./DashedEdge";
 import { NodeCard, type CardData } from "./NodeCard";
 
@@ -56,6 +57,12 @@ type Props = {
   runningRunId?: string | null;
   /** Trace mode (MI5, AC23.1): cards on the path stay, the rest fade; path lines turn ink. */
   tracePath?: Set<string> | null;
+  /** Cards chosen with Shift/Cmd-click for merging (AC24.6). */
+  multiIds?: Set<string>;
+  onToggleMulti?: (id: string) => void;
+  /** Drag a line from a right handle to a card in the next lane (AC30.2). */
+  onConnectNodes?: (fromId: string, toId: string) => Promise<boolean>;
+  onConnectRefused?: () => void;
 };
 
 /** Lane names stay pinned at the top while the canvas pans (AC22.12). */
@@ -134,8 +141,15 @@ function Canvas({
   onAddSource,
   onMoveAssets,
   tracePath = null,
+  multiIds,
+  onToggleMulti,
+  onConnectNodes,
+  onConnectRefused,
 }: Props) {
   const rf = useReactFlow();
+  // While a line is being dragged, cards that can't accept it fade (AC30.2).
+  const [connecting, setConnecting] = useState<string | null>(null);
+  const typeOfNode = useMemo(() => new Map(nodes.map((n) => [n.id, n.type])), [nodes]);
   const [viewport, setViewport] = useState<Viewport>({ x: 24, y: 0, zoom: 1 });
   const [dragged, setDragged] = useState<Record<string, number>>({});
   // The canvas measures each card and reports its size; cards passed back without it are hidden.
@@ -204,13 +218,18 @@ function Canvas({
           running,
           isNew: added >= 0,
           delayMs: Math.min(Math.max(added, 0), 4) * 40,
-          dimmed: tracePath ? !tracePath.has(p.id) : false,
+          dimmed:
+            (tracePath ? !tracePath.has(p.id) : false) ||
+            (connecting !== null &&
+              p.id !== connecting &&
+              !canConnect(typeOfNode.get(connecting) ?? "", typeOfNode.get(p.id) ?? "")),
+          canConnect: Boolean(onConnectNodes),
           expanded: expanded.has(p.id),
           onToggle: toggle,
           onAddSource: byId.get(p.id)!.type === "source" ? onAddSource : undefined,
           onMoveAssets: byId.get(p.id)!.type === "asset_set" ? onMoveAssets : undefined,
         },
-        selected: p.id === selectedId,
+        selected: p.id === selectedId || Boolean(multiIds?.has(p.id)),
         ariaLabel: byId.get(p.id)!.title,
         ...(sizes[p.id] ? { measured: sizes[p.id] } : {}),
       };
@@ -230,6 +249,10 @@ function Canvas({
     onAddSource,
     onMoveAssets,
     tracePath,
+    multiIds,
+    connecting,
+    typeOfNode,
+    onConnectNodes,
   ]);
 
   const runOf = useMemo(() => new Map(nodes.map((n) => [n.id, n.stageRunId])), [nodes]);
@@ -319,7 +342,22 @@ function Canvas({
         edgeTypes={edgeTypes}
         onNodesChange={onNodesChange}
         onNodeDragStop={onDragStop}
-        onNodeClick={(_, n) => !n.id.startsWith("lane-") && onSelect(n.id)}
+        onNodeClick={(e, n) => {
+          if (n.id.startsWith("lane-")) return;
+          if ((e.shiftKey || e.metaKey || e.ctrlKey) && onToggleMulti) onToggleMulti(n.id);
+          else onSelect(n.id);
+        }}
+        nodesConnectable={Boolean(onConnectNodes)}
+        isValidConnection={(conn) =>
+          canConnect(typeOfNode.get(conn.source) ?? "", typeOfNode.get(conn.target) ?? "")
+        }
+        onConnectStart={(_, params) => setConnecting(params.nodeId ?? null)}
+        onConnect={(conn) => void onConnectNodes?.(conn.source, conn.target)}
+        onConnectEnd={(_, state) => {
+          setConnecting(null);
+          // Dropped on a card that can't take the line: say why (AC30.3). Empty canvas: nothing.
+          if (state.toNode && !state.isValid) onConnectRefused?.();
+        }}
         onPaneClick={() => onSelect(null)}
         onViewportChange={setViewport}
         defaultViewport={{ x: 24, y: 44, zoom: 1 }}
@@ -330,7 +368,6 @@ function Canvas({
         ]}
         minZoom={0.25}
         maxZoom={2}
-        nodesConnectable={false}
         elementsSelectable
         disableKeyboardA11y
         proOptions={{ hideAttribution: true }}
