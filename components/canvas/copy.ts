@@ -136,7 +136,7 @@ export const canvasCopy = {
     select: (name: string) => `Select ${name}`,
   },
   addCardLater: "Adding cards by hand comes with editing, in a later build step.",
-  intakeFirst: "Start with the intake. Your objectives will appear here.",
+  intakeFirst: "Start with the brief. Your objectives will appear here.",
   lockedWhileRunning: (stage: string) =>
     `This is being worked on right now. You can edit it once ${stage} finishes.`,
   offline: "You're offline. Changes will save when you reconnect.",

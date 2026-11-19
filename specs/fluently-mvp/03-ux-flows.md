@@ -14,7 +14,7 @@ flowchart LR
   SCR1 --> SCR3[SCR3 Projects]
   SCR2 --> SCR3
   SCR3 --> SCR4[SCR4 New project dialog]
-  SCR4 --> SCR6[SCR6 Intake]
+  SCR4 --> SCR6[SCR6 Brief]
   SCR3 --> SCR5[SCR5 Project canvas]
   SCR6 -->|Approve objectives| SCR5
   SCR5 --- SCR7[SCR7 Inspector panel]
@@ -26,7 +26,7 @@ flowchart LR
   SCR3 --> SCR12[SCR12 Workspace settings]
 ```
 
-Global sidebar (all signed-in screens; changed from a top bar on 2026-11-17 with the calm direction, 03b SCR3): Fluently logo (→ Home), search (⌘K), *Home*, *Projects*, *Toolkit*, *Settings*, recent projects, *How Fluently works* (→ SCR2), account menu (*Sign out*), *Collapse*. Inside a project, a project header adds: project name, mode · channel, toolkit version, cost so far, tabs *Canvas* / *Intake* / *Report*.
+Global sidebar (all signed-in screens; changed from a top bar on 2026-11-17 with the calm direction, 03b SCR3): Fluently logo (→ Home), search (⌘K), *Home*, *Projects*, *Toolkit*, *Settings*, recent projects, *How Fluently works* (→ SCR2), account menu (*Sign out*), *Collapse*. Inside a project, a project header adds: project name, mode · channel, toolkit version, cost so far, tabs *Canvas* / *Brief* / *Report*.
 
 ## 2. Screen inventory
 
@@ -37,7 +37,7 @@ Global sidebar (all signed-in screens; changed from a top bar on 2026-11-17 with
 | SCR3 | Projects | See and open all team projects | Sign-in; logo | *New project* | US7, US25 |
 | SCR4 | New project (dialog) | Name, mode, channel | SCR3 | *Create project* | US7 |
 | SCR5 | Project canvas | The OST: watch, edit, trace, decide | SCR3; after SCR6 approval | Depends on stage (SCR8) | US9–US26 |
-| SCR6 | Intake | Brief, objectives with coaching, assets | SCR4; *Intake* tab | *Approve objectives* | US8, US9, US10 |
+| SCR6 | Brief | Objectives with coaching, audience, assets | SCR4; *Brief* tab | *Approve objectives* | US8, US9, US10 |
 | SCR7 | Inspector (right panel on SCR5) | Full node content, sources, history, actions | Select a node | Edit / Regenerate / Trace | US12, US16, US22–US24, US26 |
 | SCR8 | Checkpoint panel (bottom panel on SCR5) | Say what's done and what to decide | Stage completes; stage running | Approve / Send back | US14, US17, US20, US21, US25 |
 | SCR9 | Audit Report | Readable report from the graph | *Report* tab | Read; (Should) Export | US15, US12 |
@@ -91,7 +91,7 @@ Copy keys in `[brackets]` are written out in §7.
 | State | User sees | Can do |
 |---|---|---|
 | Loading | Column headers + skeleton nodes | — |
-| Intake not approved | Objectives column with placeholder `[canvas.intakeFirst]` and *Go to intake* | Go to SCR6 |
+| Intake not approved | Objectives column with placeholder `[canvas.intakeFirst]` and *Go to brief* | Go to SCR6 |
 | Ethics running | Ethics node with spinner "Checking the brief against our ethics rules…" | Wait |
 | Ethics flagged | Ethics node flagged; SCR8 shows reasons | Edit brief, override |
 | Ready to research | SCR8 `[checkpoint.readyResearch]` | *Start research* |
@@ -111,7 +111,7 @@ Copy keys in `[brackets]` are written out in §7.
 | List view (accessibility toggle) | Nodes as nested lists by column with the same actions | Everything the canvas allows |
 | Complete | Header chip "Complete"; SCR8 `[checkpoint.complete]` | Edit anything, rate (NFR12) |
 
-### SCR6 Intake
+### SCR6 Brief
 | State | User sees | Can do |
 |---|---|---|
 | Default (new mode) | Fields per AC8.1 except assets; helper text under each | Type, upload |
@@ -125,7 +125,7 @@ Copy keys in `[brackets]` are written out in §7.
 | Autosave | "Saving…" / "Saved just now" / `[common.saveFailed]` with *Try again* | — |
 | Ready | *Approve objectives* enabled | Approve |
 | Missing objective | *Approve objectives* disabled, `[intake.needsObjectives]` | Fill |
-| Approved | Read-only summary with *Edit intake* (warns `[intake.editWarnsStale]` if later stages exist) | Edit |
+| Approved | Read-only summary with *Edit brief* and *Go to canvas* (edit warns `[intake.editWarnsStale]` if later stages exist) | Edit |
 | Ethics result: flagged | Panel listing reasons, *Edit brief*, *Override with a reason* | Edit, override |
 | Ethics result: refused sector | `[ethics.refusedSector]`; no override | Archive project |
 | Ethics check failed | `[ethics.checkFailed]` + *Try again* | Retry |
@@ -213,7 +213,7 @@ Format: user action → system response → resulting state (ACs).
 2. Clicks link → verified, signed in → SCR2 step 1 (AC2.1).
 3. *Next* ×2 → *Start my first project* → SCR4 (AC2.2).
 
-### FL2 Intake to research ready (JS1, JS6)
+### FL2 Brief to research ready (JS1, JS6)
 1. In SCR4, enters name, mode, channel → *Create project* → SCR6 (AC7.1).
 2. Types behavioural objective, leaves field → "Looking for a sharper version…" → suggestion card (AC8.2).
 3. *Use suggestion* → field updated, Saved (AC8.3, AC8.9).
@@ -254,7 +254,7 @@ Format: user action → system response → resulting state (ACs).
 - **ALT3 Send back:** at any checkpoint, *Send back with feedback* → stage re-runs with feedback, people's nodes kept (AC25.2).
 - **ALT4 Edit upstream later:** member edits an approved objective → `[intake.editWarnsStale]` → confirm → downstream nodes stale, intake checkpoint re-opens (AC9.3, AC24.4).
 - **ALT5 Email project:** FL5 produces email variants with subject and preview text (AC19.1–AC19.2).
-- **ALT6 Optimise mode:** intake requires current assets; lo-fi annotates changes vs current (AC8.6, AC18.6).
+- **ALT6 Optimise mode:** the brief requires current assets; lo-fi annotates changes vs current (AC8.6, AC18.6).
 - **ALT7 Member (not admin) on SCR12:** sees usage only (AC3.6).
 
 ### Failure flows
@@ -283,7 +283,7 @@ Format: user action → system response → resulting state (ACs).
 | EC | Situation | Expected behaviour | AC |
 |---|---|---|---|
 | EC1 | New toolkit version uploaded while a project is mid-way | Project stays on its pinned version; header shows "Toolkit v1 (newer v2 available)" | AC7.4 |
-| EC2 | No toolkit uploaded yet | Projects can be created and intake done; research blocked with `[toolkit.noneYet]` | AC4.9 |
+| EC2 | No toolkit uploaded yet | Projects can be created and the brief done; research blocked with `[toolkit.noneYet]` | AC4.9 |
 | EC3 | Academic search returns 0 relevant papers | Step completes with "0 papers found"; confidence reflects fewer source types; gaps more likely | AC11.4, AC12.6 |
 | EC4 | All opportunities are Low confidence | All remain selectable, labelled; SCR8 notes `[checkpoint.allLow]` | AC13.4 |
 | EC5 | Sources contradict (e.g. reviews praise speed, analytics shows drop-off) | Confidence Low; gap node states the contradiction | AC12.6, AC13.1 |
@@ -303,7 +303,7 @@ Format: user action → system response → resulting state (ACs).
 | EC19 | Paper found but no abstract available | Listed as a source; not used for findings unless its full text is fetched | AC12.2 |
 | EC20 | Brief or sources not in English | `[Assumption]` v1 outputs in English; non-English sources summarised in English and marked "(translated)" | AC12.2 |
 | EC21 | Same opportunity has a Low confidence label and a low-specificity objective | Both labels shown, each once | AC16.5 |
-| EC22 | Member tries to delete an objective node | Refused; points to intake | AC24.8 |
+| EC22 | Member tries to delete an objective node | Refused; points to the brief | AC24.8 |
 
 ## 6. Interactions and validation
 
@@ -694,6 +694,9 @@ Format: user action → system response → resulting state (ACs).
 | report.citationCols | "#" / "Source" / "Kind" / "Details" / "Retrieved" |
 | report.openLink / report.uploadedFile | "Open" / "Uploaded file" |
 | report.backToReport | "Back to report" |
+| brief.goToCanvas | "Go to canvas" (main button on the approved brief; added 2026-11-19, icebox IB14) |
+| brief.editBrief / brief.editWarnsStale | "Edit brief" / "Changing the brief will mark everything built from it as out of date. You can regenerate those parts afterwards." (user decision 2026-11-19: people see "brief", never "intake") |
+| canvas.intakeFirst | "Start with the brief. Your objectives will appear here." |
 
 **Added for project management (2026-11-17, from icebox IB5): please confirm this wording.** A "…" menu on each projects-list row and beside the project name in the project header.
 

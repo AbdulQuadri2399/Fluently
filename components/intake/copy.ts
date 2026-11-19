@@ -63,9 +63,10 @@ export const intakeCopy = {
   needsSector: "Choose the client's sector so we can check it against our ethics rules.",
   needsAssets: "Add at least one current screen or email so Fluently knows what to optimise.",
   approvedBy: (name: string, time: string) => `Approved by ${name}, ${time}`,
-  editIntake: "Edit intake",
+  editBrief: "Edit brief",
+  goToCanvas: "Go to canvas",
   editWarnsStale:
-    "Changing the intake will mark everything built from it as out of date. You can regenerate those parts afterwards.",
+    "Changing the brief will mark everything built from it as out of date. You can regenerate those parts afterwards.",
   editConfirm: "Edit anyway",
   cancel: "Cancel",
 } as const;

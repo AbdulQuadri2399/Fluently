@@ -273,16 +273,25 @@ describe("SCR6 Brief", () => {
       ethics,
     });
 
-  it("approved: read-only summary with Edit intake, which warns intake.editWarnsStale", async () => {
+  it("approved: read-only summary with Edit brief and Go to canvas; editing warns intake.editWarnsStale", async () => {
     const a = actions();
     render(<BriefPage data={approved({ state: "running" })} actions={a} />);
     expect(screen.getByText(c.approvedBy("Ada", "17 Nov 2026"))).toBeInTheDocument();
     expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
     expect(screen.getByText(e.checking)).toBeInTheDocument();
-    await userEvent.click(screen.getByRole("button", { name: c.editIntake }));
+    expect(screen.getByRole("link", { name: c.goToCanvas })).toHaveAttribute(
+      "href",
+      "/projects/p1",
+    );
+    await userEvent.click(screen.getByRole("button", { name: c.editBrief }));
     expect(screen.getByText(c.editWarnsStale)).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: c.editConfirm }));
     expect(a.editIntake).toHaveBeenCalledWith("p1");
+  });
+
+  it("Go to canvas only shows once the objectives are approved", () => {
+    render(<BriefPage data={data()} actions={actions()} />);
+    expect(screen.queryByRole("link", { name: c.goToCanvas })).not.toBeInTheDocument();
   });
 
   it("ethics passed: badge and checkpoint.readyResearch", () => {
@@ -305,7 +314,7 @@ describe("SCR6 Brief", () => {
     );
     expect(screen.getByRole("heading", { name: e.flaggedTitle })).toBeInTheDocument();
     expect(screen.getByText("Fake urgency or scarcity.")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: e.editBrief })).toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: e.editBrief }).length).toBeGreaterThan(0);
     await userEvent.click(screen.getByRole("button", { name: e.override }));
     await userEvent.type(screen.getByLabelText(e.reasonLabel), "Too short");
     expect(screen.getAllByText(e.reasonTooShort, { exact: false }).length).toBeGreaterThan(0);

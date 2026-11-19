@@ -1,6 +1,7 @@
 "use client";
 
 import { WarningCircleIcon } from "@phosphor-icons/react/dist/ssr";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -294,9 +295,14 @@ export function BriefPage({ data, actions }: { data: BriefData; actions: BriefAc
             ) : null}
             <div className="flex items-center justify-between gap-4 border-t border-line pt-4">
               <p className="text-small text-muted">{c.approvedBy(approved.by, approved.at)}</p>
-              <Button variant="secondary" onClick={() => setConfirmEdit(true)}>
-                {c.editIntake}
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button variant="secondary" onClick={() => setConfirmEdit(true)}>
+                  {c.editBrief}
+                </Button>
+                <Button asChild>
+                  <Link href={`/projects/${project.id}`}>{c.goToCanvas}</Link>
+                </Button>
+              </div>
             </div>
           </section>
           {data.ethics ? (
@@ -320,7 +326,7 @@ export function BriefPage({ data, actions }: { data: BriefData; actions: BriefAc
           ) : null}
           <Dialog open={confirmEdit} onOpenChange={setConfirmEdit}>
             <DialogContent>
-              <DialogTitle className="mb-2">{c.editIntake}</DialogTitle>
+              <DialogTitle className="mb-2">{c.editBrief}</DialogTitle>
               <DialogDescription>{c.editWarnsStale}</DialogDescription>
               <div className="mt-6 flex justify-end gap-2">
                 <Button variant="secondary" onClick={() => setConfirmEdit(false)}>
