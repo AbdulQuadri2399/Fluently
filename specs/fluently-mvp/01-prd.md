@@ -15,6 +15,8 @@ Fluently is an internal web app that takes a comms brief (app/web screens and fl
 - **Status:** draft. **Owner:** product owner of Fluently (the team lead). **Date:** 2026-11-16.
 - **Recommendation:** *Build, with the riskiest assumptions tested inside the MVP* (confidence: medium). The concept is internal, the team is both user and client, and the MVP success test (2–3 past briefs) is itself the cheap test. The biggest risk is AI quality and citation trust, so the MVP builds trust checks in code (principle IDs and source records) rather than relying on prompts alone.
 
+> **Scope change, 2026-11-19 (user decision).** Version 1 is narrowed to the **email Audit Report**: emails only, each audited alone through the toolkit (structure, content, visual), plus outside research when the full audit is chosen, one report comparing the emails with the evidence, and themes pulled from it. Screens, opportunities, solutions, wireframes and test plans move later. Details: the requirements file (02), phase 1 section; tasks P1.1 to P1.11 in the task list (05).
+
 ## 2. Problem & evidence
 *What's going wrong, how sure we are, and why now.*
 

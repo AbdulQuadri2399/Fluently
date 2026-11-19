@@ -168,6 +168,43 @@ As a strategist, I want the research as a readable report, so that I can review 
 
 ---
 
+## Phase 1: the email Audit Report *(added 2026-11-19 after a long Q&A with the user; replaces the near-term path through Slices 9 onward)*
+
+*Plain English: version 1 proves one workflow. A strategist adds emails; Fluently audits each one on its own through the Behavioural Design Toolkit, gathers outside research, writes one Audit Report that compares the emails with the research, and pulls themes out of the report. Everything after themes (opportunities, solutions, wireframes, test plans) waits.*
+
+### US31: Email audit through the toolkit (Must) — JS2, JS3
+As a strategist, I want each email audited through the toolkit across structure, content and visual, so that I get specific, checkable friction findings fast.
+- **AC31.1** THE SYSTEM SHALL support emails only in phase 1. WHEN a member creates a project THE SYSTEM SHALL show *Screens* as "coming soon" and not allow it to be chosen. Existing screens projects stay readable.
+- **AC31.2** WHEN a member adds an email (paste HTML, upload `.html`, or upload `.eml`) THE SYSTEM SHALL store it; a subject line is read from `.eml` and required as a field for HTML. This works before and after the brief is approved (AC31.9). `[Assumption]` up to 20 emails per project, each up to 10 MB.
+- **AC31.3** THE SYSTEM SHALL split each email into named parts: subject line, preheader, hero (the first phone screen), body, calls to action (CTAs) and footer. A missing preheader SHALL itself be a finding.
+- **AC31.4** THE SYSTEM SHALL render each email to a mobile-width image (375 px wide) on the server, with the email's remote images off by default and a per-email *Load this email's images* switch; images inside an `.eml` are always shown; the report SHALL say whether images were loaded and that the image is a render. A member MAY attach their own screenshot instead.
+- **AC31.5** THE SYSTEM SHALL measure in code: text and background contrast, colour values, image count and image descriptions, CTA count and size, preheader presence and length. These findings are labelled *measured*.
+- **AC31.6** WHEN a quick audit runs THE SYSTEM SHALL audit each email separately against a shortlist of about 20 toolkit principles chosen from the behavioural objective and audience, show which principles were used, and allow at most a few extra principles outside the shortlist, marked as such.
+- **AC31.7** THE SYSTEM SHALL give every email finding: the part, the lens (structure, content or visual), a verdict (*Friction* or *Working well*), the toolkit principle, an evidence strength tag (AC12.6 rule), and proof: a quote from the email, or for visual findings a named part of the email labelled *read from the image*. Code SHALL check that every quote appears in the email text; a finding whose quote isn't found SHALL be dropped and logged. There is no impact score.
+- **AC31.8** WHERE a real problem matches no toolkit principle (a broken link, an accessibility failure) THE SYSTEM SHALL show it in a separate section labelled "Not in the toolkit", not count it as a toolkit finding, and not use it for themes unless a member links it to a principle.
+- **AC31.9** WHEN an email is added after the brief is approved THE SYSTEM SHALL analyse only that email, mark the report summary and themes *Out of date*, and leave the other emails and the research untouched.
+- **AC31.10** THE SYSTEM SHALL offer two depths when starting: *Quick audit* (emails against the toolkit only) and *Full audit* (adds outside research and comparisons); a quick audit can be upgraded to a full one without re-running the email audits.
+
+### US32: Research questions you can shape (Must) — JS2
+As a strategist, I want to see, edit and add the research questions before research runs, so that the research answers what I need.
+- **AC32.1** WHEN a full audit is about to run THE SYSTEM SHALL show *Research questions*: generated from the objectives and audience, or the member's own pasted questions; the member can edit, delete, reorder and add; 3 to 8 questions.
+- **AC32.2** THE SYSTEM SHALL offer a tick-box *Review questions before research runs*, on by default and remembered per member; when off, the questions are used straight away.
+- **AC32.3** THE SYSTEM SHALL show a rough cost before research runs.
+- **AC32.4** WHEN the questions change after research has run THE SYSTEM SHALL mark the research *Out of date*.
+- **AC32.5** THE SYSTEM SHALL show in the report each question with a status of *Answered*, *Partly answered* or *No evidence found*, set by code from the sources and findings linked to it, with the findings behind it.
+- **AC32.6** THE SYSTEM SHALL research the client's own brand (including reviews and forums), named competitors, and the sector in general. An optional *Competitors* field (up to 5) is added to the brief; if blank, Fluently suggests likely ones from the sector, labelled "suggested, please check".
+
+### US33: Report first, then themes (Must) — JS2, JS3
+As a strategist, I want one report that compares the emails with the evidence, and themes pulled from it, so that most of the manual work is done.
+- **AC33.1** THE SYSTEM SHALL build the Audit Report with: summary, objectives, emails (by email, then by part, with the lens shown), research questions and their status, comparison findings (email vs evidence, in both directions: where an email conflicts with the evidence and where it agrees), evidence gaps grouped Discovery and Generative (AC13.5), *Not in the toolkit*, ethics check, toolkit principles used, references.
+- **AC33.2** A comparison finding SHALL carry both proofs: the quote or named part of the email, and the stored research source. Research findings keep the AC12.2 rule.
+- **AC33.3** WHEN the report is complete THE SYSTEM SHALL extract themes from it automatically, each linked to the report findings it came from, shown as drafts; when the report is edited the themes are marked *Out of date*.
+- **AC33.4** THE SYSTEM SHALL stop at the report and themes in phase 1; opportunities and the choose-and-continue step show "coming soon", and the report shows a placeholder "Neurons analysis, coming soon".
+- **AC33.5** THE SYSTEM SHALL load the team's real toolkit sheet as it is: the principle name is the key, IDs are generated in sheet order, empty rows and exact duplicates are skipped, goal spellings are normalised, and a skipped-rows list is shown; later versions are matched by principle name.
+- **AC33.6** THE SYSTEM SHALL report, for every test run, the AI cost and machine time. Phase 1 success checks: (1) at least 2 of 3 reports rated as good as or better than the team's own, (2) zero made-up citations or quotes in a spot-check of 20, (3) review and fixing takes under half the by-hand time (by-hand: about 1 hour for a toolkit-only email audit, 2 to 3 hours with research).
+
+---
+
 ## Solutions
 
 ### US16: Recommendations (Must) — JS3, JS6

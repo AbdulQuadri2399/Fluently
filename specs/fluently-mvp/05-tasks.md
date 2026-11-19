@@ -239,6 +239,37 @@ Slice check: suite green; FF10, FF11, FF16 pass; trace works on seeded graph. **
 
 ---
 
+## Phase 1: the email Audit Report (added 2026-11-19; do this before Slice 9)
+Goal: a strategist adds emails and gets a quick audit, then a full audit with research, one Audit Report comparing the emails with the evidence, and themes pulled from it. Prove the workflow saves time.
+You'll be able to see: emails with their findings by part and lens, research questions you can edit, the report, and themes.
+
+- [ ] P1.1 Load the real toolkit sheet as it is (name as key, generated IDs, skip empty and duplicate rows, normalise goal spellings, skipped-rows list, match later versions by name) — S — Refs: AC33.5 — Depends on: T3.5
+  Done when: `tests/unit/toolkitParse.test.ts` has cases for the sheet layout (using an invented fixture in `fixtures/toolkit/`, never the real file) and `tests/integration/O9-toolkit.test.ts` 'real layout loads, skipped rows listed, new version keeps IDs by name' passes.
+- [ ] P1.2 Emails only: *Screens* shown as coming soon on New project; optional *Competitors* field on the brief — S — Refs: AC31.1, AC32.6 — Depends on: T4.2
+  Done when: `tests/components/SCR4-new-project.test.tsx` 'screens coming soon' and `tests/components/SCR6-intake.test.tsx` competitors field pass.
+- [ ] P1.3 Add an email (paste HTML, upload `.html` or `.eml`, subject line field), before and after approval; stored privately; split into parts — M — Refs: AC31.2, AC31.3, AC31.9 — Depends on: P1.2
+  Done when: `tests/unit/emailParts.test.ts` and `tests/integration/O37-add-email.test.ts` (including a two-user access test) pass; `e2e/add-email.spec.ts` passes.
+- [ ] P1.4 **Spike S2:** render one email to a mobile image in a serverless function on Vercel; record the result in the tech plan (04 D38) — S — Refs: AC31.4 — Depends on: P1.3
+  Done when: a real render works on the hosted site, or the fallback (attached screenshots) is chosen and recorded.
+- [ ] P1.5 Render and measure: mobile image (images off by default, per-email switch), contrast, colours, CTA size and count, image alt text, preheader — M — Refs: AC31.4, AC31.5 — Depends on: P1.4
+  Done when: `tests/unit/emailMeasure.test.ts` and `tests/integration/O38-render.test.ts` pass.
+- [ ] P1.6 Quick audit (J8): toolkit shortlist, per-email findings by part and lens, quote check, Friction or Working well, evidence strength, *Not in the toolkit* — L — Refs: AC31.6–AC31.8, AC31.10 — Depends on: P1.1, P1.5
+  Done when: `tests/jobs/J8-email-audit.test.ts` ('every quote appears in the email', 'an invented quote is dropped and logged', 'findings outside the toolkit are separate', 'shortlist is about 20') and `tests/unit/quoteCheck.test.ts` pass; screens test on a seeded email.
+- [ ] P1.7 Report rebuilt around emails: per email by part with the lens shown, principles used, measured vs read-from-image labels, Not in the toolkit, Neurons placeholder; quick audit downloadable — M — Refs: AC33.1, AC33.4 — Depends on: P1.6, T7.6
+  Done when: `tests/components/SCR9-report.test.tsx` and `tests/integration/O28-export.test.ts` pass with the new sections.
+- [ ] P1.8 Research questions step: table with access rules, generated or pasted, edit, add, remove, reorder, 3 to 8, review tick-box remembered per person, rough cost, out-of-date on change — M — Refs: AC32.1–AC32.4 — Depends on: T6.5
+  Done when: `tests/rls/research_questions.test.ts` (two-user), `tests/integration/O39-questions.test.ts`, `tests/components/SCR13-questions.test.tsx` and `e2e/questions.spec.ts` pass.
+- [ ] P1.9 Full audit: research steps use the questions; client brand, competitors (named or suggested) and sector; comparison findings (email quote plus research source); question statuses; evidence gaps by kind — L — Refs: AC32.5, AC32.6, AC33.1, AC33.2 — Depends on: P1.6, P1.8, T6.1
+  Done when: `tests/jobs/J2-research.test.ts` ('every question gets a status', 'comparison findings carry both proofs', 'suggested competitors are labelled') pass.
+- [ ] P1.10 Themes extracted automatically from the report, linked to report findings; opportunities and choose-and-continue shown as coming soon; upgrade quick to full; a late email analysed alone — M — Refs: AC31.9, AC31.10, AC33.3, AC33.4 — Depends on: P1.7, P1.9
+  Done when: `tests/jobs/J9-themes.test.ts` ('themes link to report findings', 'editing the report marks themes out of date') and `e2e/phase1.spec.ts` pass.
+- [ ] P1.11 Update `scripts/success-test.md` for the three phase 1 checks plus cost and machine time; **Service test (user):** run 2 to 3 past email audits with the real key and toolkit; record the results — S — Refs: AC33.6 — Depends on: P1.10
+  Done when: the results table is filled and a go or iterate decision is recorded.
+
+Phase 1 check: suite green; the report and themes work on a seeded project and on a real email. **Stop for the user.**
+
+---
+
 ## Slice 9: Recommendations (US16, US17, US26 for recommendations)
 Goal: chosen opportunities become principle-backed recommendations with ethics checks, which the strategist chooses, edits or adds.
 You'll be able to see: recommendation nodes and the solutions checkpoint.
