@@ -27,6 +27,7 @@ import {
 import type { TreeEdge, TreeNode } from "@/lib/canvas/load";
 import { canvasCopy as c, laneNames } from "./copy";
 import { canConnect } from "@/lib/canvas/connect";
+import type { EmailPreviewData } from "@/lib/email/service";
 import { DashedEdge } from "./DashedEdge";
 import { NodeCard, type CardData } from "./NodeCard";
 
@@ -63,6 +64,8 @@ type Props = {
   /** Drag a line from a right handle to a card in the next lane (AC30.2). */
   onConnectNodes?: (fromId: string, toId: string) => Promise<boolean>;
   onConnectRefused?: () => void;
+  /** Email cards load their preview when expanded (phase 1). */
+  loadEmailPreview?: (nodeId: string) => Promise<EmailPreviewData | null>;
 };
 
 /** Lane names stay pinned at the top while the canvas pans (AC22.12). */
@@ -145,6 +148,7 @@ function Canvas({
   onToggleMulti,
   onConnectNodes,
   onConnectRefused,
+  loadEmailPreview,
 }: Props) {
   const rf = useReactFlow();
   // While a line is being dragged, cards that can't accept it fade (AC30.2).
@@ -224,6 +228,7 @@ function Canvas({
               p.id !== connecting &&
               !canConnect(typeOfNode.get(connecting) ?? "", typeOfNode.get(p.id) ?? "")),
           canConnect: Boolean(onConnectNodes),
+          loadEmail: byId.get(p.id)!.type === "email" ? loadEmailPreview : undefined,
           expanded: expanded.has(p.id),
           onToggle: toggle,
           onAddSource: byId.get(p.id)!.type === "source" ? onAddSource : undefined,
@@ -253,6 +258,7 @@ function Canvas({
     connecting,
     typeOfNode,
     onConnectNodes,
+    loadEmailPreview,
   ]);
 
   const runOf = useMemo(() => new Map(nodes.map((n) => [n.id, n.stageRunId])), [nodes]);

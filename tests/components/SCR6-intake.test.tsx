@@ -2,6 +2,7 @@ import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { emailCopy } from "@/components/email/copy";
+import { splitEmail } from "@/lib/email/parts";
 import { BriefPage, type BriefActions, type BriefData } from "@/components/intake/BriefPage";
 import { ethicsCopy as e, intakeCopy as c } from "@/components/intake/copy";
 import type { EthicsView } from "@/components/intake/EthicsPanel";
@@ -424,6 +425,42 @@ describe("SCR6 Brief", () => {
         screen.getByRole("button", { name: `${emailCopy.remove}: Welcome to Examplebank` }),
       );
       expect(removeEmail).toHaveBeenCalledWith("e1");
+    });
+
+    it("each email has a Preview that loads it and shows the preview dialog", async () => {
+      const previewEmail = vi.fn(async () => ({
+        id: "e1",
+        subject: "Welcome to Examplebank",
+        html: "<h1>Welcome</h1>",
+        parts: splitEmail("<h1>Welcome</h1>", "Welcome to Examplebank"),
+      }));
+      const a = actions({ previewEmail });
+      render(
+        <BriefPage
+          data={emailProject({
+            emails: [
+              {
+                id: "e1",
+                nodeId: "n1",
+                subject: "Welcome to Examplebank",
+                source: "paste",
+                createdAt: "",
+              },
+            ],
+          })}
+          actions={a}
+        />,
+      );
+      await userEvent.click(
+        screen.getByRole("button", { name: `${emailCopy.preview.button}: Welcome to Examplebank` }),
+      );
+      expect(
+        await screen.findByRole("dialog", { name: emailCopy.preview.title }),
+      ).toBeInTheDocument();
+      expect(previewEmail).toHaveBeenCalledWith("e1");
+      expect(
+        await screen.findByTitle(emailCopy.preview.frameTitle("Welcome to Examplebank")),
+      ).toHaveAttribute("sandbox", "");
     });
 
     it("Add email opens the dialog", async () => {

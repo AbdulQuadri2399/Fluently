@@ -84,6 +84,8 @@ test("Slice 8: trace, add, connect, delete with undo, merge, regenerate stale (A
 
   // Merge two themes: Shift-click, then Merge.
   await card(page, "The ID step takes too much effort").click();
+  // Wait until the first click has opened the card, so the Shift-click builds on it.
+  await expect(page.getByRole("complementary", { name: "Theme" })).toBeVisible();
   await card(page, "Progress isn't visible").click({ modifiers: ["Shift"] });
   await expect(page.getByText("2 cards selected")).toBeVisible();
   await page.getByRole("button", { name: "Merge", exact: true }).click();

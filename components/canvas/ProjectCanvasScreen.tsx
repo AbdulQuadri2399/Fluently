@@ -18,6 +18,7 @@ export function ProjectCanvasScreen({ tree, budget }: { tree: ProjectTree; budge
         getRunActivity: canvasActions.getRunActivity,
         getTrace: canvasActions.getTrace,
         getEmail: emailActions.getEmailForNode,
+        getEmailPreview: emailActions.getEmailPreview,
         removeEmail: (emailId: string) => emailActions.removeEmail(projectId, emailId),
         addEmail: {
           addPaste: (subject, html) =>

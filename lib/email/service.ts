@@ -146,3 +146,28 @@ export async function emailForNode(client: Client, nodeId: string): Promise<Emai
     imagesLoaded: data.images_loaded,
   };
 }
+
+export type EmailPreviewData = {
+  id: string;
+  subject: string;
+  html: string;
+  parts: EmailParts;
+};
+
+/** The email's HTML and parts, for the preview. Fetched only when someone opens a preview. */
+export async function emailPreview(
+  client: Client,
+  by: { emailId: string } | { nodeId: string },
+): Promise<EmailPreviewData | null> {
+  const q = client.from("emails").select("id, subject, html, parts");
+  const { data } = await (
+    "emailId" in by ? q.eq("id", by.emailId) : q.eq("node_id", by.nodeId)
+  ).maybeSingle();
+  if (!data) return null;
+  return {
+    id: data.id,
+    subject: data.subject,
+    html: data.html,
+    parts: data.parts as unknown as EmailParts,
+  };
+}

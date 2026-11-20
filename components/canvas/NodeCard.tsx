@@ -33,6 +33,8 @@ import { StrengthTag } from "./StrengthTag";
 import { canvasCopy as c } from "./copy";
 import { ASSET_MIME, AssetsExpanded, type AssetThumb } from "./AssetsExpanded";
 import { EvidenceExpanded, type EvidenceGroup } from "./EvidenceExpanded";
+import { EmailExpanded } from "@/components/email/EmailPreview";
+import type { EmailPreviewData } from "@/lib/email/service";
 
 const ICONS: Record<string, ComponentType<{ className?: string; "aria-hidden"?: boolean }>> = {
   objective: TargetIcon,
@@ -70,6 +72,8 @@ export type CardData = {
   dimmed: boolean;
   /** Lines can be dragged from and to this card (AC30.1). */
   canConnect?: boolean;
+  /** Email cards load their preview when expanded (phase 1). */
+  loadEmail?: (nodeId: string) => Promise<EmailPreviewData | null>;
   expanded?: boolean;
   onToggle?: (id: string) => void;
   onAddSource?: () => void;
@@ -81,11 +85,14 @@ function Expanded({
   node,
   onAddSource,
   onMoveAssets,
+  loadEmail,
 }: {
   node: TreeNode;
   onAddSource?: () => void;
   onMoveAssets?: (uploadIds: string[], toNodeId: string | null) => void;
+  loadEmail?: (nodeId: string) => Promise<EmailPreviewData | null>;
 }) {
+  if (node.type === "email" && loadEmail) return <EmailExpanded load={() => loadEmail(node.id)} />;
   if (node.type === "asset_set") {
     const thumbs = (node.data as { assets?: AssetThumb[] }).assets ?? [];
     return (
@@ -155,6 +162,7 @@ export function CardBody({
   onToggle,
   onAddSource,
   onMoveAssets,
+  loadEmail,
 }: {
   node: TreeNode;
   running: boolean;
@@ -163,6 +171,7 @@ export function CardBody({
   onToggle?: (id: string) => void;
   onAddSource?: () => void;
   onMoveAssets?: (uploadIds: string[], toNodeId: string | null) => void;
+  loadEmail?: (nodeId: string) => Promise<EmailPreviewData | null>;
 }) {
   const v = cardView(node, running);
   const Icon = ICONS[node.type] ?? BookOpenIcon;
@@ -251,7 +260,12 @@ export function CardBody({
       </div>
       {expanded ? (
         <div className="animate-in fade-in-0 duration-base">
-          <Expanded node={node} onAddSource={onAddSource} onMoveAssets={onMoveAssets} />
+          <Expanded
+            node={node}
+            onAddSource={onAddSource}
+            onMoveAssets={onMoveAssets}
+            loadEmail={loadEmail}
+          />
         </div>
       ) : null}
     </div>
@@ -306,6 +320,7 @@ export function NodeCard({ data, selected }: NodeProps<Node<CardData>>) {
         onToggle={data.onToggle}
         onAddSource={data.onAddSource}
         onMoveAssets={data.onMoveAssets}
+        loadEmail={data.loadEmail}
       />
       <Handle
         type="source"

@@ -29,7 +29,8 @@ import { EthicsPanel, type EthicsView } from "./EthicsPanel";
 import { UploadList } from "./UploadList";
 import { AddEmailDialog, type AddEmailFns } from "@/components/email/AddEmailDialog";
 import { emailCopy } from "@/components/email/copy";
-import type { EmailRow } from "@/lib/email/service";
+import { EmailPreviewDialog } from "@/components/email/EmailPreview";
+import type { EmailPreviewData, EmailRow } from "@/lib/email/service";
 import { competitorLines, MAX_COMPETITORS } from "@/lib/schemas/intake";
 
 export type BriefActions = {
@@ -57,6 +58,8 @@ export type BriefActions = {
   /** Phase 1: emails are added and removed here for email projects (AC31.2). */
   addEmail?: AddEmailFns;
   removeEmail?: (emailId: string) => Promise<ActionResult>;
+  /** The email's HTML and parts for a preview, right after adding it. */
+  previewEmail?: (emailId: string) => Promise<EmailPreviewData | null>;
   approve: (projectId: string) => Promise<ActionResult<{ stageRunId: string }>>;
   editIntake: (projectId: string) => Promise<ActionResult>;
   override: (
@@ -200,6 +203,7 @@ export function BriefPage({ data, actions }: { data: BriefData; actions: BriefAc
   const emails = data.emails ?? [];
   const isEmailProject = project.channel === "email";
   const [addingEmail, setAddingEmail] = useState(false);
+  const [previewing, setPreviewing] = useState<string | null>(null);
   const missing = missingForApproval(
     {
       business_objective: values.business_objective,
@@ -470,7 +474,17 @@ export function BriefPage({ data, actions }: { data: BriefData; actions: BriefAc
                       key={e.id}
                       className="flex items-center justify-between gap-3 rounded-sm bg-soft px-3 py-2 text-small"
                     >
-                      <span className="min-w-0 truncate">{e.subject}</span>
+                      <span className="min-w-0 flex-1 truncate">{e.subject}</span>
+                      {actions.previewEmail ? (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          aria-label={`${emailCopy.preview.button}: ${e.subject}`}
+                          onClick={() => setPreviewing(e.id)}
+                        >
+                          {emailCopy.preview.button}
+                        </Button>
+                      ) : null}
                       {actions.removeEmail ? (
                         <Button
                           variant="ghost"
@@ -490,6 +504,14 @@ export function BriefPage({ data, actions }: { data: BriefData; actions: BriefAc
               ) : (
                 <p className="text-small text-muted">{emailCopy.empty}</p>
               )}
+              {previewing && actions.previewEmail ? (
+                <EmailPreviewDialog
+                  key={previewing}
+                  open
+                  onOpenChange={(o) => !o && setPreviewing(null)}
+                  load={() => actions.previewEmail!(previewing)}
+                />
+              ) : null}
               {actions.addEmail ? (
                 <AddEmailDialog
                   open={addingEmail}

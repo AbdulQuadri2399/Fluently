@@ -706,6 +706,10 @@ Format: user action → system response → resulting state (ACs).
 | email.added / email.addedLate / email.removed | "Email added." / "Email added. The summary and themes are now out of date." / "Email removed." |
 | email.remove / email.removeTitle / email.removeConfirm / email.removing | "Remove" / "Remove this email?" / "Remove email" / "Removing…" |
 | email.removeBody | "Its card is removed too. If research has run, the summary and themes are marked out of date." |
+| email.preview.button / email.preview.title / email.preview.heading | "Preview" / "Email preview" / "Preview" *(2026-11-20: please confirm)* |
+| email.preview.loading / email.preview.failed | "Loading the preview…" / "Couldn't load the preview. Try closing and opening the card again." |
+| email.preview.note | "Shown at phone width. Your mail program may look slightly different." |
+| email.preview.imagesOff / email.preview.loadImages / email.preview.loadImagesHint | "Images are off." / "Load this email's images" / "Loading images can count as an open for the sender." |
 | email.parts.* | "Email parts" · "Subject line" · "Preheader" ("None. The inbox will show the start of the email instead.") · "Hero" · "Buttons" ("main" beside the first) · "Body" ("{n} words") · "Footer" ("Unsubscribe link found" / "No unsubscribe link found") · "Images" ("{n} images, {m} without a description") |
 | email.card | "{n} buttons · preheader" / "{n} buttons · no preheader" (status line on the email card) |
 | intake.competitorsLabel / intake.competitorsHelp | "Competitors (optional)" / "Up to five, one per line. Leave it blank and Fluently will suggest some for you to check." |

@@ -45,6 +45,7 @@ export function BriefScreen({ data }: { data: BriefData }) {
           },
         },
         removeEmail: (emailId: string) => emailActions.removeEmail(projectId, emailId),
+        previewEmail: (emailId: string) => emailActions.getEmailPreview({ emailId }),
         approve: a.approveObjectives,
         editIntake: a.editApprovedIntake,
         override: a.recordOverride,

@@ -17,3 +17,6 @@ export async function removeEmail(projectId: string, emailId: string) {
 export async function getEmailForNode(nodeId: string) {
   return email.emailForNode(await createClient(), nodeId);
 }
+export async function getEmailPreview(by: { emailId: string } | { nodeId: string }) {
+  return email.emailPreview(await createClient(), by);
+}
