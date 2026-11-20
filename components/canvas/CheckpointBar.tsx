@@ -348,7 +348,7 @@ export function CheckpointBar({
         key={to}
         type="button"
         onClick={() => setSize(to)}
-        className="inline-flex items-center gap-1 rounded-xs px-1.5 py-1 text-caption text-muted hover:bg-soft hover:text-ink"
+        className="inline-flex shrink-0 items-center gap-1 rounded-xs px-1.5 py-1 text-caption whitespace-nowrap text-muted hover:bg-soft hover:text-ink"
       >
         <Icon aria-hidden="true" className="size-3.5" />
         {label}
@@ -370,15 +370,20 @@ export function CheckpointBar({
       )}
     >
       {minimised ? (
-        <div className="flex items-center gap-4">
-          <p aria-live="polite" className="flex-1 truncate text-small">
+        <div className="flex min-w-0 items-center gap-4">
+          {/* min-w-0 lets a long message shrink and truncate instead of pushing the buttons out. */}
+          <p
+            aria-live="polite"
+            title={message || undefined}
+            className="min-w-0 flex-1 truncate text-small"
+          >
             {state.kind === "choose"
               ? `${c.checkpoint.chooseOpportunities} · ${c.checkpoint.selected(chosen)}`
               : message}
           </p>
           {sizeButton("standard")}
           {sizeButton("expanded")}
-          {state.kind === "choose" ? null : action}
+          {state.kind === "choose" ? null : <span className="shrink-0">{action}</span>}
         </div>
       ) : (
         <div className="-my-1 flex justify-end gap-1">
