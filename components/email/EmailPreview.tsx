@@ -4,34 +4,47 @@ import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import type { EmailPreviewData } from "@/lib/email/service";
 import { previewDocument } from "@/lib/email/preview";
+import { FOLD_PX, measureLinks, PHONE_WIDTH, type LinkPosition } from "@/lib/email/fold";
+import { LinkList } from "./LinkList";
 import { emailCopy as c } from "./copy";
 
-const PHONE_W = 375;
-const FRAME_H = 640;
+const PHONE_W = PHONE_WIDTH;
+const FRAME_H = 800;
 
-/** The email at phone width in a sandboxed frame: no scripts, no network (04 D38). */
+/**
+ * The email at phone width in a sandboxed frame: no scripts, no network (04 D38). The frame shares
+ * its origin with the page only so the page can read where each link sits (the fold, AC31.3b);
+ * with no scripts allowed, nothing inside it can run or reach out.
+ */
 export function EmailPreviewFrame({
   html,
   subject,
   width,
   images,
+  onMeasure,
 }: {
   html: string;
   subject: string;
   /** The space available; the phone-width page is scaled down to fit it. */
   width: number;
   images: boolean;
+  /** Called once the email has been laid out (and again after images load, when they are on). */
+  onMeasure?: (doc: Document) => void;
 }) {
   const scale = Math.min(1, width / PHONE_W);
   return (
     <div
-      className="overflow-hidden rounded-sm border border-line bg-surface"
+      className="relative overflow-hidden rounded-sm border border-line bg-surface"
       style={{ width: PHONE_W * scale, height: FRAME_H * scale }}
     >
       <iframe
         title={c.preview.frameTitle(subject)}
-        sandbox=""
+        sandbox="allow-same-origin"
         srcDoc={previewDocument(html, { images })}
+        onLoad={(e) => {
+          const doc = e.currentTarget.contentDocument;
+          if (doc) onMeasure?.(doc);
+        }}
         style={{
           width: PHONE_W,
           height: FRAME_H,
@@ -40,14 +53,35 @@ export function EmailPreviewFrame({
           transformOrigin: "top left",
         }}
       />
+      <div
+        aria-hidden="true"
+        data-testid="fold-line"
+        className="pointer-events-none absolute inset-x-0 border-t border-dashed border-ink/60"
+        style={{ top: FOLD_PX * scale }}
+      >
+        <span className="absolute right-1 -top-4 rounded-xs bg-surface px-1 text-caption text-muted">
+          {c.preview.foldLine}
+        </span>
+      </div>
     </div>
   );
 }
 
 /** The preheader and buttons, then the preview with its images switch. */
-export function EmailPreviewBody({ data, width }: { data: EmailPreviewData; width: number }) {
+export function EmailPreviewBody({
+  data,
+  width,
+  measure = measureLinks,
+}: {
+  data: EmailPreviewData;
+  width: number;
+  /** Reads link positions from the laid-out email; replaceable in tests. */
+  measure?: typeof measureLinks;
+}) {
   const [images, setImages] = useState(false);
+  const [positions, setPositions] = useState<Record<string, LinkPosition>>({});
   const p = data.parts;
+  const wanted = [...p.ctas, ...(p.links ?? [])];
   return (
     <div className="grid gap-3">
       <dl className="grid gap-2">
@@ -60,24 +94,19 @@ export function EmailPreviewBody({ data, width }: { data: EmailPreviewData; widt
         <div className="grid gap-0.5">
           <dt className="text-caption text-muted">{c.parts.buttons}</dt>
           <dd className="text-caption text-ink">
-            {p.ctas.length ? (
-              <ul className="grid gap-0.5">
-                {p.ctas.map((cta) => (
-                  <li key={`${cta.text}|${cta.href}`}>
-                    {cta.text}
-                    {cta.primary ? <span className="text-muted"> · {c.parts.primary}</span> : null}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <span className="text-muted">{c.parts.noButtons}</span>
-            )}
+            <LinkList parts={p} positions={positions} />
           </dd>
         </div>
       </dl>
       <div className="grid gap-1.5">
         <p className="text-caption font-medium text-ink">{c.preview.heading}</p>
-        <EmailPreviewFrame html={data.html} subject={data.subject} width={width} images={images} />
+        <EmailPreviewFrame
+          html={data.html}
+          subject={data.subject}
+          width={width}
+          images={images}
+          onMeasure={(doc) => setPositions(measure(doc, wanted))}
+        />
         <label className="flex items-start gap-2 text-caption">
           <input
             type="checkbox"
@@ -92,6 +121,9 @@ export function EmailPreviewBody({ data, width }: { data: EmailPreviewData; widt
             </span>
           </span>
         </label>
+        <p className="text-caption text-muted">
+          {images ? c.preview.foldNoteOn : c.preview.foldNote}
+        </p>
         <p className="text-caption text-muted">{c.preview.note}</p>
       </div>
     </div>

@@ -20,20 +20,25 @@ describe("email parts", () => {
     expect(welcome().text).toContain("Thanks for joining.");
   });
 
-  it("finds the styled button as the primary call to action, then the text link", () => {
-    const ctas = welcome().ctas;
-    expect(ctas[0]).toEqual({
-      text: "Verify my identity",
-      href: "https://example.org/verify",
-      primary: true,
-    });
-    expect(ctas.map((c) => c.text)).toEqual(["Verify my identity"]);
+  it("finds the styled button as the primary call to action, and lists plain links separately", () => {
+    const parts = welcome();
+    expect(parts.ctas).toEqual([
+      {
+        text: "Verify my identity",
+        href: "https://example.org/verify",
+        primary: true,
+        kind: "button",
+      },
+    ]);
+    expect(parts.links).toEqual([{ text: "remind me later", href: "https://example.org/later" }]);
   });
 
   it("with no styled buttons, short text links stand in; unsubscribe and privacy links never do", () => {
     const eml = parseEml(readFileSync("fixtures/emails/plain-links.eml", "utf8"));
     const parts = splitEmail(eml.html!, eml.subject);
     expect(parts.ctas.map((c) => c.text)).toEqual(["Shop the sale"]);
+    expect(parts.ctas[0]!.kind).toBe("link"); // no styled button, so a text link stands in
+    expect(parts.links).toEqual([]);
     expect(parts.footer.hasUnsubscribe).toBe(true);
   });
 

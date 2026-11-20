@@ -68,7 +68,7 @@ export function NewProjectDialog({
   const [status, setStatus] = useState<"default" | "saving" | "error">("default");
   const form = useForm<CreateProjectInput>({
     resolver: zodResolver(createProjectSchema),
-    defaultValues: { name: "", mode: "new", channel: "email", clientLabel: "" },
+    defaultValues: { name: "", mode: "optimise", channel: "email", clientLabel: "" },
   });
   const nameError = form.formState.errors.name?.message;
 
@@ -138,7 +138,7 @@ export function NewProjectDialog({
               name="mode"
               render={({ field }) => (
                 <R.Root className="grid gap-2" value={field.value} onValueChange={field.onChange}>
-                  <ChoiceCard value="new" title={c.modeNew} hint={c.modeNewHint} />
+                  <ChoiceCard value="new" title={c.modeNew} hint={c.comingSoon} disabled />
                   <ChoiceCard value="optimise" title={c.modeOptimise} hint={c.modeOptimiseHint} />
                 </R.Root>
               )}

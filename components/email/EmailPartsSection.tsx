@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import type { EmailDetail } from "@/lib/email/service";
 import { emailCopy as c } from "./copy";
+import { LinkList } from "./LinkList";
 
 const Row = ({ label, children }: { label: string; children: React.ReactNode }) => (
   <div className="grid gap-0.5">
@@ -29,18 +30,7 @@ export function EmailPartsSection({ detail }: { detail: EmailDetail }) {
           {p.hero.headline ?? <span className="text-muted">{c.parts.noHeadline}</span>}
         </Row>
         <Row label={c.parts.buttons}>
-          {p.ctas.length ? (
-            <ul className="grid gap-0.5">
-              {p.ctas.map((cta) => (
-                <li key={`${cta.text}|${cta.href}`}>
-                  {cta.text}
-                  {cta.primary ? <span className="text-muted"> · {c.parts.primary}</span> : null}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <span className="text-muted">{c.parts.noButtons}</span>
-          )}
+          <LinkList parts={p} />
         </Row>
         <Row label={c.parts.body}>{c.parts.words(p.body.wordCount)}</Row>
         <Row label={c.parts.footer}>

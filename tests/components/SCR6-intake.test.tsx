@@ -460,7 +460,7 @@ describe("SCR6 Brief", () => {
       expect(previewEmail).toHaveBeenCalledWith("e1");
       expect(
         await screen.findByTitle(emailCopy.preview.frameTitle("Welcome to Examplebank")),
-      ).toHaveAttribute("sandbox", "");
+      ).toHaveAttribute("sandbox", "allow-same-origin");
     });
 
     it("Add email opens the dialog", async () => {

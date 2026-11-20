@@ -135,14 +135,15 @@ export type EmailDetail = {
 export async function emailForNode(client: Client, nodeId: string): Promise<EmailDetail | null> {
   const { data } = await client
     .from("emails")
-    .select("id, source, parts, images_loaded")
+    .select("id, source, subject, html, images_loaded")
     .eq("node_id", nodeId)
     .maybeSingle();
   if (!data) return null;
   return {
     id: data.id,
     source: data.source,
-    parts: data.parts as unknown as EmailParts,
+    // Split again from the stored HTML, so emails added before a splitter change get the latest.
+    parts: splitEmail(data.html, data.subject),
     imagesLoaded: data.images_loaded,
   };
 }
@@ -159,7 +160,7 @@ export async function emailPreview(
   client: Client,
   by: { emailId: string } | { nodeId: string },
 ): Promise<EmailPreviewData | null> {
-  const q = client.from("emails").select("id, subject, html, parts");
+  const q = client.from("emails").select("id, subject, html");
   const { data } = await (
     "emailId" in by ? q.eq("id", by.emailId) : q.eq("node_id", by.nodeId)
   ).maybeSingle();
@@ -168,6 +169,6 @@ export async function emailPreview(
     id: data.id,
     subject: data.subject,
     html: data.html,
-    parts: data.parts as unknown as EmailParts,
+    parts: splitEmail(data.html, data.subject),
   };
 }

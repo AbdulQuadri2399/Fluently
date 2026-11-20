@@ -18,8 +18,10 @@ describe("SCR4 New project dialog", () => {
     await open();
     expect(screen.getByRole("dialog", { name: c.newProject })).toBeInTheDocument();
     expect(screen.getByLabelText(c.name)).toBeInTheDocument();
-    expect(screen.getByRole("radio", { name: new RegExp(c.modeNew) })).toBeChecked();
-    expect(screen.getByRole("radio", { name: new RegExp(c.modeOptimise) })).not.toBeChecked();
+    // Phase 1 (AC31.1): "Create something new" is coming soon; optimise is the default.
+    expect(screen.getByRole("radio", { name: new RegExp(c.modeNew) })).toBeDisabled();
+    expect(screen.getByRole("radio", { name: new RegExp(c.modeNew) })).not.toBeChecked();
+    expect(screen.getByRole("radio", { name: new RegExp(c.modeOptimise) })).toBeChecked();
     // Phase 1 (AC31.1): email is the default and Screens is coming soon, not choosable.
     expect(
       screen.getByRole("radio", { name: `${c.channelScreens}. ${c.comingSoon}` }),

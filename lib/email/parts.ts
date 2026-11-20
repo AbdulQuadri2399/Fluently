@@ -5,7 +5,10 @@ import { HTMLElement, parse, type Node, TextNode } from "node-html-parser";
 // no network. The "hero" here is the opening block; the real first phone screen comes from the
 // render (P1.5).
 
-export type Cta = { text: string; href: string | null; primary: boolean };
+/** A call to action: a link designed as a button, or (when the email has no styled button) a short text link standing in. */
+export type Cta = { text: string; href: string | null; primary: boolean; kind: "button" | "link" };
+/** Any other meaningful link: a plain link in the copy, not designed as a button. */
+export type PlainLink = { text: string; href: string | null };
 export type EmailImage = { alt: string | null; src: string | null };
 
 export type EmailParts = {
@@ -15,6 +18,7 @@ export type EmailParts = {
   hero: { headline: string | null; hasImage: boolean; imageAlt: string | null; text: string };
   body: { text: string; wordCount: number };
   ctas: Cta[];
+  links: PlainLink[];
   footer: { text: string; hasUnsubscribe: boolean };
   images: EmailImage[];
   /** All visible text, in order. What quotes are checked against (AC31.7). */
@@ -99,16 +103,27 @@ export function splitEmail(html: string, subject: string): EmailParts {
   const candidates = links.filter(
     (a) => linkText(a) && !SKIP_LINK.test(linkText(a) + " " + (a.getAttribute("href") ?? "")),
   );
-  let buttons = candidates.filter(looksLikeButton);
-  // No styled buttons: short links stand in (a text link as the call to action).
-  if (buttons.length === 0) buttons = candidates.filter((a) => words(linkText(a)) <= 6);
+  const styled = candidates.filter(looksLikeButton);
+  // No styled buttons: short text links stand in as the calls to action.
+  const chosen = styled.length ? styled : candidates.filter((a) => words(linkText(a)) <= 6);
+  const kind: Cta["kind"] = styled.length ? "button" : "link";
   const seen = new Set<string>();
-  for (const a of buttons) {
-    const text = linkText(a);
-    const key = `${text}|${a.getAttribute("href")}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    ctas.push({ text, href: a.getAttribute("href") ?? null, primary: ctas.length === 0 });
+  const keyOf = (a: HTMLElement) => `${linkText(a)}|${a.getAttribute("href")}`;
+  for (const a of chosen) {
+    if (seen.has(keyOf(a))) continue;
+    seen.add(keyOf(a));
+    ctas.push({
+      text: linkText(a),
+      href: a.getAttribute("href") ?? null,
+      primary: ctas.length === 0,
+      kind,
+    });
+  }
+  const plainLinks: PlainLink[] = [];
+  for (const a of candidates) {
+    if (seen.has(keyOf(a))) continue;
+    seen.add(keyOf(a));
+    plainLinks.push({ text: linkText(a), href: a.getAttribute("href") ?? null });
   }
 
   const images: EmailImage[] = root.querySelectorAll("img").map((img) => ({
@@ -151,6 +166,7 @@ export function splitEmail(html: string, subject: string): EmailParts {
     },
     body: { text: bodyText, wordCount: words(bodyText) },
     ctas,
+    links: plainLinks,
     footer: {
       text: footerBlocks.map((b) => b.text).join("\n"),
       hasUnsubscribe:

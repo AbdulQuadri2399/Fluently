@@ -96,4 +96,8 @@ test("New project: Screens is coming soon and can't be chosen (AC31.1)", async (
   await page.getByRole("button", { name: "New project" }).click();
   await expect(page.getByRole("radio", { name: /Screens and flows\. Coming soon/ })).toBeDisabled();
   await expect(page.getByRole("radio", { name: "Email", exact: true })).toBeChecked();
+  await expect(
+    page.getByRole("radio", { name: /Create something new\. Coming soon/ }),
+  ).toBeDisabled();
+  await expect(page.getByRole("radio", { name: /Optimise something that exists/ })).toBeChecked();
 });

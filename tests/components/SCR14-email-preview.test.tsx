@@ -1,7 +1,11 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
-import { EmailExpanded, EmailPreviewDialog } from "@/components/email/EmailPreview";
+import {
+  EmailExpanded,
+  EmailPreviewBody,
+  EmailPreviewDialog,
+} from "@/components/email/EmailPreview";
 import { emailCopy as c } from "@/components/email/copy";
 import { splitEmail } from "@/lib/email/parts";
 import type { EmailPreviewData } from "@/lib/email/service";
@@ -28,7 +32,7 @@ describe("expanded email card", () => {
     expect(screen.getByText("Verify my identity")).toBeInTheDocument();
     expect(screen.getByText(c.parts.primary, { exact: false })).toBeInTheDocument();
     const f = frame();
-    expect(f.getAttribute("sandbox")).toBe("");
+    expect(f.getAttribute("sandbox")).toBe("allow-same-origin");
     expect(f.getAttribute("srcdoc")).toContain("Welcome to Examplebank");
     expect(f.getAttribute("srcdoc")).toContain("default-src 'none'");
     expect(f.style.width).toBe("375px");
@@ -67,5 +71,46 @@ describe("preview dialog (the brief)", () => {
     expect(await screen.findByRole("dialog", { name: c.preview.title })).toBeInTheDocument();
     expect(screen.getByText("Welcome to Examplebank", { selector: "p" })).toBeInTheDocument();
     expect(frame().style.width).toBe("375px");
+  });
+});
+
+describe("buttons, links and the fold (AC31.3b)", () => {
+  const tall = () => {
+    const parts = splitEmail(html, "Welcome to Examplebank");
+    return { ...data(), parts };
+  };
+
+  it("says which is designed as a button and which is a plain link", async () => {
+    render(<EmailExpanded load={async () => tall()} />);
+    const button = (await screen.findByText("Verify my identity")).closest("li")!;
+    expect(button).toHaveTextContent(c.parts.kindButton);
+    expect(button).toHaveTextContent(c.parts.primary);
+    const link = screen.getByText("remind me later").closest("li")!;
+    expect(link).toHaveTextContent(c.parts.kindLink);
+    expect(link).not.toHaveTextContent(c.parts.kindButton);
+  });
+
+  it("once the email is laid out, each link says above or below the fold; the fold line is drawn", async () => {
+    const measure = vi.fn(() => ({
+      "Verify my identity|https://example.org/verify": { top: 420 },
+      "remind me later|https://example.org/later": { top: 900 },
+    }));
+    render(<EmailPreviewBody data={tall()} width={256} measure={measure} />);
+    expect(screen.queryByText(c.parts.aboveFold)).not.toBeInTheDocument();
+    fireEvent.load(frame());
+    expect(await screen.findByText(c.parts.aboveFold)).toBeInTheDocument();
+    expect(screen.getByText(c.parts.belowFold)).toBeInTheDocument();
+    expect(screen.getByText("Verify my identity").closest("li")).toHaveTextContent(
+      c.parts.aboveFold,
+    );
+    expect(screen.getByText("remind me later").closest("li")).toHaveTextContent(c.parts.belowFold);
+    expect(screen.getByTestId("fold-line")).toBeInTheDocument();
+    expect(screen.getByText(c.preview.foldNote)).toBeInTheDocument();
+  });
+
+  it("with images on, the fold note no longer calls it an estimate", async () => {
+    render(<EmailPreviewBody data={tall()} width={256} measure={() => ({})} />);
+    await userEvent.click(screen.getByLabelText(new RegExp(c.preview.loadImages)));
+    expect(screen.getByText(c.preview.foldNoteOn)).toBeInTheDocument();
   });
 });

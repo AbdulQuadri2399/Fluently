@@ -710,6 +710,12 @@ Format: user action → system response → resulting state (ACs).
 | email.preview.loading / email.preview.failed | "Loading the preview…" / "Couldn't load the preview. Try closing and opening the card again." |
 | email.preview.note | "Shown at phone width. Your mail program may look slightly different." |
 | email.preview.imagesOff / email.preview.loadImages / email.preview.loadImagesHint | "Images are off." / "Load this email's images" / "Loading images can count as an open for the sender." |
+| email.parts.buttons / email.parts.plainLinks | "Buttons and links" / "Other links" *(2026-11-20: please confirm)* |
+| email.parts.kindButton / email.parts.kindLink | "Button" (designed as a button) / "Link" (a plain link, or a text link standing in when the email has no styled button) |
+| email.parts.aboveFold / email.parts.belowFold | "Above the fold" / "Below the fold" (shown in the preview once the email is laid out) |
+| email.preview.foldLine | "Fold" (label on the dashed line drawn at about 650 px) |
+| email.preview.foldNote / email.preview.foldNoteOn | "The fold is the first phone screen, about 650 px. With images off it is an estimate, because blocked images take no space." / "The fold is the first phone screen, about 650 px." |
+| project.modeNewSoon | "Create something new" with the hint "Coming soon" (disabled on New project; Optimise something that exists is the default) |
 | email.parts.* | "Email parts" · "Subject line" · "Preheader" ("None. The inbox will show the start of the email instead.") · "Hero" · "Buttons" ("main" beside the first) · "Body" ("{n} words") · "Footer" ("Unsubscribe link found" / "No unsubscribe link found") · "Images" ("{n} images, {m} without a description") |
 | email.card | "{n} buttons · preheader" / "{n} buttons · no preheader" (status line on the email card) |
 | intake.competitorsLabel / intake.competitorsHelp | "Competitors (optional)" / "Up to five, one per line. Leave it blank and Fluently will suggest some for you to check." |
