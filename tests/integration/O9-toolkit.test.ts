@@ -77,4 +77,63 @@ describe("O9 toolkit", () => {
       code: "validation",
     });
   });
+
+  it("real layout loads, skipped rows listed, new version keeps IDs by name (AC33.5)", async () => {
+    // A workspace of its own, so earlier toolkit versions do not change the numbering.
+    const owner = await createIsolatedAdmin();
+    const sheet = readFileSync("fixtures/toolkit/sheet-layout.csv", "utf8");
+    const v1 = await saveToolkitVersion(owner.client, {
+      fileName: "sheet-layout.csv",
+      content: sheet,
+    });
+    if (!v1.ok) throw new Error(v1.code);
+    const keys = async (versionId: string) =>
+      Object.fromEntries(
+        (
+          (
+            await owner.client
+              .from("principles")
+              .select("principle_key, name")
+              .eq("version_id", versionId)
+          ).data ?? []
+        ).map((p) => [p.name.toLowerCase(), p.principle_key]),
+      );
+    const first = await keys(v1.data.versionId);
+    expect(Object.keys(first)).toHaveLength(6);
+    expect(first["short lines"]).toBe("P001");
+    expect(first["second look"]).toBe("P006");
+    // The notices are saved with the version, for the owners to tidy the sheet.
+    const saved = await owner.client
+      .from("toolkit_versions")
+      .select("warnings")
+      .eq("id", v1.data.versionId)
+      .single();
+    const kinds = ((saved.data!.warnings ?? []) as { kind: string }[]).map((w) => w.kind);
+    expect(kinds).toEqual(
+      expect.arrayContaining(["generatedIds", "mergedSameName", "thinRows", "noName"]),
+    );
+
+    // Same principles in a different order, plus a new one: existing IDs hold.
+    const lines = sheet.trim().split(/\r?\n/);
+    const reordered = [
+      lines[0],
+      ...lines.slice(1).reverse(),
+      lines[1]!.replace("Short Lines", "Brand New"),
+    ].join("\n");
+    const v2 = await saveToolkitVersion(owner.client, {
+      fileName: "sheet-layout-v2.csv",
+      content: reordered,
+    });
+    if (!v2.ok) throw new Error(v2.code);
+    const second = await keys(v2.data.versionId);
+    for (const name of [
+      "Short Lines",
+      "Calm Colours",
+      "Price Anchor",
+      "Pause Prompt",
+      "Second Look",
+    ])
+      expect(second[name.toLowerCase()], name).toBe(first[name.toLowerCase()]);
+    expect(second["brand new"]).toBe("P007");
+  });
 });

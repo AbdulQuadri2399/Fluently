@@ -2,6 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { fail, ok, type ActionResult } from "@/lib/actions/result";
 import { currentMember } from "@/lib/projects/service";
 import type { Database, Json } from "@/lib/supabase/database.types";
+import { keepKeysByName } from "./keys";
 import { MAX_BYTES, parseToolkit, type EvidenceLevel } from "./parse";
 
 type Client = SupabaseClient<Database>;
@@ -36,10 +37,27 @@ export async function saveToolkitVersion(
   if (!me || me.role !== "admin") return fail("forbidden");
   const parsed = parseToolkit(input.content, input.fileName, size);
   if (!parsed.ok) return fail("validation");
+  let { principles, relations } = parsed;
+  if (parsed.warnings.some((w) => w.kind === "generatedIds")) {
+    // No ID column: a principle with the same name as in the latest version keeps its ID (AC33.5).
+    const { data: latest } = await client
+      .from("toolkit_versions")
+      .select("id")
+      .order("number", { ascending: false })
+      .limit(1);
+    const { data: previous } = latest?.[0]
+      ? await client
+          .from("principles")
+          .select("principle_key, name")
+          .eq("version_id", latest[0].id)
+          .limit(20000)
+      : { data: [] };
+    ({ principles, relations } = keepKeysByName(principles, relations, previous ?? []));
+  }
   const { data, error } = await client.rpc("save_toolkit_version", {
     p_file_name: input.fileName.slice(0, 255),
-    p_principles: parsed.principles as unknown as Json,
-    p_relations: parsed.relations as unknown as Json,
+    p_principles: principles as unknown as Json,
+    p_relations: relations as unknown as Json,
     p_warnings: parsed.warnings as unknown as Json,
   });
   if (error) return fail(error.code === "42501" ? "forbidden" : "unavailable");

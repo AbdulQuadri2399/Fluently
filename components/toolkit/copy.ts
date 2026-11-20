@@ -19,6 +19,15 @@ export const toolkitCopy = {
     `Fluently doesn't use these columns, so they were left out: ${columns.join(", ")}.`,
   warnRelatedNotFound: (row: number, text: string) =>
     `Row ${row}: the related principle "${text}" isn't in this file, so no connection was made. The text is kept.`,
+  warnGeneratedIds:
+    "This file has no ID column, so Fluently gave each principle an ID in the order of the sheet. Later uploads keep the same ID for a principle with the same name.",
+  warnNoName: (row: number) => `Row ${row}: no principle name, so this row was left out.`,
+  warnMergedSameName: (name: string, rows: number[]) =>
+    `"${name}" appears on rows ${rows.join(", ")}. They were combined into one principle.`,
+  warnGoalsUnified: (variants: string[], used: string) =>
+    `These goal spellings were treated as one: ${variants.map((v) => `"${v}"`).join(", ")}. Fluently uses "${used}".`,
+  warnThinRows: (count: number, names: string[]) =>
+    `${count} ${count === 1 ? "principle has" : "principles have"} no summary, explanation or example (for example ${names.join(", ")}). They're kept, and used less when Fluently picks principles to audit with.`,
   saved: (n: number) => `Toolkit version ${n} saved. New projects will use it.`,
   upload: "Upload toolkit",
   uploadNew: "Upload new version",

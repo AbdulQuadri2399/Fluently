@@ -9,3 +9,5 @@ company IP and must never be committed (`scripts/check-toolkit-fixture.sh` check
 - `bad-missing-id.csv`: row 4 has an empty ID.
 - `bad-duplicate-id.csv`: rows 3 and 6 share an ID.
 - `bad-missing-columns.csv`: no `Sub-Goal` or `Mechanism` column.
+
+- `sheet-layout.csv`: invented data in the same layout as the team's working sheet (no ID column, repeated principle names, two spellings of one goal, a thin row, an unnamed row, extra tidy-up columns). Used to test that such a sheet loads (AC33.5). It is not the real toolkit.

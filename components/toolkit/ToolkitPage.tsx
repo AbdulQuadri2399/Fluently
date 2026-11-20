@@ -46,9 +46,22 @@ export function errorMessage(e: ToolkitError): string {
 }
 
 export function warningMessage(w: ToolkitWarning): string {
-  return w.kind === "unknownColumns"
-    ? c.warnUnknownColumns(w.columns)
-    : c.warnRelatedNotFound(w.row, w.text);
+  switch (w.kind) {
+    case "unknownColumns":
+      return c.warnUnknownColumns(w.columns);
+    case "relatedNotFound":
+      return c.warnRelatedNotFound(w.row, w.text);
+    case "generatedIds":
+      return c.warnGeneratedIds;
+    case "noName":
+      return c.warnNoName(w.row);
+    case "mergedSameName":
+      return c.warnMergedSameName(w.name, w.rows);
+    case "goalsUnified":
+      return c.warnGoalsUnified(w.variants, w.used);
+    case "thinRows":
+      return c.warnThinRows(w.count, w.names);
+  }
 }
 
 /** Reads the chosen file and runs the same checks the server runs on save (AC4.1). */

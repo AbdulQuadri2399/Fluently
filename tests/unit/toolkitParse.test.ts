@@ -32,9 +32,12 @@ describe("toolkit parse", () => {
       "Principle,General Goal,Sub-Goal,Mechanism\nA,B,C,D\n",
       "x.csv",
     );
-    expect(noIdColumn).toMatchObject({
+    // Changed 2026-11-19 (AC33.5): no ID column is fine; IDs are generated.
+    expect(noIdColumn).toMatchObject({ ok: true, rowCount: 1 });
+    expect(noIdColumn.warnings).toContainEqual({ kind: "generatedIds" });
+    expect(parseToolkit("Principle,General Goal,Mechanism\nA,B,D\n", "x.csv")).toMatchObject({
       ok: false,
-      errors: [{ kind: "missingColumns", columns: ["ID"] }],
+      errors: [{ kind: "missingColumns", columns: ["Sub-Goal"] }],
     });
   });
 
@@ -100,5 +103,87 @@ describe("toolkit parse", () => {
       ok: false,
       errors: [{ kind: "empty" }],
     });
+  });
+});
+
+describe("toolkit sheet without an ID column (AC33.5)", () => {
+  const result = () => {
+    const r = parse("sheet-layout.csv");
+    if (!r.ok) throw new Error(JSON.stringify(r.errors));
+    return r;
+  };
+
+  it("loads: the name is the key, IDs are generated in sheet order", () => {
+    const r = result();
+    expect(r.rowCount).toBe(9);
+    expect(r.principles.map((p) => [p.principle_key, p.name])).toEqual([
+      ["P001", "Short Lines"],
+      ["P002", "Calm Colours"],
+      ["P003", "Quiet Imagery"],
+      ["P004", "Price Anchor"],
+      ["P005", "Pause Prompt"],
+      ["P006", "Second Look"],
+    ]);
+    expect(r.warnings).toContainEqual({ kind: "generatedIds" });
+  });
+
+  it("rows with the same name (any case or spacing) become one principle with combined text", () => {
+    const r = result();
+    const anchor = r.principles.find((p) => p.name === "Price Anchor")!;
+    expect(anchor.quick_insight).toBe("Invented: the first number sets expectations.");
+    expect(anchor.extended_explanation).toBe("Second note about the anchor, invented.");
+    expect(anchor.examples).toBe("An invented shop shows a crossed-out price.");
+    expect(r.warnings).toContainEqual({
+      kind: "mergedSameName",
+      name: "Price Anchor",
+      rows: [5, 6, 7],
+    });
+  });
+
+  it("goal spellings that mean the same thing are unified, using the most common one", () => {
+    const r = result();
+    const goals = new Set(r.principles.map((p) => p.general_goal));
+    expect(goals).toEqual(
+      new Set([
+        "Ease processing",
+        "Prime emotions & states",
+        "Alter perceptions",
+        "Prompt conscious processing",
+      ]),
+    );
+    expect(r.warnings.filter((w) => w.kind === "goalsUnified")).toHaveLength(2);
+  });
+
+  it("a row with no name is left out, with its row number", () => {
+    expect(result().warnings).toContainEqual({ kind: "noName", row: 10 });
+  });
+
+  it("principles with no summary, explanation or example are kept and counted", () => {
+    const r = result();
+    expect(r.principles.find((p) => p.name === "Quiet Imagery")).toBeDefined();
+    expect(r.warnings).toContainEqual({ kind: "thinRows", count: 1, names: ["Quiet Imagery"] });
+  });
+
+  it("columns the app doesn't use are listed, not an error", () => {
+    const w = result().warnings.find((x) => x.kind === "unknownColumns");
+    expect(w).toMatchObject({
+      columns: expect.arrayContaining(["SLICE", "SALIENT", "Tidy-up flag", "Decision"]),
+    });
+  });
+
+  it("related principles still connect by name", () => {
+    expect(result().relations).toEqual([{ from: "P002", to: "P001" }]);
+  });
+
+  it("evidence strength comes from the link, reference and evidence text", () => {
+    const r = result();
+    const level = (n: string) => r.principles.find((p) => p.name === n)!.evidence_level;
+    expect(level("Short Lines")).toBe("strong");
+    expect(level("Calm Colours")).toBe("none");
+    expect(level("Pause Prompt")).toBe("some");
+  });
+
+  it("a file with an ID column still needs every ID (as before)", () => {
+    expect(parse("bad-missing-id.csv")).toMatchObject({ ok: false });
   });
 });

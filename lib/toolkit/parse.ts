@@ -2,6 +2,7 @@ import Papa from "papaparse";
 
 // Toolkit file checks (AC4.1–AC4.4, AC4.6, AC4.7). Pure: no database, no network.
 
+/** The columns every file needs. `ID` is needed only when the file has an ID column (AC33.5). */
 export const REQUIRED_COLUMNS = [
   "ID",
   "Principle",
@@ -41,7 +42,17 @@ export type ToolkitError =
 
 export type ToolkitWarning =
   | { kind: "unknownColumns"; columns: string[] }
-  | { kind: "relatedNotFound"; row: number; text: string };
+  | { kind: "relatedNotFound"; row: number; text: string }
+  /** No ID column: IDs were generated in sheet order (AC33.5). */
+  | { kind: "generatedIds" }
+  /** A row with other cells filled but no principle name was left out. */
+  | { kind: "noName"; row: number }
+  /** Rows with the same principle name became one principle (AC33.5). */
+  | { kind: "mergedSameName"; name: string; rows: number[] }
+  /** Goal spellings that mean the same thing were unified (AC33.5). */
+  | { kind: "goalsUnified"; variants: string[]; used: string }
+  /** Principles with no summary, explanation or example: kept, but ranked lower. */
+  | { kind: "thinRows"; count: number; names: string[] };
 
 export type EvidenceLevel = "strong" | "some" | "none";
 
@@ -123,7 +134,8 @@ const orNull = (s: string): string | null => (s === "" ? null : s);
 export function evidenceLevel(link: string, reference: string, evidence: string): EvidenceLevel {
   if (/^no source\.?$/i.test(evidence.trim())) return "none";
   const hasLink = link.trim() !== "" || reference.trim() !== "";
-  const hasEvidence = evidence.trim() !== "";
+  // "Link only" says there is a link and nothing more: it isn't evidence text.
+  const hasEvidence = evidence.trim() !== "" && !/^link only\.?$/i.test(evidence.trim());
   if (hasLink && hasEvidence) return "strong";
   if (hasLink || hasEvidence) return "some";
   return "none";
@@ -158,7 +170,8 @@ export function parseToolkit(content: string, fileName: string, byteSize?: numbe
     : [];
   const rowCount = read.rows.length;
 
-  const missing = REQUIRED_COLUMNS.filter((c) => !present.has(c));
+  const hasIdColumn = present.has("ID");
+  const missing = REQUIRED_COLUMNS.filter((c) => c !== "ID" && !present.has(c));
   if (missing.length)
     return {
       ok: false,
@@ -178,22 +191,12 @@ export function parseToolkit(content: string, fileName: string, byteSize?: numbe
   });
 
   const errors: ToolkitError[] = [];
-  const byId = new Map<string, number[]>();
-  for (const { row, get } of rows) {
-    const id = get("ID");
-    if (!id) errors.push({ kind: "missingId", row });
-    else byId.set(id.toLowerCase(), [...(byId.get(id.toLowerCase()) ?? []), row]);
-  }
-  for (const [, list] of byId) {
-    if (list.length > 1) {
-      const first = rows.find((r) => r.row === list[0]);
-      errors.push({ kind: "duplicateId", rows: list, id: first?.get("ID") ?? "" });
-    }
-  }
-  if (errors.length) return { ok: false, rowCount, errors, warnings };
+  const extraWarnings: ToolkitWarning[] = [];
+  let principles: ParsedPrinciple[];
+  let rowOf: number[]; // sheet row of each principle (its first row)
 
-  const principles: ParsedPrinciple[] = rows.map(({ get }) => ({
-    principle_key: get("ID"),
+  const build = (get: (c: Column) => string, key: string): ParsedPrinciple => ({
+    principle_key: key,
     name: get("Principle"),
     general_goal: get("General Goal"),
     sub_goal: get("Sub-Goal"),
@@ -209,7 +212,109 @@ export function parseToolkit(content: string, fileName: string, byteSize?: numbe
     evidence: orNull(get("Evidence")),
     related_raw: orNull(get("Related Principles")),
     evidence_level: evidenceLevel(get("Link to paper"), get("Reference"), get("Evidence")),
-  }));
+  });
+
+  if (hasIdColumn) {
+    // Files with an ID column: every row needs a unique ID, as before (AC4.2).
+    const byId = new Map<string, number[]>();
+    for (const { row, get } of rows) {
+      const id = get("ID");
+      if (!id) errors.push({ kind: "missingId", row });
+      else byId.set(id.toLowerCase(), [...(byId.get(id.toLowerCase()) ?? []), row]);
+    }
+    for (const [, list] of byId) {
+      if (list.length > 1) {
+        const first = rows.find((r) => r.row === list[0]);
+        errors.push({ kind: "duplicateId", rows: list, id: first?.get("ID") ?? "" });
+      }
+    }
+    if (errors.length) return { ok: false, rowCount, errors, warnings };
+    principles = rows.map(({ get }) => build(get, get("ID")));
+    rowOf = rows.map((r) => r.row);
+  } else {
+    // AC33.5: no ID column. The principle name is the key; IDs are generated in sheet order,
+    // rows with the same name become one principle, and goal spellings are unified.
+    extraWarnings.push({ kind: "generatedIds" });
+    const named = rows.filter(({ get, row }) => {
+      if (get("Principle")) return true;
+      extraWarnings.push({ kind: "noName", row });
+      return false;
+    });
+    if (named.length === 0) return { ok: false, rowCount, errors: [{ kind: "empty" }], warnings };
+    const groups = new Map<string, typeof named>();
+    for (const r of named) {
+      const k = r.get("Principle").toLowerCase().replace(/\s+/g, " ");
+      groups.set(k, [...(groups.get(k) ?? []), r]);
+    }
+    const goalKey = (g: string) =>
+      g
+        .toLowerCase()
+        .replace(/&/g, "and")
+        .replace(/concious/g, "conscious")
+        .replace(/\s+/g, " ")
+        .trim();
+    const goalVariants = new Map<string, Map<string, number>>();
+    for (const r of named) {
+      const g = r.get("General Goal");
+      if (!g) continue;
+      const m = goalVariants.get(goalKey(g)) ?? new Map<string, number>();
+      m.set(g, (m.get(g) ?? 0) + 1);
+      goalVariants.set(goalKey(g), m);
+    }
+    const goalUsed = new Map<string, string>();
+    for (const [k, m] of goalVariants) {
+      // Most common spelling wins; a known misspelling is corrected either way.
+      const used = [...m.entries()]
+        .sort((x, y) => y[1] - x[1])[0]![0]
+        .replace(/concious/gi, (t) => (t[0] === "C" ? "Conscious" : "conscious"));
+      goalUsed.set(k, used);
+      if (m.size > 1 || [...m.keys()].some((v) => v !== used))
+        extraWarnings.push({ kind: "goalsUnified", variants: [...m.keys()], used });
+    }
+    const first = (list: typeof named, c: Column) => list.map((r) => r.get(c)).find(Boolean) ?? "";
+    const joined = (list: typeof named, c: Column, sep: string) =>
+      [...new Set(list.map((r) => r.get(c)).filter(Boolean))].join(sep);
+    principles = [];
+    rowOf = [];
+    let n = 0;
+    for (const list of groups.values()) {
+      n += 1;
+      const get = (c: Column): string => {
+        switch (c) {
+          case "Extended Explanation":
+          case "Examples":
+            return joined(list, c, "\n\n");
+          case "Reference":
+          case "Related Principles":
+            return joined(list, c, "; ");
+          case "General Goal": {
+            const g = first(list, c);
+            return g ? (goalUsed.get(goalKey(g)) ?? g) : "";
+          }
+          default:
+            return first(list, c);
+        }
+      };
+      principles.push(build(get, `P${String(n).padStart(3, "0")}`));
+      rowOf.push(list[0]!.row);
+      if (list.length > 1)
+        extraWarnings.push({
+          kind: "mergedSameName",
+          name: list[0]!.get("Principle"),
+          rows: list.map((r) => r.row),
+        });
+    }
+    const thin = principles.filter(
+      (p) => !p.quick_insight && !p.extended_explanation && !p.examples,
+    );
+    if (thin.length)
+      extraWarnings.push({
+        kind: "thinRows",
+        count: thin.length,
+        names: thin.slice(0, 5).map((p) => p.name),
+      });
+  }
+  warnings.push(...extraWarnings);
 
   // AC4.6, AC4.7: related principles match an ID first, then a name; unmatched text is kept.
   const keyOf = new Map<string, string>();
@@ -218,7 +323,7 @@ export function parseToolkit(content: string, fileName: string, byteSize?: numbe
     if (p.name && !keyOf.has(p.name.toLowerCase()))
       keyOf.set(p.name.toLowerCase(), p.principle_key);
   const relations: { from: string; to: string }[] = [];
-  rows.forEach(({ row }, i) => {
+  rowOf.forEach((row, i) => {
     const p = principles[i]!;
     for (const part of (p.related_raw ?? "").split(/[;,\n]+/)) {
       const t = part.trim();

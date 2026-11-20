@@ -171,13 +171,15 @@ export function ProjectCanvas({
     (id: string) =>
       setMulti((cur) => {
         const next = new Set(cur);
-        // The card already open counts as the first one chosen.
-        if (cur.size === 0 && selectedId && selectedId !== id) next.add(selectedId);
+        // The card already open counts as the first one chosen. Read from the address, which
+        // changes the instant a card is clicked, so a quick Shift-click can't see an older card.
+        const open = new URLSearchParams(window.location.search).get("node");
+        if (cur.size === 0 && open && open !== id) next.add(open);
         if (next.has(id)) next.delete(id);
         else next.add(id);
         return next;
       }),
-    [selectedId],
+    [],
   );
   const multiNodes = tree.nodes.filter((n) => multi.has(n.id));
   const multiType =

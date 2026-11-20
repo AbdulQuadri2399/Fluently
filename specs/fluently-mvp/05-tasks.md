@@ -243,7 +243,7 @@ Slice check: suite green; FF10, FF11, FF16 pass; trace works on seeded graph. **
 Goal: a strategist adds emails and gets a quick audit, then a full audit with research, one Audit Report comparing the emails with the evidence, and themes pulled from it. Prove the workflow saves time.
 You'll be able to see: emails with their findings by part and lens, research questions you can edit, the report, and themes.
 
-- [ ] P1.1 Load the real toolkit sheet as it is (name as key, generated IDs, skip empty and duplicate rows, normalise goal spellings, skipped-rows list, match later versions by name) — S — Refs: AC33.5 — Depends on: T3.5
+- [x] P1.1 (done 2026-11-20; `tests/unit/toolkitParse.test.ts`, `tests/unit/toolkitKeys.test.ts`, `tests/integration/O9-toolkit.test.ts`, `tests/components/SCR11-toolkit.test.tsx`; the real sheet loads as 93 principles with 13 same-name merges and 12 thin rows) Load the real toolkit sheet as it is (name as key, generated IDs, skip empty and duplicate rows, normalise goal spellings, skipped-rows list, match later versions by name) — S — Refs: AC33.5 — Depends on: T3.5
   Done when: `tests/unit/toolkitParse.test.ts` has cases for the sheet layout (using an invented fixture in `fixtures/toolkit/`, never the real file) and `tests/integration/O9-toolkit.test.ts` 'real layout loads, skipped rows listed, new version keeps IDs by name' passes.
 - [ ] P1.2 Emails only: *Screens* shown as coming soon on New project; optional *Competitors* field on the brief — S — Refs: AC31.1, AC32.6 — Depends on: T4.2
   Done when: `tests/components/SCR4-new-project.test.tsx` 'screens coming soon' and `tests/components/SCR6-intake.test.tsx` competitors field pass.

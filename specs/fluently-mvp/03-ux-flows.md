@@ -694,6 +694,11 @@ Format: user action → system response → resulting state (ACs).
 | report.citationCols | "#" / "Source" / "Kind" / "Details" / "Retrieved" |
 | report.openLink / report.uploadedFile | "Open" / "Uploaded file" |
 | report.backToReport | "Back to report" |
+| toolkit.warnGeneratedIds | "This file has no ID column, so Fluently gave each principle an ID in the order of the sheet. Later uploads keep the same ID for a principle with the same name." *(Phase 1, 2026-11-20: please confirm)* |
+| toolkit.warnNoName | "Row {n}: no principle name, so this row was left out." |
+| toolkit.warnMergedSameName | "\"{name}\" appears on rows {rows}. They were combined into one principle." |
+| toolkit.warnGoalsUnified | "These goal spellings were treated as one: {variants}. Fluently uses \"{used}\"." |
+| toolkit.warnThinRows | "{n} principles have no summary, explanation or example (for example {names}). They're kept, and used less when Fluently picks principles to audit with." |
 | editing.addTitle / editing.add / editing.adding | "Add a {type}" / "Add card" / "Adding…" |
 | editing.builtFrom / editing.chooseOne / editing.noneToLink | "Built from" / "Choose at least one {required} to build this from." / "There are no {required} cards to build this from yet." |
 | editing.addLater | "Adding cards to this column comes in a later build step." |

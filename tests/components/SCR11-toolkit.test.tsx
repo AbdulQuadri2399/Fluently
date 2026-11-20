@@ -82,6 +82,30 @@ describe("SCR11 Toolkit", () => {
     expect(within(preview).getByRole("button", { name: c.saveAs(1) })).toBeInTheDocument();
   });
 
+  it("preview of a sheet without IDs: says what was generated, merged and kept (AC33.5)", async () => {
+    setup();
+    await choose("sheet-layout.csv");
+    const preview = await screen.findByRole("region", {
+      name: c.previewTitle("sheet-layout.csv"),
+    });
+    expect(within(preview).getByText(/9 rows · 6 principles/)).toBeInTheDocument();
+    expect(within(preview).getByText(c.warnGeneratedIds)).toBeInTheDocument();
+    expect(
+      within(preview).getByText(c.warnMergedSameName("Price Anchor", [5, 6, 7])),
+    ).toBeInTheDocument();
+    expect(within(preview).getByText(c.warnNoName(10))).toBeInTheDocument();
+    expect(within(preview).getByText(c.warnThinRows(1, ["Quiet Imagery"]))).toBeInTheDocument();
+    expect(
+      within(preview).getByText(
+        c.warnGoalsUnified(
+          ["Prompt concious processing", "Prompt conscious processing"],
+          "Prompt conscious processing",
+        ),
+      ),
+    ).toBeInTheDocument();
+    expect(within(preview).getByRole("button", { name: c.saveAs(1) })).toBeInTheDocument();
+  });
+
   it("preview invalid: row errors with 03 copy, Choose another file, no save", async () => {
     setup();
     await choose("bad-duplicate-id.csv");
