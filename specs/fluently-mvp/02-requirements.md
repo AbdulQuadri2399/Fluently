@@ -133,11 +133,11 @@ As a strategist, I want research to run on its own and show progress, so that I 
 ### US12: Sourced findings, themes and opportunities (Must) — JS2, JS3
 As a strategist, I want findings grouped into themes and opportunities, each linked to its sources with a confidence rating, so that I can trust and choose.
 - **AC12.1** THE SYSTEM SHALL gather from: the pinned toolkit (cited by ID), academic papers retrieved from Semantic Scholar or OpenAlex, desk and market research via web search, competitive research (a separate step), social signal via web search (Reddit, Trustpilot, app stores, forums), and client uploads.
-- **AC12.2** WHEN a finding is created THE SYSTEM SHALL link it to ≥1 stored source record (title, URL or file, retrieval date, source type, and for papers: authors, year, DOI or Semantic Scholar/OpenAlex ID), or label it `AI inference`; any other finding SHALL be discarded.
+- **AC12.2** WHEN a finding is created THE SYSTEM SHALL link it to ≥1 stored source record (title, URL or file, retrieval date, source type, and for papers: authors, year, DOI or Semantic Scholar/OpenAlex ID), or label it `AI independent inference`; any other finding SHALL be discarded.
 - **AC12.3** IF the model cites a paper that was not in that run's retrieval results THEN THE SYSTEM SHALL discard the citation and log it (analytics `citation_rejected`).
 - **AC12.4** WHEN social signal findings are shown THE SYSTEM SHALL label them `Qualitative signal · n sources` with the count of distinct URLs.
 - **AC12.5** WHEN synthesis completes THE SYSTEM SHALL create theme nodes (each linked to its findings) and opportunity nodes (each linked to its themes, and to ≥1 candidate principle via the toolkit's General Goal → Sub-Goal → Principle hierarchy). `[Assumption]` At most 8 opportunities by default.
-- **AC12.6** THE SYSTEM SHALL give each opportunity an evidence confidence of High, Med or Low by this rule: High = ≥3 sources of ≥2 source types that agree; Med = 2+ sources that agree, or 3+ of one type; Low = 1 source, only AI inference, or sources that contradict. The rule SHALL be computed in code from the stored links, not by the model.
+- **AC12.6** THE SYSTEM SHALL give each opportunity an evidence confidence of High, Med or Low by this rule: High = ≥3 sources of ≥2 source types that agree; Med = 2+ sources that agree, or 3+ of one type; Low = 1 source, only AI independent inference, or sources that contradict. The rule SHALL be computed in code from the stored links, not by the model.
 - **AC12.7** WHEN a member opens a finding, theme or opportunity THE SYSTEM SHALL show its sources with links, the confidence and the reason for it.
 - **AC12.8** WHEN a member opens *Citation check* on the Audit Report THE SYSTEM SHALL list every citation with its stored record and a link, so 20 can be spot-checked (NFR4).
 - **AC12.10** WHEN a member adds a source from the Evidence card (upload or link) after research THE SYSTEM SHALL store it as a source, mark themes built from Evidence as Out of date, and offer *Regenerate stale*. *(Added 2026-11-17.)*
@@ -162,7 +162,7 @@ As a strategist, I want to pick which opportunities to pursue, so that solutions
 ### US15: Behavioural Audit Report (Must; export Should) — JS2, JS3
 As a strategist, I want the research as a readable report, so that I can review it and share it with the team.
 - **AC15.1** WHEN research completes THE SYSTEM SHALL generate the Audit Report view (SCR9) from the graph: summary, objectives (with any low-specificity flag), sources by type with counts, themes, opportunities with confidence, evidence gaps, ethics result and any overrides, toolkit version.
-- **AC15.2** THE SYSTEM SHALL show every claim in the report with an inline citation marker linking to its source record or the label `AI inference`.
+- **AC15.2** THE SYSTEM SHALL show every claim in the report with an inline citation marker linking to its source record or the label `AI independent inference`.
 - **AC15.3** WHEN graph nodes change THE SYSTEM SHALL reflect the change in the report on next open (the report is a view, not a copy).
 - **AC15.4** (Should; moved into Slice 7 on 2026-11-17 at the user's request) WHEN a member exports the report THE SYSTEM SHALL produce Markdown and PDF files with the same content and citations as SCR9.
 

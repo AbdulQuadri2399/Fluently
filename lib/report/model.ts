@@ -22,7 +22,7 @@ export type Citation = {
 export type ReportFinding = {
   id: string;
   text: string;
-  /** Citation numbers; empty means the finding is labelled AI inference (AC15.2). */
+  /** Citation numbers; empty means the finding is labelled AI independent inference (AC15.2). */
   citations: number[];
   aiInference: boolean;
   /** Distinct social URLs behind it, for the Qualitative signal label (AC12.4). */

@@ -1,6 +1,6 @@
 // Citation check (D8, AC12.2, AC12.3, NFR4). A finding may only cite sources found in this run
 // (by handle, e.g. "S12"). Unknown handles are dropped and reported for `citation_rejected`.
-// A finding left with no valid source survives only if the model labelled it AI inference.
+// A finding left with no valid source survives only if the model labelled it AI independent inference.
 
 export type DraftFinding = { text: string; sourceHandles: string[]; aiInference: boolean };
 export type CheckedFinding = { text: string; sourceHandles: string[]; aiInference: boolean };

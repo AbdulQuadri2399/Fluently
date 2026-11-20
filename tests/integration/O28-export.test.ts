@@ -45,7 +45,7 @@ describe("O28 export", () => {
       const line = md.split("\n").find((l) => l.startsWith(`- ${f.text}`))!;
       expect(line).toBeTruthy();
       if (f.citations.length) for (const n of f.citations) expect(line).toContain(`[${n}]`);
-      else expect(line).toContain("AI inference");
+      else expect(line).toContain("AI independent inference");
     }
     for (const h of [
       "Summary",

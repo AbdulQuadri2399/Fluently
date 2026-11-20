@@ -178,7 +178,7 @@ export const canvasCopy = {
     failed: "Couldn't save. Check your connection and try again.",
   },
   labels: {
-    aiInference: "AI inference",
+    aiInference: "AI independent inference",
     qualitative: (n: number) => `Qualitative signal · ${n} ${n === 1 ? "source" : "sources"}`,
     sources: (n: number) => `${n} ${n === 1 ? "source" : "sources"}`,
     gapMethod: (method: string) => `Open question · ${method}`,
@@ -188,7 +188,7 @@ export const canvasCopy = {
       med_two_agree: "Two or more sources agree.",
       med_three_one_type: "Three or more sources, all of one kind.",
       low_single: "Only one source.",
-      low_ai_only: "Only AI inference, no stored source.",
+      low_ai_only: "Only AI independent inference, no stored source.",
       low_contradict: "The sources disagree.",
     } as Record<string, string>,
   },

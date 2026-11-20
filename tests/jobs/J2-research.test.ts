@@ -80,7 +80,7 @@ describe("J2 research", () => {
     expect(themes).toHaveLength(3);
     expect(opps).toHaveLength(3);
     expect(opps.every((o) => ["High", "Med", "Low"].includes(o.confidence!))).toBe(true);
-    // The privacy opportunity rests on one review plus AI inference → Low → gap.
+    // The privacy opportunity rests on one review plus AI independent inference → Low → gap.
     const privacy = opps.find((o) => o.title === "Explain where the ID photo goes")!;
     expect(privacy.confidence).toBe("Low");
     expect(gaps).toHaveLength(1);

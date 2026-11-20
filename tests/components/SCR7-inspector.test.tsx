@@ -276,7 +276,7 @@ describe("SCR7 details panel", () => {
       expect(screen.getAllByText(c.labels.qualitative(2)).length).toBeGreaterThan(0);
     });
 
-    it("AI inference", () => {
+    it("AI independent inference", () => {
       show(
         node({
           id: "f3",

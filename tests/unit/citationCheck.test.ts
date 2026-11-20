@@ -15,7 +15,7 @@ describe("citation check (AC12.2, AC12.3, NFR4)", () => {
     expect(res.rejectedHandles).toEqual(["S99"]);
   });
 
-  it("finding with no valid source becomes AI inference only if the model labelled it so", () => {
+  it("finding with no valid source becomes AI independent inference only if the model labelled it so", () => {
     const res = checkCitations(
       [
         { text: "Probably a trust issue", sourceHandles: ["S42"], aiInference: true },
@@ -31,7 +31,7 @@ describe("citation check (AC12.2, AC12.3, NFR4)", () => {
     expect(res.rejectedHandles.sort()).toEqual(["S42", "S77"]);
   });
 
-  it("a finding with a real source is never labelled AI inference, and duplicates collapse", () => {
+  it("a finding with a real source is never labelled AI independent inference, and duplicates collapse", () => {
     const res = checkCitations(
       [{ text: "x", sourceHandles: ["S2", "S2"], aiInference: true }],
       run,

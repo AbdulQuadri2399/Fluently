@@ -34,7 +34,7 @@ describe("confidence (AC12.6)", () => {
   it("Low: 1 source", () => {
     expect(confidence(input(src("paper")))).toEqual({ level: "Low", reason: "low_single" });
   });
-  it("Low: only AI inference", () => {
+  it("Low: only AI independent inference", () => {
     expect(confidence(input([], { aiInference: true }))).toEqual({
       level: "Low",
       reason: "low_ai_only",
@@ -79,7 +79,7 @@ describe("theme strength", () => {
     expect(confidence(input(src("social", "social"))).level).toBe("Med");
     expect(confidence(input(src("desk", "desk", "desk"))).reason).toBe("med_three_one_type");
   });
-  it("Low: one source, AI inference only, or findings that disagree", () => {
+  it("Low: one source, AI independent inference only, or findings that disagree", () => {
     expect(confidence(input(src("paper"))).level).toBe("Low");
     expect(confidence({ sources: [], aiInference: true, contradicts: false }).reason).toBe(
       "low_ai_only",

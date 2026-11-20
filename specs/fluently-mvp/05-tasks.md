@@ -160,7 +160,7 @@ You'll be able to see: research running live on the canvas and the research chec
 - [x] T6.2 [P] `lib/retrieval/semanticScholar.ts`, `openAlex.ts` (15 s timeout, backoff, fallback) + fakes — S — Refs: D17, AC12.1 — Depends on: —
   Done when: `tests/unit/retrieval.test.ts` passes with recorded fixtures: maps to source rows; 429 → backoff then fallback.
 - [x] T6.3 Migration: `sources` table + RLS; `lib/rules/citationCheck.ts` (handles only from this run) — S — Refs: D8, AC12.2, AC12.3, NFR4 — Depends on: T4.2
-  Done when: `tests/unit/citationCheck.test.ts` passes: unknown handle dropped + `citation_rejected` logged; finding with no valid source becomes `AI inference` only if model labelled it so, otherwise dropped.
+  Done when: `tests/unit/citationCheck.test.ts` passes: unknown handle dropped + `citation_rejected` logged; finding with no valid source becomes `AI independent inference` only if model labelled it so, otherwise dropped.
 - [x] T6.4 `lib/rules/confidence.ts` (AC12.6 rule) + gap decision (AC13.1, AC13.2) — S — Refs: AC12.6, AC13.1, AC13.2, EC5 — Depends on: —
   Done when: `tests/unit/confidence.test.ts` passes one case per rule branch (High, Med ×2, Low ×3) and contradiction → Low + gap.
 - [x] T6.5 J2 retrieval steps: toolkit candidates (goal hierarchy), papers, desk, competitive, social (labelled qualitative signal), uploads (text/CSV/PDF/images) — M — Refs: AC12.1, AC12.4, AC11.4, EC3, EC19, EC20 — Depends on: T5.5, T6.2, T6.3
@@ -173,7 +173,7 @@ You'll be able to see: research running live on the canvas and the research chec
   Done when: `tests/components/SCR5-expanded-cards.test.tsx` passes (groups in order with counts, 3 items then 'Show n more', collapse); `tests/integration/O35-add-source.test.ts` passes ('new source marks themes out of date').
 - [x] T6.10 Split, rename and move assets between Current assets cards (O36) — S — Refs: AC22.11 — Depends on: T6.9
   Done when: `tests/integration/O36-assets.test.ts` passes ('split keeps every asset in one card', 'moving the last asset removes the empty card', 'rename saves').
-- [x] T6.8 [P] SCR7 shows sources with links, confidence and its reason, `Qualitative signal · n sources`, `AI inference`, `External principle` — S — Refs: AC12.4, AC12.7 — Depends on: T6.6
+- [x] T6.8 [P] SCR7 shows sources with links, confidence and its reason, `Qualitative signal · n sources`, `AI independent inference`, `External principle` — S — Refs: AC12.4, AC12.7 — Depends on: T6.6
   Done when: `tests/components/SCR7-inspector.test.tsx` adds one test per label.
 
 Slice check: suite green; FL3 and FF5 pass with fakes; one live research run on a seeded brief completes (user's key) and its usage appears on SCR12. **Stop for the user.**
@@ -185,7 +185,7 @@ Goal: the research reads as a report with checkable citations, projects stay wit
 You'll be able to see: the Audit Report, the citation check table, cost warnings.
 
 - [x] T7.1 O27 report model from the graph (sections per AC15.1, citation numbering, labels) — M — Refs: AC15.1–AC15.3 — Depends on: T6.6
-  Done when: `tests/integration/O27-report.test.ts` passes: every finding in report has a citation or `AI inference`; editing a node changes the next report.
+  Done when: `tests/integration/O27-report.test.ts` passes: every finding in report has a citation or `AI independent inference`; editing a node changes the next report.
 - [x] T7.2 SCR9 UI: loading, not yet, default, stale banner, citation check table — M — Refs: SCR9, AC12.8 — Depends on: T7.1
   Done when: `tests/components/SCR9-report.test.tsx` one test per SCR9 state (except export); screenshot vs 03b SCR9.
 - [x] T7.3 Cost cap: near-cap header chip at 80%, pause at 100% before next AI call (`paused_cost`), O31 raise cap (admin) / confirm over cap (member) — M — Refs: AC27.3, AC27.4, FF12 — Depends on: T5.5

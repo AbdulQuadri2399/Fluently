@@ -166,7 +166,7 @@ Copy keys in `[brackets]` are written out in §7.
 |---|---|---|
 | Loading | Skeleton paragraphs | — |
 | Not yet | `[report.notYet]` | Back to canvas |
-| Default | Sections per AC15.1, citation markers `[1]` linking to a source list; `AI inference` labels; strength and confidence tags (AC12.12); low-specificity labels; gaps summary grouped Discovery / Generative (AC13.5) | Read, open citation, trace, *Download* (Markdown or PDF) |
+| Default | Sections per AC15.1, citation markers `[1]` linking to a source list; `AI independent inference` labels; strength and confidence tags (AC12.12); low-specificity labels; gaps summary grouped Discovery / Generative (AC13.5) | Read, open citation, trace, *Download* (Markdown or PDF) |
 | Stale content | Banner `[report.hasStale]` | Go to canvas |
 | Citation check | Table of every citation with record and link | Open links |
 | Exporting | `[report.exporting]` | Wait |
@@ -646,9 +646,9 @@ Format: user action → system response → resulting state (ACs).
 | checkpoint.retryFailed / checkpoint.retrySynthesis | "Retry failed steps" / "Retry themes and opportunities" |
 | checkpoint.themesCount / checkpoint.confidenceLabel / checkpoint.selected | "{n} themes" / "{level} confidence" / "{n} selected" |
 | card.markers (added) | "Low confidence" |
-| finding.labels | "AI inference" / "Qualitative signal · {n} sources" / "{n} sources" |
+| finding.labels | "AI independent inference" / "Qualitative signal · {n} sources" / "{n} sources" |
 | gap.status | "Open question · {method}" |
-| confidence.reasons | High: "Three or more sources of at least two kinds agree." · Med: "Two or more sources agree." / "Three or more sources, all of one kind." · Low: "Only one source." / "Only AI inference, no stored source." / "The sources disagree." |
+| confidence.reasons | High: "Three or more sources of at least two kinds agree." · Med: "Two or more sources agree." / "Three or more sources, all of one kind." · Low: "Only one source." / "Only AI independent inference, no stored source." / "The sources disagree." |
 | checkpoint.solutionsNext | "Opportunities chosen. Solutions arrive in a later build step." (prototype only) |
 
 **Added for Slice 7 (2026-11-17, from icebox IB7–IB9, IB11 and the report download): please confirm this wording.**

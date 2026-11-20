@@ -42,7 +42,7 @@ describe("O27 report", () => {
     ]);
   });
 
-  it("every finding in the report has a citation or AI inference; citations resolve to records", async () => {
+  it("every finding in the report has a citation or AI independent inference; citations resolve to records", async () => {
     const run = await startStage(admin.client, projectId, "research");
     if (!run.ok) throw new Error(run.code);
     await runResearch(db, run.data.stageRunId);

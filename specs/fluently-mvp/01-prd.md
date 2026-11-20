@@ -59,7 +59,7 @@ Fluently is an internal web app that takes a comms brief (app/web screens and fl
 | Measure | Pass bar | How it's measured |
 |---|---|---|
 | Audit Report quality | As good as or better than the original on ≥2 of 3 briefs; ≥1 useful insight the team missed | Blind side-by-side rating by 2 team members |
-| Trust (primary guardrail) | 100% of claims sourced or labelled "AI inference"; **0 made-up citations** in a spot-check of 20 | Spot-check against source records (NFR4) |
+| Trust (primary guardrail) | 100% of claims sourced or labelled "AI independent inference"; **0 made-up citations** in a spot-check of 20 | Spot-check against source records (NFR4) |
 | Principles applied correctly | ≥80% of recommendations and annotations judged correct | Behavioural designer review |
 | Speed (primary metric) | Brief → approved lo-fi in < 1 working day (baseline: `[Assumption]` 3–5 days by hand) | Timestamps of intake start and lo-fi approval (analytics, NFR13) |
 | Cost | < £10 of AI usage per project | Usage log per stage (US27) |
@@ -122,7 +122,7 @@ Fluently is an internal web app that takes a comms brief (app/web screens and fl
 *Limits the build must respect. Constraints, not technology decisions.*
 
 - **Principle rule in code:** every recommendation, lo-fi variant and annotation must carry ≥1 principle ID that exists in the project's pinned toolkit version, or be an "external principle, not yet in toolkit" with a source. Items failing the check are never shown. (AC16.2, AC18.4)
-- **Citation rule in code:** every finding links to a stored source record (retrieved paper, page, upload) or is labelled "AI inference". Papers must come from a real Semantic Scholar / OpenAlex retrieval, never from model memory. (AC12.2, NFR4)
+- **Citation rule in code:** every finding links to a stored source record (retrieved paper, page, upload) or is labelled "AI independent inference". Papers must come from a real Semantic Scholar / OpenAlex retrieval, never from model memory. (AC12.2, NFR4)
 - **Toolkit is company IP:** not committed to the repo; uploaded by the team; read-only; every upload is a version; each project records its version. Approval from the toolkit owner is needed before the real toolkit is imported (OQ5).
 - **No scraping, no paid social APIs.** Social signal comes only from web search results, labelled "qualitative signal" with a count of sources.
 - **AI:** Claude only in v1, via the Anthropic API, with a separate model setting per stage. Defaults: Haiku-class for development and bulk extraction; Sonnet-class for synthesis, recommendations and lo-fi code in demos; Opus-class per stage only if quality requires. Uses Claude's built-in web search and web fetch, image and PDF input, and structured outputs.
@@ -157,7 +157,7 @@ Fluently is an internal web app that takes a comms brief (app/web screens and fl
 
 **Pre-mortem: it's six months later and nobody uses Fluently. Why?**
 1. *Outputs felt generic.* Prevention: research grounded in client uploads and specific social signal; themes cite specific sources; quality test A1 before building lo-fi.
-2. *One bad citation destroyed trust.* Prevention: code-enforced source records; "AI inference" label; spot-check before demos.
+2. *One bad citation destroyed trust.* Prevention: code-enforced source records; "AI independent inference" label; spot-check before demos.
 3. *The canvas was confusing and slow.* Prevention: fixed pipeline, checkpoint panel that says what to do next, onboarding, LEMES ACs, performance budgets (NFR1–NFR2).
 
 **Assumption log**

@@ -55,7 +55,7 @@ export const reportCopy = {
   openLink: "Open",
   uploadedFile: "Uploaded file",
   backToReport: "Back to report",
-  aiInference: "AI inference",
+  aiInference: "AI independent inference",
   qualitative: (n: number) => `Qualitative signal · ${n} ${n === 1 ? "source" : "sources"}`,
   lowSpecificity: "Low specificity",
   outOfDate: "Out of date",
@@ -78,7 +78,7 @@ export const reportCopy = {
     med_two_agree: "Two or more sources agree.",
     med_three_one_type: "Three or more sources, all of one kind.",
     low_single: "Only one source.",
-    low_ai_only: "Only AI inference, no stored source.",
+    low_ai_only: "Only AI independent inference, no stored source.",
     low_contradict: "The sources disagree.",
   } as Record<string, string>,
 } as const;

@@ -150,7 +150,7 @@ describe("SCR9 Audit Report", () => {
     );
   });
 
-  it("default: sections, citation markers linking to references, AI inference, tags", () => {
+  it("default: sections, citation markers linking to references, AI independent inference, tags", () => {
     view(report());
     for (const h of [
       "Summary",
@@ -171,7 +171,7 @@ describe("SCR9 Audit Report", () => {
     const marker = screen.getAllByRole("link", { name: "Source 1" })[0]!;
     expect(marker.getAttribute("href")).toBe("#ref-1");
     expect(document.getElementById("ref-1")!.textContent).toContain("The goal-gradient hypothesis");
-    expect(screen.getByText("AI inference")).toBeTruthy();
+    expect(screen.getByText("AI independent inference")).toBeTruthy();
     expect(screen.getByText("High strength")).toBeTruthy();
     expect(screen.getByText("Low confidence")).toBeTruthy();
     expect(screen.getByText("Low specificity")).toBeTruthy();

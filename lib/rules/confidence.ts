@@ -14,7 +14,7 @@ export type ConfidenceReason =
 export type EvidenceInput = {
   /** Distinct stored sources behind the opportunity (through its themes and findings). */
   sources: { id: string; type: SourceType }[];
-  /** True when at least one finding behind it is labelled AI inference. */
+  /** True when at least one finding behind it is labelled AI independent inference. */
   aiInference: boolean;
   /** True when findings behind it point in opposite directions (EC5). */
   contradicts: boolean;

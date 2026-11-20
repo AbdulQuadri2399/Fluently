@@ -28,7 +28,7 @@ export const ethicsSchema = z.object({
 });
 export type EthicsOutput = z.infer<typeof ethicsSchema>;
 
-/** J2 findings step (AC12.2): each finding cites source handles from this run, or says it's AI inference. */
+/** J2 findings step (AC12.2): each finding cites source handles from this run, or says it's AI independent inference. */
 export const findingsSchema = z.object({
   findings: z
     .array(
