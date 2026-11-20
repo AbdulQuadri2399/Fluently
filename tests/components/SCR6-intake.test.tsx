@@ -1,6 +1,7 @@
 import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { emailCopy } from "@/components/email/copy";
 import { BriefPage, type BriefActions, type BriefData } from "@/components/intake/BriefPage";
 import { ethicsCopy as e, intakeCopy as c } from "@/components/intake/copy";
 import type { EthicsView } from "@/components/intake/EthicsPanel";
@@ -19,6 +20,7 @@ const empty = {
   sector: "",
   sector_other: "",
   figma_link: "",
+  competitors: "",
 };
 const filled = {
   ...empty,
@@ -362,5 +364,118 @@ describe("SCR6 Brief", () => {
     expect(screen.getByText(e.checkFailed)).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: e.tryAgain }));
     expect(a.retryEthics).toHaveBeenCalledWith("p1");
+  });
+
+  describe("phase 1: emails and competitors (AC31.2, AC32.6)", () => {
+    const emailProject = (over: Partial<BriefData> = {}) =>
+      data(
+        {
+          project: {
+            id: "p1",
+            name: "Examplebank emails",
+            mode: "optimise",
+            channel: "email",
+            status: "in_progress",
+          },
+          ...over,
+        },
+        filled,
+      );
+
+    it("an email project lists its emails in place of current assets; approval needs one", async () => {
+      const a = actions();
+      render(<BriefPage data={emailProject()} actions={a} />);
+      expect(screen.getByRole("heading", { name: emailCopy.section })).toBeInTheDocument();
+      expect(screen.queryByText(c.assetsLabel)).not.toBeInTheDocument();
+      expect(screen.getByText(emailCopy.empty)).toBeInTheDocument();
+      expect(screen.getAllByText(emailCopy.needsEmails).length).toBeGreaterThan(0);
+      expect(screen.getByRole("button", { name: c.approve })).toHaveAttribute(
+        "aria-disabled",
+        "true",
+      );
+    });
+
+    it("with an email added the brief can be approved; emails can be removed", async () => {
+      const removeEmail = vi.fn(async () => ({ ok: true as const, data: undefined }));
+      const a = actions({ removeEmail });
+      render(
+        <BriefPage
+          data={emailProject({
+            emails: [
+              {
+                id: "e1",
+                nodeId: "n1",
+                subject: "Welcome to Examplebank",
+                source: "paste",
+                createdAt: "",
+              },
+            ],
+          })}
+          actions={a}
+        />,
+      );
+      expect(screen.getByText("Welcome to Examplebank")).toBeInTheDocument();
+      expect(screen.queryByText(emailCopy.needsEmails)).not.toBeInTheDocument();
+      expect(screen.getByRole("button", { name: c.approve })).not.toHaveAttribute(
+        "aria-disabled",
+        "true",
+      );
+      await userEvent.click(
+        screen.getByRole("button", { name: `${emailCopy.remove}: Welcome to Examplebank` }),
+      );
+      expect(removeEmail).toHaveBeenCalledWith("e1");
+    });
+
+    it("Add email opens the dialog", async () => {
+      const addPaste = vi.fn(async () => ({ ok: true as const, data: { id: "e1" } }));
+      const a = actions({ addEmail: { addPaste, addFile: vi.fn() } });
+      render(<BriefPage data={emailProject()} actions={a} />);
+      await userEvent.click(screen.getByRole("button", { name: emailCopy.add }));
+      expect(screen.getByRole("dialog", { name: emailCopy.addTitle })).toBeInTheDocument();
+    });
+
+    it("a screens project is unchanged: still current assets, no emails section", () => {
+      render(
+        <BriefPage
+          data={data(
+            {
+              project: {
+                id: "p1",
+                name: "S",
+                mode: "optimise",
+                channel: "screens",
+                status: "in_progress",
+              },
+            },
+            filled,
+          )}
+          actions={actions()}
+        />,
+      );
+      expect(screen.getByText(c.assetsLabel)).toBeInTheDocument();
+      expect(screen.queryByRole("heading", { name: emailCopy.section })).not.toBeInTheDocument();
+    });
+
+    it("competitors: optional, saves, and more than five is flagged and not saved", async () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true });
+      const saveField = vi.fn(async () => ({ ok: true as const, data: { version: 2 } }));
+      render(<BriefPage data={data({}, filled)} actions={actions({ saveField })} />);
+      const box = screen.getByLabelText(c.competitorsLabel);
+      expect(screen.getByText(c.competitorsHelp)).toBeInTheDocument();
+      await userEvent.type(box, "Alpha Bank{enter}Beta Bank");
+      await vi.advanceTimersByTimeAsync(1300);
+      expect(saveField).toHaveBeenCalledWith(
+        expect.objectContaining({ field: "competitors", value: "Alpha Bank\nBeta Bank" }),
+      );
+      saveField.mockClear();
+      await userEvent.clear(box);
+      await userEvent.type(box, "A{enter}B{enter}C{enter}D{enter}E{enter}F");
+      await vi.advanceTimersByTimeAsync(1300);
+      expect(screen.getByText(c.competitorsTooMany)).toBeInTheDocument();
+      expect(saveField).not.toHaveBeenCalledWith(
+        expect.objectContaining({ field: "competitors", value: expect.stringContaining("F") }),
+      );
+      vi.useRealTimers();
+    });
   });
 });

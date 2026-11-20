@@ -12,6 +12,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import type { ActionResult } from "@/lib/actions/result";
 import { canvasCopy as c, typeNames } from "./copy";
+import { EmailPartsSection, RemoveEmailSection } from "@/components/email/EmailPartsSection";
+import type { EmailDetail } from "@/lib/email/service";
 import { ConnectionsSection, DeleteCardSection } from "./CardActions";
 import { StrengthTag, type Level } from "./StrengthTag";
 
@@ -124,6 +126,8 @@ export function Inspector({
   onDelete,
   onConnect,
   onDisconnect,
+  loadEmail,
+  onRemoveEmail,
 }: {
   node: TreeNode;
   nodes: TreeNode[];
@@ -149,7 +153,22 @@ export function Inspector({
   onDelete?: (nodeId: string) => Promise<boolean>;
   onConnect?: (fromId: string, toId: string) => Promise<boolean>;
   onDisconnect?: (edgeId: string) => Promise<boolean>;
+  /** Phase 1: the parts of the email behind an email card (AC31.3). */
+  loadEmail?: (nodeId: string) => Promise<EmailDetail | null>;
+  onRemoveEmail?: (emailId: string) => Promise<boolean>;
 }) {
+  const [email, setEmail] = useState<{ nodeId: string; detail: EmailDetail | null } | null>(null);
+  useEffect(() => {
+    if (!loadEmail || node.type !== "email") return;
+    let live = true;
+    loadEmail(node.id)
+      .then((detail) => live && setEmail({ nodeId: node.id, detail }))
+      .catch(() => live && setEmail({ nodeId: node.id, detail: null }));
+    return () => {
+      live = false;
+    };
+  }, [node.id, node.type, loadEmail]);
+  const emailDetail = email && email.nodeId === node.id ? email.detail : null;
   const [history, setHistory] = useState<HistoryItem[] | null>(null);
   const [editing, setEditing] = useState(false);
   const [evidence, setEvidence] = useState<NodeEvidenceView | null>(null);
@@ -239,7 +258,7 @@ export function Inspector({
         <p className="text-body whitespace-pre-wrap">{(node.data as { body?: string }).body}</p>
       ) : null}
       {!editing && onSave ? (
-        node.type === "objective" ? (
+        node.type === "email" ? null : node.type === "objective" ? (
           <p className="flex items-center justify-between gap-3 text-small text-muted">
             {c.edit.objectiveHint}
             {projectId ? (
@@ -366,6 +385,7 @@ export function Inspector({
           </div>
         ))}
       </dl>
+      {node.type === "email" && emailDetail ? <EmailPartsSection detail={emailDetail} /> : null}
       {onTrace ? (
         <div className="grid gap-2">
           <Button
@@ -440,6 +460,9 @@ export function Inspector({
           ))}
         </ul>
       </details>
+      {node.type === "email" && emailDetail && onRemoveEmail ? (
+        <RemoveEmailSection disabled={locked} onRemove={() => onRemoveEmail(emailDetail.id)} />
+      ) : null}
       {onDelete ? (
         <DeleteCardSection
           node={node}

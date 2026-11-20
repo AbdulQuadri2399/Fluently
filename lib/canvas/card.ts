@@ -1,4 +1,5 @@
 import { canvasCopy as c, typeNames } from "@/components/canvas/copy";
+import { emailCopy } from "@/components/email/copy";
 import type { TreeNode } from "./load";
 
 export type Marker = {
@@ -48,6 +49,9 @@ export function cardView(n: TreeNode, running: boolean) {
     status = (n.data as { summary?: string }).summary || status;
   } else if (n.type === "gap") {
     status = c.labels.gapMethod((n.data as { method?: string }).method ?? "");
+  } else if (n.type === "email") {
+    const d = n.data as { buttons?: number; hasPreheader?: boolean };
+    status = `${emailCopy.card.buttons(d.buttons ?? 0)} · ${d.hasPreheader ? emailCopy.card.preheader : emailCopy.card.noPreheader}`;
   } else if (n.type === "asset_set") {
     const count = (n.data as { count?: number }).count ?? 0;
     status = count === 1 ? "1 asset" : `${count} assets`;

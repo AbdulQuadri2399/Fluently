@@ -1,0 +1,23 @@
+From: Invented Shop <hello@example.org>
+To: customer@example.org
+Subject: =?utf-8?Q?Don=27t_miss_out_on_20=25_off?=
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="BOUNDARY"
+
+--BOUNDARY
+Content-Type: text/plain; charset=utf-8
+
+Plain version, not used.
+
+--BOUNDARY
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+<html><body>
+<h2>20% off, today only</h2>
+<p>Everything in the invented shop is cheaper until midnight.</p>
+<p><a href=3D"https://example.org/shop">Shop the sale</a></p>
+<p><a href=3D"https://example.org/unsubscribe">Unsubscribe</a></p>
+</body></html>
+
+--BOUNDARY--

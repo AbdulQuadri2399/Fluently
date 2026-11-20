@@ -23,6 +23,7 @@ export const TOP = 60;
 const LANE_OF_TYPE: Record<string, Lane> = {
   objective: "objectives",
   asset_set: "objectives",
+  email: "objectives",
   ethics: "objectives",
   override: "objectives",
   source: "evidence",
@@ -38,7 +39,13 @@ const LANE_OF_TYPE: Record<string, Lane> = {
 };
 
 /** Objectives first, then current assets, then the ethics gate and its override (AC22.1, AC22.7). */
-const TYPE_ORDER: Record<string, number> = { objective: 0, asset_set: 1, ethics: 2, override: 3 };
+const TYPE_ORDER: Record<string, number> = {
+  objective: 0,
+  asset_set: 1,
+  email: 1,
+  ethics: 2,
+  override: 3,
+};
 
 export function laneOf(type: string): Lane {
   return LANE_OF_TYPE[type] ?? "evidence";

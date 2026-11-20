@@ -13,6 +13,7 @@ export const laneNames: Record<string, string> = {
 export const typeNames: Record<string, string> = {
   objective: "Objective",
   asset_set: "Current assets",
+  email: "Email",
   ethics: "Ethics check",
   source: "Source",
   finding: "Finding",

@@ -8,7 +8,13 @@ export const COACHED_FIELDS = [
   "constraints",
 ] as const;
 export type CoachedField = (typeof COACHED_FIELDS)[number];
-export const INTAKE_FIELDS = [...COACHED_FIELDS, "sector", "sector_other", "figma_link"] as const;
+export const INTAKE_FIELDS = [
+  ...COACHED_FIELDS,
+  "sector",
+  "sector_other",
+  "figma_link",
+  "competitors",
+] as const;
 export type IntakeField = (typeof INTAKE_FIELDS)[number];
 
 export const FIELD_MAX: Record<IntakeField, number> = {
@@ -19,7 +25,16 @@ export const FIELD_MAX: Record<IntakeField, number> = {
   sector: 80,
   sector_other: 80,
   figma_link: 500,
+  competitors: 500,
 };
+
+/** AC32.6: up to five competitors, one per line. */
+export const MAX_COMPETITORS = 5;
+export const competitorLines = (value: string) =>
+  value
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter(Boolean);
 
 export const FIGMA_LINK = /^https:\/\/(www\.)?figma\.com\/\S+$/;
 
@@ -31,6 +46,9 @@ export const saveFieldSchema = z
     version: z.number().int().min(1),
   })
   .refine((v) => v.value.length <= FIELD_MAX[v.field], { path: ["value"] })
+  .refine((v) => v.field !== "competitors" || competitorLines(v.value).length <= MAX_COMPETITORS, {
+    path: ["value"],
+  })
   .refine(
     (v) => v.field !== "figma_link" || v.value.trim() === "" || FIGMA_LINK.test(v.value.trim()),
     {

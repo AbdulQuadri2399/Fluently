@@ -19,6 +19,10 @@ export const intakeCopy = {
       help: "Brand, design system, regulation, anything that can't change.",
     },
   },
+  competitorsLabel: "Competitors (optional)",
+  competitorsHelp:
+    "Up to five, one per line. Leave it blank and Fluently will suggest some for you to check.",
+  competitorsTooMany: "Add up to five competitors, one per line.",
   sectorLabel: "Sector",
   sectorPlaceholder: "Choose a sector",
   sectorOther: "Which sector?",

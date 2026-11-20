@@ -253,6 +253,8 @@ export const intakes = pgTable(
     sector: text("sector"),
     sectorOther: text("sector_other"),
     figmaLink: text("figma_link"),
+    // AC32.6: optional, up to five names, one per line.
+    competitors: text("competitors"),
     lowSpecificity: jsonb("low_specificity").notNull().default({}),
     approvedAt: timestamp("approved_at", { withTimezone: true }),
     approvedBy: uuid("approved_by").references(() => members.id, { onDelete: "set null" }),
@@ -634,7 +636,7 @@ export const nodes = pgTable(
   (t) => [
     check(
       "nodes_type_valid",
-      sql`${t.type} in ('objective','asset_set','ethics','source','finding','theme','opportunity','gap','recommendation','lofi_variant','annotation','test_plan','override','reference')`,
+      sql`${t.type} in ('objective','asset_set','ethics','source','finding','theme','opportunity','gap','recommendation','lofi_variant','annotation','test_plan','override','reference','email')`,
     ),
     check("nodes_provenance_valid", sql`${t.provenance} in ('ai','ai_edited','human')`),
     check(
@@ -874,5 +876,50 @@ export const runEvents = pgTable(
     index("run_events_run_idx").on(t.stageRunId, t.createdAt),
     // Written only by jobs (service role); members read.
     memberRead("run_events"),
+  ],
+).enableRLS();
+
+// ---------- Phase 1: emails (AC31.2, AC31.3, 04 D37) ----------
+
+export const emails = pgTable(
+  "emails",
+  {
+    id: id(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "restrict" }),
+    projectId: uuid("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    nodeId: uuid("node_id").references((): AnyPgColumn => nodes.id, { onDelete: "set null" }),
+    uploadId: uuid("upload_id").references(() => uploads.id, { onDelete: "set null" }),
+    source: text("source").notNull(),
+    subject: text("subject").notNull(),
+    preheader: text("preheader"),
+    html: text("html").notNull(),
+    parts: jsonb("parts").notNull().default({}),
+    imagesLoaded: boolean("images_loaded").notNull().default(false),
+    addedBy: uuid("added_by")
+      .notNull()
+      .references(() => members.id, { onDelete: "restrict" }),
+    ...timestamps(),
+  },
+  (t) => [
+    check("emails_source_valid", sql`${t.source} in ('paste','html','eml')`),
+    check("emails_subject_length", sql`char_length(${t.subject}) between 1 and 300`),
+    check("emails_html_size", sql`char_length(${t.html}) <= 1000000`),
+    index("emails_project_idx").on(t.projectId, t.createdAt),
+    memberRead("emails"),
+    // Members add emails as themselves and remove them (remove_email); editing waits for later.
+    pgPolicy("emails_insert", {
+      for: "insert",
+      to: authenticatedRole,
+      withCheck: sql`public.is_member(${t.workspaceId}) and ${t.addedBy} = ${authUid}`,
+    }),
+    pgPolicy("emails_delete", {
+      for: "delete",
+      to: authenticatedRole,
+      using: isMember("workspace_id"),
+    }),
   ],
 ).enableRLS();

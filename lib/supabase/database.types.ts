@@ -145,6 +145,50 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"emails": {
+                  Row: {
+                    "added_by": string,"created_at": string,"html": string,"id": string,"images_loaded": boolean,"node_id": string | null,"parts": NonNullable<Json>,"preheader": string | null,"project_id": string,"source": string,"subject": string,"updated_at": string,"upload_id": string | null,"workspace_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "added_by": string,"created_at"?: string,"html": string,"id"?: string,"images_loaded"?: boolean,"node_id"?: string | null,"parts"?: NonNullable<Json>,"preheader"?: string | null,"project_id": string,"source": string,"subject": string,"updated_at"?: string,"upload_id"?: string | null,"workspace_id": string
+                  }
+                  Update: {
+                    "added_by"?: string,"created_at"?: string,"html"?: string,"id"?: string,"images_loaded"?: boolean,"node_id"?: string | null,"parts"?: NonNullable<Json>,"preheader"?: string | null,"project_id"?: string,"source"?: string,"subject"?: string,"updated_at"?: string,"upload_id"?: string | null,"workspace_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "emails_added_by_members_id_fk"
+      columns: ["added_by"]
+isOneToOne: false
+      referencedRelation: "members"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "emails_node_id_nodes_id_fk"
+      columns: ["node_id"]
+isOneToOne: false
+      referencedRelation: "nodes"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "emails_project_id_projects_id_fk"
+      columns: ["project_id"]
+isOneToOne: false
+      referencedRelation: "projects"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "emails_upload_id_uploads_id_fk"
+      columns: ["upload_id"]
+isOneToOne: false
+      referencedRelation: "uploads"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "emails_workspace_id_workspaces_id_fk"
+      columns: ["workspace_id"]
+isOneToOne: false
+      referencedRelation: "workspaces"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"ethics_overrides": {
                   Row: {
                     "created_at": string,"decided_by": string,"id": string,"node_id": string,"project_id": string,"reason": string,"rule": string,"updated_at": string,"workspace_id": string
@@ -211,14 +255,14 @@ isOneToOne: false
                   ]
                 },"intakes": {
                   Row: {
-                    "approved_at": string | null,"approved_by": string | null,"audience_context": string | null,"behavioural_objective": string | null,"business_objective": string | null,"constraints": string | null,"created_at": string,"figma_link": string | null,"low_specificity": NonNullable<Json>,"project_id": string,"sector": string | null,"sector_other": string | null,"updated_at": string,"version": number,"workspace_id": string
+                    "approved_at": string | null,"approved_by": string | null,"audience_context": string | null,"behavioural_objective": string | null,"business_objective": string | null,"competitors": string | null,"constraints": string | null,"created_at": string,"figma_link": string | null,"low_specificity": NonNullable<Json>,"project_id": string,"sector": string | null,"sector_other": string | null,"updated_at": string,"version": number,"workspace_id": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "approved_at"?: string | null,"approved_by"?: string | null,"audience_context"?: string | null,"behavioural_objective"?: string | null,"business_objective"?: string | null,"constraints"?: string | null,"created_at"?: string,"figma_link"?: string | null,"low_specificity"?: NonNullable<Json>,"project_id": string,"sector"?: string | null,"sector_other"?: string | null,"updated_at"?: string,"version"?: number,"workspace_id": string
+                    "approved_at"?: string | null,"approved_by"?: string | null,"audience_context"?: string | null,"behavioural_objective"?: string | null,"business_objective"?: string | null,"competitors"?: string | null,"constraints"?: string | null,"created_at"?: string,"figma_link"?: string | null,"low_specificity"?: NonNullable<Json>,"project_id": string,"sector"?: string | null,"sector_other"?: string | null,"updated_at"?: string,"version"?: number,"workspace_id": string
                   }
                   Update: {
-                    "approved_at"?: string | null,"approved_by"?: string | null,"audience_context"?: string | null,"behavioural_objective"?: string | null,"business_objective"?: string | null,"constraints"?: string | null,"created_at"?: string,"figma_link"?: string | null,"low_specificity"?: NonNullable<Json>,"project_id"?: string,"sector"?: string | null,"sector_other"?: string | null,"updated_at"?: string,"version"?: number,"workspace_id"?: string
+                    "approved_at"?: string | null,"approved_by"?: string | null,"audience_context"?: string | null,"behavioural_objective"?: string | null,"business_objective"?: string | null,"competitors"?: string | null,"constraints"?: string | null,"created_at"?: string,"figma_link"?: string | null,"low_specificity"?: NonNullable<Json>,"project_id"?: string,"sector"?: string | null,"sector_other"?: string | null,"updated_at"?: string,"version"?: number,"workspace_id"?: string
                   }
                   Relationships: [
                     {
@@ -707,7 +751,10 @@ isOneToOne: false
             [_ in never]: never
           }
           Functions: {
-            "add_node":
+            "add_email":
+{ Args: { "p_html": string,"p_parts": Json,"p_project": string,"p_source": string,"p_subject": string,"p_upload": string }; Returns: string
+                           },
+"add_node":
 { Args: { "p_body": string,"p_links": (string)[],"p_project": string,"p_title": string,"p_type": string }; Returns: string
                            },
 "allowed_workspace_for":
@@ -752,6 +799,9 @@ isOneToOne: false
 "mark_downstream_stale":
 { Args: { "p_from": (string)[] }; Returns: number
                            },
+"mark_email_outputs_stale":
+{ Args: { "p_project": string }; Returns: undefined
+                           },
 "merge_nodes":
 { Args: { "p_nodes": (string)[],"p_title": string }; Returns: string
                            },
@@ -763,6 +813,9 @@ isOneToOne: false
                            },
 "record_override":
 { Args: { "p_node": string,"p_reason": string }; Returns: string
+                           },
+"remove_email":
+{ Args: { "p_email": string }; Returns: undefined
                            },
 "restore_node":
 { Args: { "p_node": string }; Returns: undefined

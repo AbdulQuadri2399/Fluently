@@ -694,6 +694,23 @@ Format: user action → system response → resulting state (ACs).
 | report.citationCols | "#" / "Source" / "Kind" / "Details" / "Retrieved" |
 | report.openLink / report.uploadedFile | "Open" / "Uploaded file" |
 | report.backToReport | "Back to report" |
+| email.section / email.help | "Emails" / "The emails to audit. Each one is audited on its own. Add the HTML or an .eml file; you don't need a screenshot." *(Phase 1, 2026-11-20: please confirm)* |
+| email.empty / email.needsEmails | "No emails yet." / "Add at least one email to audit." |
+| email.add / email.addTitle | "Add email" / "Add an email" |
+| email.tabPaste / email.tabFile | "Paste HTML" / "Upload a file" |
+| email.subjectLabel / email.subjectHelp | "Subject line" / "Read from an .eml file. Needed for HTML, which doesn't contain it." |
+| email.htmlLabel / email.fileLabel / email.fileHelp | "Email HTML" / "HTML or EML file" / "An .html or .eml file, up to 10 MB." |
+| email.submit / email.adding / email.cancel | "Add email" / "Adding…" / "Cancel" |
+| email.subjectNeeded / email.htmlNeeded / email.fileNeeded | "Add the subject line. An HTML file doesn't contain it." / "Paste the email's HTML." / "Choose an .html or .eml file." |
+| email.fileType / email.noHtml / email.tooMany / email.failed | "Use an .html or .eml file up to 10 MB." / "This file has no HTML body to read." / "A project can have up to 20 emails." / "Couldn't add this. Check your connection and try again." |
+| email.added / email.addedLate / email.removed | "Email added." / "Email added. The summary and themes are now out of date." / "Email removed." |
+| email.remove / email.removeTitle / email.removeConfirm / email.removing | "Remove" / "Remove this email?" / "Remove email" / "Removing…" |
+| email.removeBody | "Its card is removed too. If research has run, the summary and themes are marked out of date." |
+| email.parts.* | "Email parts" · "Subject line" · "Preheader" ("None. The inbox will show the start of the email instead.") · "Hero" · "Buttons" ("main" beside the first) · "Body" ("{n} words") · "Footer" ("Unsubscribe link found" / "No unsubscribe link found") · "Images" ("{n} images, {m} without a description") |
+| email.card | "{n} buttons · preheader" / "{n} buttons · no preheader" (status line on the email card) |
+| intake.competitorsLabel / intake.competitorsHelp | "Competitors (optional)" / "Up to five, one per line. Leave it blank and Fluently will suggest some for you to check." |
+| intake.competitorsTooMany | "Add up to five competitors, one per line." |
+| project.channelScreensSoon | "Screens and flows" with the hint "Coming soon" (disabled choice on New project; Email is the default) |
 | toolkit.warnGeneratedIds | "This file has no ID column, so Fluently gave each principle an ID in the order of the sheet. Later uploads keep the same ID for a principle with the same name." *(Phase 1, 2026-11-20: please confirm)* |
 | toolkit.warnNoName | "Row {n}: no principle name, so this row was left out." |
 | toolkit.warnMergedSameName | "\"{name}\" appears on rows {rows}. They were combined into one principle." |

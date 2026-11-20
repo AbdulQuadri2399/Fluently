@@ -20,19 +20,35 @@ export async function approveObjectives(
 ): Promise<ActionResult<{ stageRunId: string }>> {
   const me = await currentMember(client);
   if (!me) return fail("forbidden");
-  const [{ data: project }, { data: intake }, { count: assets }, { data: ws }] = await Promise.all([
-    client.from("projects").select("id, mode, workspace_id").eq("id", projectId).maybeSingle(),
+  const [
+    { data: project },
+    { data: intake },
+    { count: assets },
+    { count: emailCount },
+    { data: ws },
+  ] = await Promise.all([
+    client
+      .from("projects")
+      .select("id, mode, channel, workspace_id")
+      .eq("id", projectId)
+      .maybeSingle(),
     client.from("intakes").select("*").eq("project_id", projectId).maybeSingle(),
     client
       .from("uploads")
       .select("id", { count: "exact", head: true })
       .eq("project_id", projectId)
       .eq("kind", "asset"),
+    client.from("emails").select("id", { count: "exact", head: true }).eq("project_id", projectId),
     client.from("workspaces").select("sector_refuse_list").eq("id", me.workspace_id).single(),
   ]);
   if (!project || !intake) return fail("not_found");
   if (intake.approved_at) return fail("conflict");
-  if (missingForApproval(intake, project.mode, assets ?? 0).length) return fail("validation");
+  const isEmail = project.channel === "email";
+  if (
+    missingForApproval(intake, project.mode, assets ?? 0, isEmail ? (emailCount ?? 0) : undefined)
+      .length
+  )
+    return fail("validation");
 
   const sector =
     (intake.sector === "Other" ? intake.sector_other : intake.sector)?.trim().toLowerCase() ?? "";
@@ -52,7 +68,7 @@ export async function approveObjectives(
     return fail("unavailable");
   }
   // AC22.7: optimise projects show their current assets as a card under the objectives.
-  if (project.mode === "optimise") {
+  if (project.mode === "optimise" && !isEmail) {
     const { data: files } = await client
       .from("uploads")
       .select("id")

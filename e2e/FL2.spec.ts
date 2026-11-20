@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { SEEDED, signIn } from "./helpers/auth";
+import { addPastedEmail } from "./helpers/brief";
 import { shoot } from "./helpers/shoot";
 import { freshWorkspaceUser } from "./helpers/workspace";
 
@@ -62,6 +63,8 @@ test.describe("FL2 create a project (AC7.1, AC7.3)", () => {
     });
     await expect(page.getByRole("listitem").filter({ hasText: "reviews.csv" })).toBeVisible();
     await shoot(page, "SCR6-default");
+    // Phase 1: an email project needs an email before the objectives can be approved (AC31.2).
+    await addPastedEmail(page);
 
     // Steps 5–6: approve → ethics check → passed, ready for research (AC9.2, AC10.2).
     await page.getByRole("button", { name: "Approve objectives" }).click();

@@ -183,6 +183,27 @@
       "when": 1795078195567,
       "tag": "20261119084955_tree_editing",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1795153546501,
+      "tag": "20261120054546_emails",
+      "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1795153551281,
+      "tag": "20261120054551_email_functions",
+      "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1795153739929,
+      "tag": "20261120054859_emails_delete",
+      "breakpoints": true
     }
   ]
 }

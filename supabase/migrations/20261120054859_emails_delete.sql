@@ -1,0 +1,1 @@
+CREATE POLICY "emails_delete" ON "emails" AS PERMISSIVE FOR DELETE TO "authenticated" USING (public.is_member(workspace_id));

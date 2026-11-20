@@ -11,7 +11,8 @@ export type ErrorCode =
   | "locked"
   | "cant_connect"
   | "link_required"
-  | "cant_delete_objective";
+  | "cant_delete_objective"
+  | "too_many";
 
 export type ActionResult<T = void> = { ok: true; data: T } | { ok: false; code: ErrorCode };
 

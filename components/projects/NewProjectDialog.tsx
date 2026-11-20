@@ -17,15 +17,27 @@ import { projectsCopy as c } from "./copy";
 
 type Action = (input: CreateProjectInput) => Promise<ActionResult<{ id: string }>>;
 
-function ChoiceCard({ value, title, hint }: { value: string; title: string; hint?: string }) {
+function ChoiceCard({
+  value,
+  title,
+  hint,
+  disabled,
+}: {
+  value: string;
+  title: string;
+  hint?: string;
+  disabled?: boolean;
+}) {
   return (
     <R.Item
       value={value}
+      disabled={disabled}
       aria-label={hint ? `${title}. ${hint}` : title}
       className={cn(
         "grid gap-0.5 rounded-md border border-line bg-surface px-3.5 py-3 text-left",
         "data-[state=checked]:border-ink data-[state=checked]:shadow-[0_0_0_3px_var(--line)]",
         "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink",
+        "disabled:cursor-not-allowed disabled:bg-soft disabled:opacity-60",
       )}
     >
       <span className="text-small font-medium">{title}</span>
@@ -56,7 +68,7 @@ export function NewProjectDialog({
   const [status, setStatus] = useState<"default" | "saving" | "error">("default");
   const form = useForm<CreateProjectInput>({
     resolver: zodResolver(createProjectSchema),
-    defaultValues: { name: "", mode: "new", channel: "screens", clientLabel: "" },
+    defaultValues: { name: "", mode: "new", channel: "email", clientLabel: "" },
   });
   const nameError = form.formState.errors.name?.message;
 
@@ -143,7 +155,12 @@ export function NewProjectDialog({
                   value={field.value}
                   onValueChange={field.onChange}
                 >
-                  <ChoiceCard value="screens" title={c.channelScreens} />
+                  <ChoiceCard
+                    value="screens"
+                    title={c.channelScreens}
+                    hint={c.comingSoon}
+                    disabled
+                  />
                   <ChoiceCard value="email" title={c.channelEmail} />
                 </R.Root>
               )}

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useOnline } from "@/hooks/useOnline";
 import type { ActionResult } from "@/lib/actions/result";
 import type { CoachOutput } from "@/lib/ai/schemas";
@@ -26,6 +27,10 @@ import { CoachedField, type CoachState } from "./CoachedField";
 import { intakeCopy as c, ethicsCopy } from "./copy";
 import { EthicsPanel, type EthicsView } from "./EthicsPanel";
 import { UploadList } from "./UploadList";
+import { AddEmailDialog, type AddEmailFns } from "@/components/email/AddEmailDialog";
+import { emailCopy } from "@/components/email/copy";
+import type { EmailRow } from "@/lib/email/service";
+import { competitorLines, MAX_COMPETITORS } from "@/lib/schemas/intake";
 
 export type BriefActions = {
   saveField: (input: {
@@ -49,6 +54,9 @@ export type BriefActions = {
   }) => Promise<ActionResult<{ version: number; lowSpecificity: boolean }>>;
   uploadFile: (kind: UploadKind, file: File) => Promise<ActionResult<UploadRow>>;
   removeFile: (id: string) => Promise<ActionResult>;
+  /** Phase 1: emails are added and removed here for email projects (AC31.2). */
+  addEmail?: AddEmailFns;
+  removeEmail?: (emailId: string) => Promise<ActionResult>;
   approve: (projectId: string) => Promise<ActionResult<{ stageRunId: string }>>;
   editIntake: (projectId: string) => Promise<ActionResult>;
   override: (
@@ -75,6 +83,8 @@ export type BriefData = {
     approved: null | { by: string; at: string };
   };
   uploads: UploadRow[];
+  /** Emails added to this project (phase 1, AC31.2). */
+  emails?: EmailRow[];
   ethics: EthicsView | null;
 };
 
@@ -187,6 +197,9 @@ export function BriefPage({ data, actions }: { data: BriefData; actions: BriefAc
   }, [running, router]);
 
   const assets = uploads.filter((u) => u.kind === "asset");
+  const emails = data.emails ?? [];
+  const isEmailProject = project.channel === "email";
+  const [addingEmail, setAddingEmail] = useState(false);
   const missing = missingForApproval(
     {
       business_objective: values.business_objective,
@@ -196,13 +209,14 @@ export function BriefPage({ data, actions }: { data: BriefData; actions: BriefAc
     },
     project.mode,
     assets.length,
+    isEmailProject ? emails.length : undefined,
   );
   const missingMessages = [
     ...(missing.includes("business_objective") || missing.includes("behavioural_objective")
       ? [c.needsObjectives]
       : []),
     ...(missing.includes("sector") ? [c.needsSector] : []),
-    ...(missing.includes("assets") ? [c.needsAssets] : []),
+    ...(missing.includes("assets") ? [isEmailProject ? emailCopy.needsEmails : c.needsAssets] : []),
   ];
   const approved = data.intake.approved;
 
@@ -286,6 +300,22 @@ export function BriefPage({ data, actions }: { data: BriefData; actions: BriefAc
                 {values.sector === "Other" ? values.sector_other : values.sector}
               </p>
             </div>
+            {values.competitors.trim() ? (
+              <div className="grid gap-1">
+                <p className="text-caption font-medium text-muted">{c.competitorsLabel}</p>
+                <p className="whitespace-pre-line text-body">{values.competitors}</p>
+              </div>
+            ) : null}
+            {emails.length ? (
+              <div className="grid gap-1">
+                <p className="text-caption font-medium text-muted">{emailCopy.section}</p>
+                <ul className="grid gap-1 text-small text-muted">
+                  {emails.map((e) => (
+                    <li key={e.id}>{e.subject}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
             {uploads.length ? (
               <ul className="grid gap-1 text-small text-muted">
                 {uploads.map((u) => (
@@ -389,7 +419,89 @@ export function BriefPage({ data, actions }: { data: BriefData; actions: BriefAc
             ) : null}
           </div>
 
-          {project.mode === "optimise" ? (
+          <div className="grid gap-1.5">
+            <Label htmlFor="intake-competitors">{c.competitorsLabel}</Label>
+            <Textarea
+              id="intake-competitors"
+              rows={3}
+              value={values.competitors}
+              maxLength={500}
+              aria-invalid={
+                competitorLines(values.competitors).length > MAX_COMPETITORS || undefined
+              }
+              aria-describedby="intake-competitors-help"
+              onChange={(e) => {
+                const v = e.target.value;
+                setValues((cur) => ({ ...cur, competitors: v }));
+                clearTimeout(timers.current.competitors);
+                if (competitorLines(v).length <= MAX_COMPETITORS)
+                  timers.current.competitors = setTimeout(() => void save("competitors", v), 1200);
+              }}
+            />
+            <p
+              id="intake-competitors-help"
+              className={
+                competitorLines(values.competitors).length > MAX_COMPETITORS
+                  ? "text-caption text-bad"
+                  : "text-caption text-muted"
+              }
+            >
+              {competitorLines(values.competitors).length > MAX_COMPETITORS
+                ? c.competitorsTooMany
+                : c.competitorsHelp}
+            </p>
+          </div>
+
+          {isEmailProject ? (
+            <section className="grid gap-3 rounded-lg border border-line p-5">
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="text-small font-semibold">{emailCopy.section}</h3>
+                {actions.addEmail ? (
+                  <Button variant="secondary" size="sm" onClick={() => setAddingEmail(true)}>
+                    {emailCopy.add}
+                  </Button>
+                ) : null}
+              </div>
+              <p className="text-caption text-muted">{emailCopy.help}</p>
+              {emails.length ? (
+                <ul className="grid gap-1">
+                  {emails.map((e) => (
+                    <li
+                      key={e.id}
+                      className="flex items-center justify-between gap-3 rounded-sm bg-soft px-3 py-2 text-small"
+                    >
+                      <span className="min-w-0 truncate">{e.subject}</span>
+                      {actions.removeEmail ? (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          aria-label={`${emailCopy.remove}: ${e.subject}`}
+                          onClick={async () => {
+                            await actions.removeEmail!(e.id).catch(() => null);
+                            router.refresh();
+                          }}
+                        >
+                          {emailCopy.remove}
+                        </Button>
+                      ) : null}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-small text-muted">{emailCopy.empty}</p>
+              )}
+              {actions.addEmail ? (
+                <AddEmailDialog
+                  open={addingEmail}
+                  onOpenChange={setAddingEmail}
+                  fns={actions.addEmail}
+                  onAdded={() => router.refresh()}
+                />
+              ) : null}
+            </section>
+          ) : null}
+
+          {project.mode === "optimise" && !isEmailProject ? (
             <section className="grid gap-4 rounded-lg border border-line p-5">
               <UploadList
                 kind="asset"

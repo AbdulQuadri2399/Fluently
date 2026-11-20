@@ -1,6 +1,7 @@
 "use client";
 
 import { archiveProject } from "@/lib/actions/projects";
+import * as emailActions from "@/lib/actions/email";
 import * as a from "@/lib/actions/intake";
 import { createClient } from "@/lib/supabase/client";
 import type { UploadKind } from "@/lib/uploads/rules";
@@ -28,6 +29,22 @@ export function BriefScreen({ data }: { data: BriefData }) {
         resolve: a.resolveSuggestion,
         uploadFile,
         removeFile: a.removeUpload,
+        addEmail: {
+          addPaste: (subject, html) =>
+            emailActions.addEmail({ source: "paste", projectId, subject, html }),
+          addFile: async (file, subject) => {
+            const up = await uploadFile("asset", file);
+            if (!up.ok) return up;
+            const isEml = file.name.toLowerCase().endsWith(".eml");
+            return emailActions.addEmail({
+              source: isEml ? "eml" : "html",
+              projectId,
+              uploadId: up.data.id,
+              subject: subject.trim() || undefined,
+            });
+          },
+        },
+        removeEmail: (emailId: string) => emailActions.removeEmail(projectId, emailId),
         approve: a.approveObjectives,
         editIntake: a.editApprovedIntake,
         override: a.recordOverride,

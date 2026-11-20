@@ -20,7 +20,11 @@ describe("SCR4 New project dialog", () => {
     expect(screen.getByLabelText(c.name)).toBeInTheDocument();
     expect(screen.getByRole("radio", { name: new RegExp(c.modeNew) })).toBeChecked();
     expect(screen.getByRole("radio", { name: new RegExp(c.modeOptimise) })).not.toBeChecked();
-    expect(screen.getByRole("radio", { name: c.channelScreens })).toBeChecked();
+    // Phase 1 (AC31.1): email is the default and Screens is coming soon, not choosable.
+    expect(
+      screen.getByRole("radio", { name: `${c.channelScreens}. ${c.comingSoon}` }),
+    ).toBeDisabled();
+    expect(screen.getByRole("radio", { name: c.channelEmail })).toBeChecked();
     expect(screen.getByRole("radio", { name: c.channelEmail })).toBeInTheDocument();
     expect(screen.getByLabelText(c.client)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: c.cancel })).toBeInTheDocument();

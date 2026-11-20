@@ -10,12 +10,16 @@ export function missingForApproval(
   >,
   mode: string,
   assetCount: number,
+  /** Set for email projects (phase 1): the emails added, instead of uploaded assets. */
+  emailCount?: number,
 ): Missing[] {
   const missing: Missing[] = [];
   if (!intake.business_objective?.trim()) missing.push("business_objective");
   if (!intake.behavioural_objective?.trim()) missing.push("behavioural_objective");
   if (!intake.sector?.trim() || (intake.sector === "Other" && !intake.sector_other?.trim()))
     missing.push("sector");
-  if (mode === "optimise" && assetCount === 0) missing.push("assets");
+  if (emailCount !== undefined) {
+    if (emailCount === 0) missing.push("assets");
+  } else if (mode === "optimise" && assetCount === 0) missing.push("assets");
   return missing;
 }

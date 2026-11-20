@@ -1,6 +1,7 @@
 "use client";
 
 import * as canvasActions from "@/lib/actions/canvas";
+import * as emailActions from "@/lib/actions/email";
 import * as intakeActions from "@/lib/actions/intake";
 import type { ProjectTree } from "@/lib/canvas/load";
 import { createClient } from "@/lib/supabase/client";
@@ -16,6 +17,38 @@ export function ProjectCanvasScreen({ tree, budget }: { tree: ProjectTree; budge
       actions={{
         getRunActivity: canvasActions.getRunActivity,
         getTrace: canvasActions.getTrace,
+        getEmail: emailActions.getEmailForNode,
+        removeEmail: (emailId: string) => emailActions.removeEmail(projectId, emailId),
+        addEmail: {
+          addPaste: (subject, html) =>
+            emailActions.addEmail({ source: "paste", projectId, subject, html }),
+          addFile: async (file, subject) => {
+            const request = {
+              projectId,
+              kind: "asset" as const,
+              fileName: file.name,
+              mime: file.type,
+              size: file.size,
+            };
+            const signed = await intakeActions.createUploadUrl(request);
+            if (!signed.ok) return signed;
+            const put = await createClient()
+              .storage.from("uploads")
+              .uploadToSignedUrl(signed.data.path, signed.data.token, file);
+            if (put.error) return { ok: false as const, code: "unavailable" as const };
+            const confirmed = await intakeActions.confirmUpload({
+              ...request,
+              path: signed.data.path,
+            });
+            if (!confirmed.ok) return confirmed;
+            return emailActions.addEmail({
+              source: file.name.toLowerCase().endsWith(".eml") ? "eml" : "html",
+              projectId,
+              uploadId: confirmed.data.id,
+              subject: subject.trim() || undefined,
+            });
+          },
+        },
         addNode: canvasActions.addNode,
         deleteNode: canvasActions.deleteNode,
         restoreNode: canvasActions.restoreNode,

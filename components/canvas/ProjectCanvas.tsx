@@ -14,6 +14,9 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { ADDABLE_BY_LANE, MERGEABLE } from "@/lib/canvas/connect";
 import { type Lane } from "@/lib/canvas/layout";
+import { AddEmailDialog, type AddEmailFns } from "@/components/email/AddEmailDialog";
+import { emailCopy } from "@/components/email/copy";
+import type { EmailDetail } from "@/lib/email/service";
 import { ActivityPanel } from "./ActivityPanel";
 import { AddCardDialog, MergeDialog } from "./AddCardDialog";
 import { useCardEditing, type EditingActions } from "./useCardEditing";
@@ -57,6 +60,9 @@ export type CanvasActions = {
   ) => Promise<ActionResult<{ version: number }>>;
   getRunActivity?: (runId: string) => Promise<RunActivity>;
   getTrace?: (nodeId: string) => Promise<ActionResult<string[]>>;
+  addEmail?: AddEmailFns;
+  removeEmail?: (emailId: string) => Promise<ActionResult>;
+  getEmail?: (nodeId: string) => Promise<EmailDetail | null>;
   addNode?: EditingActions["addNode"];
   deleteNode?: EditingActions["deleteNode"];
   restoreNode?: EditingActions["restoreNode"];
@@ -87,6 +93,7 @@ export function ProjectCanvas({
 }) {
   const [activityOpen, setActivityOpen] = useState(false);
   const [addLane, setAddLane] = useState<Lane | null>(null);
+  const [addingEmail, setAddingEmail] = useState(false);
   const [multi, setMulti] = useState<Set<string>>(() => new Set());
   const [merging, setMerging] = useState(false);
   const [regenerating, setRegenerating] = useState(false);
@@ -252,7 +259,9 @@ export function ProjectCanvas({
           selectedId={selectedId}
           onSelect={(id) => selectCard(id)}
           onAddCard={(lane) => {
-            if (!editing.onAdd || !ADDABLE_BY_LANE[lane]) toast(c.editing.addLater);
+            if (lane === "objectives" && tree.project.channel === "email" && actions.addEmail)
+              setAddingEmail(true);
+            else if (!editing.onAdd || !ADDABLE_BY_LANE[lane]) toast(c.editing.addLater);
             else setAddLane(lane);
           }}
           multiIds={multi}
@@ -301,6 +310,36 @@ export function ProjectCanvas({
           onDelete={editing.onDelete}
           onConnect={editing.onConnect}
           onDisconnect={editing.onDisconnect}
+          loadEmail={actions.getEmail}
+          onRemoveEmail={
+            actions.removeEmail
+              ? async (emailId) => {
+                  const res = await actions.removeEmail!(emailId);
+                  if (!res.ok) {
+                    toast.error(emailCopy.failed);
+                    return false;
+                  }
+                  toast(emailCopy.removed);
+                  selectCard(null);
+                  router.refresh();
+                  return true;
+                }
+              : undefined
+          }
+        />
+      ) : null}
+      {actions.addEmail ? (
+        <AddEmailDialog
+          open={addingEmail}
+          onOpenChange={setAddingEmail}
+          fns={actions.addEmail}
+          onAdded={() => {
+            const researched = tree.nodes.some((n) =>
+              ["finding", "theme", "opportunity"].includes(n.type),
+            );
+            toast(researched ? emailCopy.addedLate : emailCopy.added);
+            router.refresh();
+          }}
         />
       ) : null}
       {multi.size > 0 ? (

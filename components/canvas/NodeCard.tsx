@@ -5,6 +5,7 @@ import {
   CaretDownIcon,
   CaretUpIcon,
   CheckIcon,
+  EnvelopeSimpleIcon,
   FlaskIcon,
   HandPalmIcon,
   ImagesIcon,
@@ -36,6 +37,7 @@ import { EvidenceExpanded, type EvidenceGroup } from "./EvidenceExpanded";
 const ICONS: Record<string, ComponentType<{ className?: string; "aria-hidden"?: boolean }>> = {
   objective: TargetIcon,
   asset_set: ImagesIcon,
+  email: EnvelopeSimpleIcon,
   ethics: ShieldCheckIcon,
   override: HandPalmIcon,
   source: BookOpenIcon,

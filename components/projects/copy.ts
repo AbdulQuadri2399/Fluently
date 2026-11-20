@@ -42,6 +42,7 @@ export const projectsCopy = {
   modeOptimiseHint: "Improve current screens or emails. You'll add them to the brief.",
   channel: "Channel",
   channelScreens: "Screens and flows",
+  comingSoon: "Coming soon",
   channelEmail: "Email",
   client: "Client (optional)",
   create: "Create project",

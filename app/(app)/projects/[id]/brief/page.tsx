@@ -4,6 +4,7 @@ import type { BriefData } from "@/components/intake/BriefPage";
 import type { EthicsView } from "@/components/intake/EthicsPanel";
 import { INTAKE_FIELDS, type IntakeField } from "@/lib/schemas/intake";
 import { createClient } from "@/lib/supabase/server";
+import { listEmails } from "@/lib/email/service";
 import { listUploads } from "@/lib/uploads/service";
 
 export const metadata = { title: "Brief" };
@@ -20,7 +21,7 @@ const initials = (name: string) =>
 export default async function Page({ params }: PageProps<"/projects/[id]/brief">) {
   const { id } = await params;
   const supabase = await createClient();
-  const [{ data: project }, { data: intake }, uploads, { data: run }, { data: nodes }] =
+  const [{ data: project }, { data: intake }, uploads, { data: run }, { data: nodes }, emails] =
     await Promise.all([
       supabase
         .from("projects")
@@ -48,6 +49,7 @@ export default async function Page({ params }: PageProps<"/projects/[id]/brief">
         .in("type", ["ethics", "override"])
         .is("deleted_at", null)
         .order("created_at"),
+      listEmails(supabase, id),
     ]);
   if (!project || !intake) notFound();
 
@@ -106,6 +108,7 @@ export default async function Page({ params }: PageProps<"/projects/[id]/brief">
         : null,
     },
     uploads: uploads.ok ? uploads.data : [],
+    emails,
     ethics,
   };
   return <BriefScreen data={data} />;
