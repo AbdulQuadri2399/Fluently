@@ -19,6 +19,18 @@ export function ProjectCanvasScreen({ tree, budget }: { tree: ProjectTree; budge
         getTrace: canvasActions.getTrace,
         getEmail: emailActions.getEmailForNode,
         getEmailPreview: emailActions.getEmailPreview,
+        emailRender: {
+          load: emailActions.getEmailRender,
+          render: async (emailId, images) => {
+            const res = await fetch("/api/email-render", {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({ emailId, images }),
+            }).catch(() => null);
+            if (!res) return { ok: false as const, code: "unavailable" as const };
+            return (await res.json().catch(() => ({ ok: false, code: "unavailable" }))) as never;
+          },
+        },
         removeEmail: (emailId: string) => emailActions.removeEmail(projectId, emailId),
         addEmail: {
           addPaste: (subject, html) =>

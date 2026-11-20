@@ -7,8 +7,11 @@ const nextConfig: NextConfig = {
   experimental: { serverActions: { bodySizeLimit: "11mb" } },
   // The hidden browser that renders emails (04 D38) is a native binary: it is left out of the
   // bundle. Its files must be added to each route that renders (outputFileTracingIncludes);
-  // the spike that proved this on Vercel is recorded in 04 D38.
+  // the spike that proved this on Vercel is recorded in 04 D43.
   serverExternalPackages: ["@sparticuz/chromium", "puppeteer-core"],
+  outputFileTracingIncludes: {
+    "/api/email-render": ["./node_modules/@sparticuz/chromium/bin/**/*"],
+  },
   turbopack: {
     rules: {
       "*.css": {

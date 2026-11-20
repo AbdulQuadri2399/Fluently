@@ -923,3 +923,35 @@ export const emails = pgTable(
     }),
   ],
 ).enableRLS();
+
+// ---------- Phase 1: email renders (AC31.4, AC31.5, 04 D38) ----------
+
+export const emailRenders = pgTable(
+  "email_renders",
+  {
+    id: id(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "restrict" }),
+    projectId: uuid("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    emailId: uuid("email_id")
+      .notNull()
+      .references(() => emails.id, { onDelete: "cascade" }),
+    // Whether the email's own images were let in for this picture.
+    images: boolean("images").notNull().default(false),
+    storagePath: text("storage_path").notNull(),
+    width: integer("width").notNull(),
+    height: integer("height").notNull(),
+    measured: jsonb("measured").notNull().default({}),
+    renderedBy: uuid("rendered_by").references(() => members.id, { onDelete: "set null" }),
+    ...timestamps(),
+  },
+  (t) => [
+    uniqueIndex("email_renders_email_images_unique").on(t.emailId, t.images),
+    index("email_renders_project_idx").on(t.projectId),
+    // Written only by the render route (service role); members read.
+    memberRead("email_renders"),
+  ],
+).enableRLS();

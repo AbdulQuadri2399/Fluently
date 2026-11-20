@@ -16,6 +16,7 @@ import { ADDABLE_BY_LANE, MERGEABLE } from "@/lib/canvas/connect";
 import { type Lane } from "@/lib/canvas/layout";
 import { AddEmailDialog, type AddEmailFns } from "@/components/email/AddEmailDialog";
 import { emailCopy } from "@/components/email/copy";
+import type { EmailRenderFns } from "@/components/email/EmailRenderSection";
 import type { EmailDetail, EmailPreviewData } from "@/lib/email/service";
 import { ActivityPanel } from "./ActivityPanel";
 import { AddCardDialog, MergeDialog } from "./AddCardDialog";
@@ -64,6 +65,7 @@ export type CanvasActions = {
   removeEmail?: (emailId: string) => Promise<ActionResult>;
   getEmail?: (nodeId: string) => Promise<EmailDetail | null>;
   getEmailPreview?: (by: { nodeId: string }) => Promise<EmailPreviewData | null>;
+  emailRender?: EmailRenderFns;
   addNode?: EditingActions["addNode"];
   deleteNode?: EditingActions["deleteNode"];
   restoreNode?: EditingActions["restoreNode"];
@@ -315,6 +317,7 @@ export function ProjectCanvas({
           onConnect={editing.onConnect}
           onDisconnect={editing.onDisconnect}
           loadEmail={actions.getEmail}
+          emailRender={actions.emailRender}
           onRemoveEmail={
             actions.removeEmail
               ? async (emailId) => {

@@ -74,6 +74,36 @@ export const emailCopy = {
     imagesCount: (n: number, missing: number) =>
       `${n} ${n === 1 ? "image" : "images"}${missing ? `, ${missing} without a description` : ""}`,
   },
+  render: {
+    title: "Phone view",
+    button: "Render phone view",
+    again: "Render again",
+    rendering: "Rendering…",
+    failed: "Couldn't render this email. Try again.",
+    none: "Not rendered yet. The audit uses this picture, so render it first.",
+    imagesLabel: "Load this email's images",
+    imagesOn:
+      "The picture and the audit will include them. Loading images can count as an open for the sender.",
+    imagesOff: "Images are off, so the email is shown without them.",
+    pictureAlt: (subject: string) => `Phone view of ${subject}`,
+    measured: "Measured",
+    fits: "Fits a phone.",
+    shrunk: (px: number) =>
+      `Wider than a phone (${px} px), so it's shrunk to fit. Text and buttons end up smaller.`,
+    contrastOk: (n: number) => `Text contrast is readable in all ${n} text blocks.`,
+    contrastBad: (failing: number, samples: number, lowest: string, ratio: number) =>
+      `${failing} of ${samples} text blocks are below readable contrast. Lowest: "${lowest}" at ${ratio} to 1.`,
+    length: (words: number, screens: number) =>
+      `${words} ${words === 1 ? "word" : "words"}, about ${screens} phone ${screens === 1 ? "screen" : "screens"} long.`,
+    preheaderPresent: (n: number) => `Preheader: ${n} characters.`,
+    preheaderMissing: "No preheader.",
+    colours: "Main colours",
+    colourText: "Text",
+    colourBackground: "Background",
+    size: (w: number, h: number) => `${w}×${h} px`,
+    smallTap: "Small to tap",
+    lowContrast: "Low contrast",
+  },
   card: {
     buttons: (n: number) => `${n} ${n === 1 ? "button" : "buttons"}`,
     preheader: "preheader",

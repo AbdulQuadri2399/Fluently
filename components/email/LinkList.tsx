@@ -1,5 +1,6 @@
 import type { EmailParts } from "@/lib/email/parts";
 import { isAboveFold, linkKey, type LinkPosition } from "@/lib/email/fold";
+import type { MeasuredLink } from "@/lib/email/measure";
 import { cn } from "@/lib/utils";
 import { emailCopy as c } from "./copy";
 
@@ -24,9 +25,12 @@ const Tag = ({ children, tone }: { children: React.ReactNode; tone?: "ok" | "inf
 export function LinkList({
   parts,
   positions,
+  measured,
 }: {
   parts: Pick<EmailParts, "ctas" | "links">;
   positions?: Record<string, LinkPosition>;
+  /** From the render: exact position, size and contrast for each link (AC31.5). */
+  measured?: MeasuredLink[];
 }) {
   const rows = [
     ...parts.ctas.map((l) => ({ ...l, kind: l.kind ?? "button", primary: l.primary })),
@@ -36,7 +40,8 @@ export function LinkList({
   return (
     <ul className="grid gap-1.5">
       {rows.map((l) => {
-        const pos = positions?.[linkKey(l.text, l.href)];
+        const m = measured?.find((x) => linkKey(x.text, x.href) === linkKey(l.text, l.href));
+        const pos = m ? { top: m.top } : positions?.[linkKey(l.text, l.href)];
         return (
           <li key={`${l.text}|${l.href}`} className="flex flex-wrap items-center gap-1">
             <span className="min-w-0 break-words">{l.text}</span>
@@ -48,6 +53,11 @@ export function LinkList({
               <Tag tone={isAboveFold(pos.top) ? "ok" : "warn"}>
                 {isAboveFold(pos.top) ? c.parts.aboveFold : c.parts.belowFold}
               </Tag>
+            ) : null}
+            {m ? <Tag>{c.render.size(m.width, m.height)}</Tag> : null}
+            {m && !m.tapTargetOk ? <Tag tone="warn">{c.render.smallTap}</Tag> : null}
+            {m?.contrast && !m.contrast.passes ? (
+              <Tag tone="warn">{c.render.lowContrast}</Tag>
             ) : null}
           </li>
         );

@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import type { ActionResult } from "@/lib/actions/result";
 import { canvasCopy as c, typeNames } from "./copy";
 import { EmailPartsSection, RemoveEmailSection } from "@/components/email/EmailPartsSection";
+import { EmailRenderSection, type EmailRenderFns } from "@/components/email/EmailRenderSection";
 import type { EmailDetail } from "@/lib/email/service";
 import { ConnectionsSection, DeleteCardSection } from "./CardActions";
 import { StrengthTag, type Level } from "./StrengthTag";
@@ -128,6 +129,7 @@ export function Inspector({
   onDisconnect,
   loadEmail,
   onRemoveEmail,
+  emailRender,
 }: {
   node: TreeNode;
   nodes: TreeNode[];
@@ -156,6 +158,8 @@ export function Inspector({
   /** Phase 1: the parts of the email behind an email card (AC31.3). */
   loadEmail?: (nodeId: string) => Promise<EmailDetail | null>;
   onRemoveEmail?: (emailId: string) => Promise<boolean>;
+  /** Phase 1: render the email at phone width and show what was measured (AC31.4, AC31.5). */
+  emailRender?: EmailRenderFns;
 }) {
   const [email, setEmail] = useState<{ nodeId: string; detail: EmailDetail | null } | null>(null);
   useEffect(() => {
@@ -386,6 +390,15 @@ export function Inspector({
         ))}
       </dl>
       {node.type === "email" && emailDetail ? <EmailPartsSection detail={emailDetail} /> : null}
+      {node.type === "email" && emailDetail && emailRender ? (
+        <EmailRenderSection
+          emailId={emailDetail.id}
+          subject={node.title}
+          parts={emailDetail.parts}
+          imagesInitial={emailDetail.imagesLoaded}
+          fns={emailRender}
+        />
+      ) : null}
       {onTrace ? (
         <div className="grid gap-2">
           <Button

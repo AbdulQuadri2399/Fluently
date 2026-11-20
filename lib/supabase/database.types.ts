@@ -145,6 +145,44 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"email_renders": {
+                  Row: {
+                    "created_at": string,"email_id": string,"height": number,"id": string,"images": boolean,"measured": NonNullable<Json>,"project_id": string,"rendered_by": string | null,"storage_path": string,"updated_at": string,"width": number,"workspace_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"email_id": string,"height": number,"id"?: string,"images"?: boolean,"measured"?: NonNullable<Json>,"project_id": string,"rendered_by"?: string | null,"storage_path": string,"updated_at"?: string,"width": number,"workspace_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"email_id"?: string,"height"?: number,"id"?: string,"images"?: boolean,"measured"?: NonNullable<Json>,"project_id"?: string,"rendered_by"?: string | null,"storage_path"?: string,"updated_at"?: string,"width"?: number,"workspace_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "email_renders_email_id_emails_id_fk"
+      columns: ["email_id"]
+isOneToOne: false
+      referencedRelation: "emails"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "email_renders_project_id_projects_id_fk"
+      columns: ["project_id"]
+isOneToOne: false
+      referencedRelation: "projects"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "email_renders_rendered_by_members_id_fk"
+      columns: ["rendered_by"]
+isOneToOne: false
+      referencedRelation: "members"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "email_renders_workspace_id_workspaces_id_fk"
+      columns: ["workspace_id"]
+isOneToOne: false
+      referencedRelation: "workspaces"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"emails": {
                   Row: {
                     "added_by": string,"created_at": string,"html": string,"id": string,"images_loaded": boolean,"node_id": string | null,"parts": NonNullable<Json>,"preheader": string | null,"project_id": string,"source": string,"subject": string,"updated_at": string,"upload_id": string | null,"workspace_id": string

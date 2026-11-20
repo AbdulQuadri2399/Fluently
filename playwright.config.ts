@@ -1,9 +1,14 @@
 import { defineConfig, devices } from "@playwright/test";
+import { existsSync } from "node:fs";
 import { config } from "dotenv";
 
 config({ path: ".env.local" });
 
 const PORT = Number(process.env.E2E_PORT ?? 3100);
+// The hidden browser that renders emails (04 D38): locally the pre-installed one.
+const CHROME =
+  process.env.CHROMIUM_EXECUTABLE_PATH ??
+  ["/opt/pw-browsers/chromium-1243/chrome-linux64/chrome"].find((p) => existsSync(p));
 
 export default defineConfig({
   testDir: "e2e",
@@ -24,6 +29,7 @@ export default defineConfig({
   webServer: {
     command: `pnpm build && pnpm start -p ${PORT}`,
     url: `http://localhost:${PORT}/sign-in`,
+    env: CHROME ? { CHROMIUM_EXECUTABLE_PATH: CHROME } : {},
     reuseExistingServer: !process.env.CI,
     timeout: 240_000,
   },

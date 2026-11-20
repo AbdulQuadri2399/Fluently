@@ -76,6 +76,35 @@ describe.skipIf(!have)("renderEmail (local browser)", () => {
     expect(fixed.layoutWidth).toBeGreaterThanOrEqual(600);
   }, 60_000);
 
+  const pngWidth = (png: Buffer) => png.readUInt32BE(16);
+
+  it("an email wider than a phone is shrunk to fit: the picture is phone-width and positions are in phone pixels", async () => {
+    const fixed = await renderEmail({
+      html: '<style>body{margin:0}</style><table width="600" style="margin:0"><tr><td style="padding:0"><div style="height:400px"></div><a href="https://x.test/go" style="display:block;background:#1a5fb4;color:#fff;padding:20px 30px;width:200px">Go</a></td></tr></table>',
+    });
+    expect(fixed.layoutWidth).toBeGreaterThanOrEqual(600);
+    expect(fixed.zoom).toBeLessThan(0.7);
+    expect(pngWidth(fixed.png)).toBe(375);
+    const go = fixed.links.find((l) => l.text === "Go")!;
+    // About 400 layout px down (a table adds a couple), shown at phone scale.
+    expect(Math.abs(go.top - 400 * fixed.zoom)).toBeLessThan(3);
+    // A responsive email isn't shrunk.
+    const ok = await renderEmail({ html: "<h1>Hi</h1><p>A responsive email just flows.</p>" });
+    expect(ok.zoom).toBe(1);
+    expect(pngWidth(ok.png)).toBe(375);
+  }, 60_000);
+
+  it("reads colours, button boxes and text colours from the browser's own layout", async () => {
+    const r = await renderEmail({ html });
+    const verify = r.raw.links.find((l) => l.text === "Verify my identity")!;
+    expect(verify.color).toBe("rgb(255, 255, 255)");
+    expect(verify.bg).toBe("rgb(26, 95, 180)");
+    expect(verify.boxHeight).toBeGreaterThan(verify.height); // the coloured cell around the link
+    expect(r.raw.texts.some((t) => t.snippet.startsWith("Thanks for joining"))).toBe(true);
+    // Hidden preheader text isn't counted as visible text.
+    expect(r.raw.texts.some((t) => t.snippet.includes("Two quick steps"))).toBe(false);
+  }, 60_000);
+
   it("a long email is cut at the maximum height", async () => {
     const tall = `<p>Top</p><div style="height:6000px"></div><p>Bottom</p>`;
     const r = await renderEmail({ html: tall, maxHeight: 2000 });
