@@ -51,4 +51,15 @@ describe("previewDocument", () => {
       doc.indexOf("https://x.test/a.css"),
     );
   });
+
+  it("asks for the phone's width, whatever shape the email has", () => {
+    for (const html of [
+      "<p>Hi</p>",
+      "<html><body>Hi</body></html>",
+      "<html><head></head><body>Hi</body></html>",
+    ])
+      expect(previewDocument(html, { images: false })).toContain(
+        'name="viewport" content="width=device-width',
+      );
+  });
 });

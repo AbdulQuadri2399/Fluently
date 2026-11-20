@@ -249,7 +249,7 @@ You'll be able to see: emails with their findings by part and lens, research que
   Done when: `tests/components/SCR4-new-project.test.tsx` 'screens coming soon' and `tests/components/SCR6-intake.test.tsx` competitors field pass.
 - [x] P1.3 (done 2026-11-20; `tests/unit/emailParts.test.ts`, `tests/integration/O37-add-email.test.ts`, `tests/rls/emails.test.ts`, `tests/components/SCR14-add-email.test.tsx`, `e2e/add-email.spec.ts`) Add an email (paste HTML, upload `.html` or `.eml`, subject line field), before and after approval; stored privately; split into parts — M — Refs: AC31.2, AC31.3, AC31.9 — Depends on: P1.2
   Done when: `tests/unit/emailParts.test.ts` and `tests/integration/O37-add-email.test.ts` (including a two-user access test) pass; `e2e/add-email.spec.ts` passes.
-- [ ] P1.4 **Spike S2:** render one email to a mobile image in a serverless function on Vercel; record the result in the tech plan (04 D38) — S — Refs: AC31.4 — Depends on: P1.3
+- [x] P1.4 (done 2026-11-20: passed on Vercel, see 04 D43; `lib/email/render.ts`, `tests/integration/render.test.ts`) **Spike S2:** render one email to a mobile image in a serverless function on Vercel; record the result in the tech plan (04 D38) — S — Refs: AC31.4 — Depends on: P1.3
   Done when: a real render works on the hosted site, or the fallback (attached screenshots) is chosen and recorded.
 - [ ] P1.5 Render and measure: mobile image (images off by default, per-email switch), contrast, colours, CTA size and count, image alt text, preheader — M — Refs: AC31.4, AC31.5 — Depends on: P1.4
   Done when: `tests/unit/emailMeasure.test.ts` and `tests/integration/O38-render.test.ts` pass.

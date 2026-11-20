@@ -11,9 +11,10 @@ export function previewDocument(html: string, opts: { images: boolean }): string
     "style-src 'unsafe-inline'",
     "font-src data:",
   ].join("; ");
-  const meta = `<meta http-equiv="Content-Security-Policy" content="${csp}">`;
+  // Mail apps lay an email out at the phone's width; without this a browser would use a desktop width.
+  const meta = `<meta http-equiv="Content-Security-Policy" content="${csp}"><meta name="viewport" content="width=device-width, initial-scale=1">`;
   if (/<head[\s>]/i.test(html)) return html.replace(/<head([^>]*)>/i, `<head$1>${meta}`);
   if (/<html[\s>]/i.test(html))
     return html.replace(/<html([^>]*)>/i, `<html$1><head>${meta}</head>`);
-  return `<!doctype html><html><head>${meta}<meta name="viewport" content="width=device-width, initial-scale=1"></head><body>${html}</body></html>`;
+  return `<!doctype html><html><head>${meta}</head><body>${html}</body></html>`;
 }
