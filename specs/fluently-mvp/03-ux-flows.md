@@ -714,6 +714,8 @@ Format: user action → system response → resulting state (ACs).
 | email.parts.kindButton / email.parts.kindLink | "Button" (designed as a button) / "Link" (a plain link, or a text link standing in when the email has no styled button) |
 | email.parts.aboveFold / email.parts.belowFold | "Above the fold" / "Below the fold" (shown in the preview once the email is laid out) |
 | email.preview.foldLine | "Fold" (label on the dashed line that scrolls with the email, drawn at about 580 px) |
+| email.card.attached / email.card.attachedHint | "Email attached" / "Phone preview and details in the side panel" (a strip at the bottom of an email card, with a small phone icon) *(2026-11-21: please confirm)* |
+| email.card.open / email.card.showing | "Open" (button-look chip with a side-panel icon) / "Showing in the side panel" (replaces the hint while that card is the open one; the strip and chip turn dark) |
 | email.frame.inbox / email.frame.sender / email.frame.to | "Inbox" / "Sender" / "To: Me" (the generic mail app around the email; the subject line is the email's own) *(2026-11-21: please confirm)* |
 | email.render.title / email.render.button / email.render.again / email.render.rendering | "Phone view" / "Render for the audit" / "Render again" / "Rendering…" *(Phase 1, 2026-11-20: please confirm)* |
 | email.render.none / email.render.rendered / email.render.failed | "Not rendered yet. The audit uses a render of this email, so render it first." / "Rendered for the audit. The measured facts below come from that render." / "Couldn't render this email. Try again." |

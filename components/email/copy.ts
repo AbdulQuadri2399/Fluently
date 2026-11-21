@@ -115,5 +115,9 @@ export const emailCopy = {
     buttons: (n: number) => `${n} ${n === 1 ? "button" : "buttons"}`,
     preheader: "preheader",
     noPreheader: "no preheader",
+    attached: "Email attached",
+    attachedHint: "Phone preview and details in the side panel",
+    open: "Open",
+    showing: "Showing in the side panel",
   },
 } as const;

@@ -29,7 +29,14 @@ test("Phone view: render an email, see the picture and what was measured, switch
   await page.getByRole("button", { name: "Approve objectives" }).click();
   await page.getByRole("link", { name: "Go to canvas" }).click();
 
-  await page.locator(".react-flow__node").filter({ hasText: "Welcome to Examplebank" }).click();
+  // The card says an email is attached and that its preview is in the side panel; clicking opens it.
+  const card = page.locator(".react-flow__node").filter({ hasText: "Welcome to Examplebank" });
+  const strip = card.getByTestId("attachment-strip");
+  await expect(strip).toContainText("Email attached");
+  await expect(strip).toContainText("Phone preview and details in the side panel");
+  await shoot(page, "SCR5-email-attached");
+  await strip.click();
+  await expect(strip).toContainText("Showing in the side panel");
   const panel = page.getByRole("region", { name: "Phone view" });
 
   // One phone, showing the live email, ready before anything is rendered.

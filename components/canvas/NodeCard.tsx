@@ -5,6 +5,7 @@ import {
   CaretDownIcon,
   CaretUpIcon,
   CheckIcon,
+  DeviceMobileIcon,
   EnvelopeSimpleIcon,
   FlaskIcon,
   HandPalmIcon,
@@ -17,6 +18,7 @@ import {
   PuzzlePieceIcon,
   QuestionIcon,
   ShieldCheckIcon,
+  SidebarSimpleIcon,
   StackIcon,
   TargetIcon,
   WarningCircleIcon,
@@ -34,6 +36,7 @@ import { canvasCopy as c } from "./copy";
 import { ASSET_MIME, AssetsExpanded, type AssetThumb } from "./AssetsExpanded";
 import { EvidenceExpanded, type EvidenceGroup } from "./EvidenceExpanded";
 import { EmailExpanded } from "@/components/email/EmailPreview";
+import { emailCopy as ec } from "@/components/email/copy";
 import type { EmailPreviewData } from "@/lib/email/service";
 
 const ICONS: Record<string, ComponentType<{ className?: string; "aria-hidden"?: boolean }>> = {
@@ -258,6 +261,39 @@ export function CardBody({
           ) : null}
         </span>
       </div>
+      {node.type === "email" ? (
+        // Says there is an email behind this card, and where to see it (the click bubbles to the card).
+        <div
+          data-testid="attachment-strip"
+          className={cn(
+            "flex cursor-pointer items-center gap-2.5 border-t border-line pt-2.5 text-caption",
+            selected && "text-ink",
+          )}
+        >
+          <span
+            aria-hidden="true"
+            className={cn(
+              "grid h-8 w-[22px] shrink-0 place-items-center rounded-[5px] border-2 bg-soft text-muted",
+              selected ? "border-ink text-ink" : "border-line-strong",
+            )}
+          >
+            <DeviceMobileIcon className="size-3" />
+          </span>
+          <span className="grid min-w-0 flex-1 leading-tight">
+            <span className="font-medium">{ec.card.attached}</span>
+            <span className="text-muted">{selected ? ec.card.showing : ec.card.attachedHint}</span>
+          </span>
+          <span
+            className={cn(
+              "inline-flex shrink-0 items-center gap-1 rounded-full border px-2 py-0.5 font-medium",
+              selected ? "border-ink bg-ink text-surface" : "border-line-strong text-muted",
+            )}
+          >
+            {ec.card.open}
+            <SidebarSimpleIcon aria-hidden="true" className="size-3" />
+          </span>
+        </div>
+      ) : null}
       {expanded ? (
         <div className="animate-in fade-in-0 duration-base">
           <Expanded
