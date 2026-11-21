@@ -318,6 +318,9 @@ export function ProjectCanvas({
           onDisconnect={editing.onDisconnect}
           loadEmail={actions.getEmail}
           emailRender={actions.emailRender}
+          loadEmailPreview={
+            actions.getEmailPreview ? (nodeId) => actions.getEmailPreview!({ nodeId }) : undefined
+          }
           onRemoveEmail={
             actions.removeEmail
               ? async (emailId) => {

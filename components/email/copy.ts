@@ -82,11 +82,12 @@ export const emailCopy = {
   },
   render: {
     title: "Phone view",
-    button: "Render phone view",
+    button: "Render for the audit",
     again: "Render again",
     rendering: "Rendering…",
     failed: "Couldn't render this email. Try again.",
-    none: "Not rendered yet. The audit uses this picture, so render it first.",
+    none: "Not rendered yet. The audit uses a render of this email, so render it first.",
+    rendered: "Rendered for the audit. The measured facts below come from that render.",
     imagesLabel: "Load this email's images",
     imagesOn:
       "The picture and the audit will include them. Loading images can count as an open for the sender.",

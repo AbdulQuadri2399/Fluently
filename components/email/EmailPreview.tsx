@@ -58,7 +58,10 @@ export function EmailPreviewBody({
   data,
   width,
   measure = measureLinks,
+  showPhone = true,
 }: {
+  /** The card shows only the facts; the one phone lives in the details panel. */
+  showPhone?: boolean;
   data: EmailPreviewData;
   width: number;
   /** Reads link positions from the laid-out email; replaceable in tests. */
@@ -84,34 +87,36 @@ export function EmailPreviewBody({
           </dd>
         </div>
       </dl>
-      <div className="grid gap-1.5">
-        <p className="text-caption font-medium text-ink">{c.preview.heading}</p>
-        <EmailPreviewFrame
-          html={data.html}
-          subject={data.subject}
-          width={width}
-          images={images}
-          onMeasure={(doc) => setPositions(measure(doc, wanted))}
-        />
-        <label className="flex items-start gap-2 text-caption">
-          <input
-            type="checkbox"
-            checked={images}
-            onChange={(e) => setImages(e.target.checked)}
-            className="mt-0.5"
+      {showPhone ? (
+        <div className="grid gap-1.5">
+          <p className="text-caption font-medium text-ink">{c.preview.heading}</p>
+          <EmailPreviewFrame
+            html={data.html}
+            subject={data.subject}
+            width={width}
+            images={images}
+            onMeasure={(doc) => setPositions(measure(doc, wanted))}
           />
-          <span className="grid gap-0.5">
-            <span>{c.preview.loadImages}</span>
-            <span className="text-muted">
-              {images ? c.preview.loadImagesHint : c.preview.imagesOff}
+          <label className="flex items-start gap-2 text-caption">
+            <input
+              type="checkbox"
+              checked={images}
+              onChange={(e) => setImages(e.target.checked)}
+              className="mt-0.5"
+            />
+            <span className="grid gap-0.5">
+              <span>{c.preview.loadImages}</span>
+              <span className="text-muted">
+                {images ? c.preview.loadImagesHint : c.preview.imagesOff}
+              </span>
             </span>
-          </span>
-        </label>
-        <p className="text-caption text-muted">
-          {images ? c.preview.foldNoteOn : c.preview.foldNote}
-        </p>
-        <p className="text-caption text-muted">{c.preview.note}</p>
-      </div>
+          </label>
+          <p className="text-caption text-muted">
+            {images ? c.preview.foldNoteOn : c.preview.foldNote}
+          </p>
+          <p className="text-caption text-muted">{c.preview.note}</p>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -148,7 +153,9 @@ export function EmailExpanded({ load }: { load: Load }) {
       {state.status === "failed" ? (
         <p className="text-caption text-bad">{c.preview.failed}</p>
       ) : null}
-      {state.status === "ready" ? <EmailPreviewBody data={state.data} width={256} /> : null}
+      {state.status === "ready" ? (
+        <EmailPreviewBody data={state.data} width={256} showPhone={false} />
+      ) : null}
     </div>
   );
 }

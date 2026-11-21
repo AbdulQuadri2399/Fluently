@@ -31,26 +31,27 @@ test("Phone view: render an email, see the picture and what was measured, switch
 
   await page.locator(".react-flow__node").filter({ hasText: "Welcome to Examplebank" }).click();
   const panel = page.getByRole("region", { name: "Phone view" });
+
+  // One phone, showing the live email, ready before anything is rendered.
+  await expect(panel.getByTestId("phone-frame")).toBeVisible();
+  await expect(page.getByTestId("phone-frame")).toHaveCount(1);
+  const email = page.frameLocator("iframe[title^='Preview of']");
+  await expect(email.getByText("Welcome to Examplebank")).toBeVisible();
+  await expect(email.locator("[data-fold]")).toBeAttached();
   await expect(panel.getByText(/Not rendered yet/)).toBeVisible();
 
-  await panel.getByRole("button", { name: "Render phone view" }).click();
-  await expect(
-    panel.getByRole("img", { name: "Phone view of Welcome to Examplebank" }),
-  ).toBeVisible({
-    timeout: 60_000,
-  });
-  await expect(panel.getByTestId("phone-frame")).toBeVisible();
-  await expect(panel.getByTestId("fold-line")).toBeAttached();
+  // Render for the audit: the measured facts appear.
+  await panel.getByRole("button", { name: "Render for the audit" }).click();
+  await expect(panel.getByText(/Rendered for the audit/)).toBeVisible({ timeout: 60_000 });
   await expect(panel.getByText(/Preheader: \d+ characters/)).toBeVisible();
   await expect(panel.getByText(/Wider than a phone|Fits a phone/)).toBeVisible();
   await expect(panel.getByText("Verify my identity")).toBeVisible();
   await shoot(page, "SCR5-phone-view");
 
-  // The other setting has its own picture, so it starts empty.
+  // The other images setting has its own render, so it starts unrendered; the phone stays one.
   await panel.getByLabel(/Load this email's images/).check();
   await expect(panel.getByText(/Not rendered yet/)).toBeVisible();
+  await expect(page.getByTestId("phone-frame")).toHaveCount(1);
   await panel.getByLabel(/Load this email's images/).uncheck();
-  await expect(
-    panel.getByRole("img", { name: "Phone view of Welcome to Examplebank" }),
-  ).toBeVisible();
+  await expect(panel.getByText(/Rendered for the audit/)).toBeVisible();
 });

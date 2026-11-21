@@ -75,8 +75,9 @@ test("Email preview: safe by default, shows preheader and buttons, on the brief 
   await card.getByRole("button", { name: "Expand card" }).click();
   await expect(card.getByText("Your made-up account is ready.")).toBeVisible();
   await expect(card.getByText("Verify my identity")).toBeVisible();
-  await expect(card.locator("iframe")).toHaveAttribute("sandbox", "allow-same-origin");
+  // The card shows the facts only; the one phone is in the details panel.
+  await expect(card.locator("iframe")).toHaveCount(0);
   await shoot(page, "SCR5-email-card");
   await card.getByRole("button", { name: "Collapse card" }).click();
-  await expect(card.locator("iframe")).toHaveCount(0);
+  await expect(card.getByText("Verify my identity")).toHaveCount(0);
 });

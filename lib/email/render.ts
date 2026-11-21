@@ -158,7 +158,7 @@ export async function renderEmail(opts: RenderOptions): Promise<RenderedEmail> {
   const started = Date.now();
   const width = opts.width ?? PHONE_WIDTH;
   const height = opts.height ?? 800;
-  const maxHeight = opts.maxHeight ?? 4000;
+  const maxHeight = opts.maxHeight ?? 12000;
   const images = opts.images ?? false;
   const allow = opts.allowImage ?? allowedImageUrl;
   const local = process.env.CHROMIUM_EXECUTABLE_PATH;

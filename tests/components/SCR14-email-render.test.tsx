@@ -58,16 +58,19 @@ const fns = (loaded: EmailRenderView | null, rendered?: EmailRenderView): EmailR
       : { ok: false as const, code: "unavailable" as const },
   ),
 });
-const show = (f: EmailRenderFns, imagesInitial = false) =>
+const preview = { id: "e1", subject: "Welcome to Examplebank", html, parts };
+const show = (f: EmailRenderFns, imagesInitial = false, loadPreview = async () => preview) =>
   render(
     <EmailRenderSection
       emailId="e1"
-      subject="Welcome to Examplebank"
       parts={parts}
       imagesInitial={imagesInitial}
       fns={f}
+      loadPreview={loadPreview}
     />,
   );
+const frame = () =>
+  screen.getByTitle(c.preview.frameTitle("Welcome to Examplebank")) as HTMLIFrameElement;
 
 describe("email phone view", () => {
   it("says it isn't rendered yet when there is no picture", async () => {
@@ -76,12 +79,15 @@ describe("email phone view", () => {
     expect(screen.getByRole("button", { name: c.render.button })).toBeInTheDocument();
   });
 
-  it("shows the stored picture and what was measured", async () => {
+  it("shows the live email in one phone, and what was measured", async () => {
     show(fns(view()));
-    const img = await screen.findByAltText(c.render.pictureAlt("Welcome to Examplebank"));
-    expect(img).toHaveAttribute("src", "https://signed.test/pic.png");
-    expect(screen.getByTestId("phone-frame")).toContainElement(img);
-    expect(screen.getByTestId("fold-line")).toBeInTheDocument();
+    expect(await screen.findByText(c.render.rendered)).toBeInTheDocument();
+    expect(screen.getByTestId("phone-frame")).toContainElement(frame());
+    expect(screen.getAllByTestId("phone-frame")).toHaveLength(1);
+    expect(frame().getAttribute("sandbox")).toBe("allow-same-origin");
+    expect(frame().getAttribute("srcdoc")).toContain("Welcome to Examplebank");
+    expect(frame().getAttribute("srcdoc")).toContain("data-fold");
+    expect(screen.queryByRole("img")).not.toBeInTheDocument();
     expect(screen.getByText(c.render.shrunk(608))).toBeInTheDocument();
     expect(screen.getByText(c.render.contrastOk(10))).toBeInTheDocument();
     expect(screen.getByText(c.render.preheaderPresent(52))).toBeInTheDocument();
@@ -90,6 +96,11 @@ describe("email phone view", () => {
     expect(screen.getByText(c.render.smallTap)).toBeInTheDocument();
     expect(screen.getByText("#222222")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: c.render.again })).toBeInTheDocument();
+  });
+
+  it("says so when the email can't be loaded", async () => {
+    show(fns(null), false, async () => null as never);
+    expect(await screen.findByText(c.preview.failed)).toBeInTheDocument();
   });
 
   it("names the weakest text when contrast is low", async () => {
@@ -112,9 +123,7 @@ describe("email phone view", () => {
     show(f);
     await userEvent.click(await screen.findByRole("button", { name: c.render.button }));
     expect(f.render).toHaveBeenCalledWith("e1", false);
-    expect(
-      await screen.findByAltText(c.render.pictureAlt("Welcome to Examplebank")),
-    ).toBeInTheDocument();
+    expect(await screen.findByText(c.render.rendered)).toBeInTheDocument();
     expect(screen.getByText(c.render.measured)).toBeInTheDocument();
   });
 
@@ -133,5 +142,6 @@ describe("email phone view", () => {
     await userEvent.click(screen.getByLabelText(new RegExp(c.render.imagesLabel)));
     expect(f.load).toHaveBeenLastCalledWith("e1", true);
     expect(await screen.findByText(c.render.imagesOn)).toBeInTheDocument();
+    expect(frame().getAttribute("srcdoc")).toContain("img-src data: https:");
   });
 });

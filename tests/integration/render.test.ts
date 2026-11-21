@@ -112,6 +112,13 @@ describe.skipIf(!have)("renderEmail (local browser)", () => {
     expect(r.height).toBe(2000);
   }, 60_000);
 
+  it("a long email is rendered in full by default (not cut at 4,000 px)", async () => {
+    const tall = `<p>Top</p><div style="height:6000px"></div><p>Bottom</p>`;
+    const r = await renderEmail({ html: tall });
+    expect(r.fullHeight).toBeGreaterThan(6000);
+    expect(r.height).toBe(r.fullHeight);
+  }, 60_000);
+
   it("fetches nothing from the internet by default, however the email asks", async () => {
     hits = [];
     const sneaky = `<img src="${base}/pixel.gif"><link rel="stylesheet" href="${base}/a.css"><script src="${base}/a.js"></script><iframe src="${base}/f"></iframe><p style="background:url(${base}/bg.gif)">Hi</p>`;

@@ -6,9 +6,11 @@ import type { ActionResult } from "@/lib/actions/result";
 import { FOLD_PX } from "@/lib/email/fold";
 import type { EmailParts } from "@/lib/email/parts";
 import type { EmailRenderView } from "@/lib/email/renderService";
+import type { EmailPreviewData } from "@/lib/email/service";
 import { emailCopy as c } from "./copy";
 import { LinkList } from "./LinkList";
-import { PhoneFrame } from "./PhoneFrame";
+import { EmailPreviewFrame } from "./EmailPreview";
+import { FRAME_W } from "./PhoneFrame";
 
 export type EmailRenderFns = {
   load: (emailId: string, images: boolean) => Promise<EmailRenderView | null>;
@@ -83,17 +85,34 @@ function MeasuredList({ view, parts }: { view: EmailRenderView; parts: EmailPart
  */
 export function EmailRenderSection({
   emailId,
-  subject,
   parts,
   imagesInitial,
   fns,
+  loadPreview,
 }: {
   emailId: string;
-  subject: string;
   parts: EmailParts;
   imagesInitial: boolean;
   fns: EmailRenderFns;
+  /** The email itself, to show in the phone. `undefined` while loading, `null` if it can't load. */
+  loadPreview: () => Promise<EmailPreviewData | null>;
 }) {
+  const [loadedPreview, setLoadedPreview] = useState<{
+    emailId: string;
+    data: EmailPreviewData | null;
+  } | null>(null);
+  const preview = loadedPreview?.emailId === emailId ? loadedPreview.data : undefined;
+  useEffect(() => {
+    let live = true;
+    loadPreview()
+      .then((data) => live && setLoadedPreview({ emailId, data }))
+      .catch(() => live && setLoadedPreview({ emailId, data: null }));
+    return () => {
+      live = false;
+    };
+    // The loader is created per card; only the email matters.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [emailId]);
   const [images, setImages] = useState(imagesInitial);
   const [loaded, setLoaded] = useState<{ key: string; view: EmailRenderView | null } | null>(null);
   const [busy, setBusy] = useState(false);
@@ -143,31 +162,23 @@ export function EmailRenderSection({
           <span className="text-muted">{images ? c.render.imagesOn : c.render.imagesOff}</span>
         </span>
       </label>
-      {view?.url ? (
-        <PhoneFrame subject={subject} scale={0.86}>
-          <div className="relative h-full overflow-y-auto overflow-x-hidden bg-white">
-            {/* eslint-disable-next-line @next/next/no-img-element -- a private, signed picture */}
-            <img
-              src={view.url}
-              alt={c.render.pictureAlt(subject)}
-              style={{ width: 375, display: "block" }}
-            />
-            <div
-              aria-hidden="true"
-              data-testid="fold-line"
-              className="pointer-events-none absolute inset-x-0 border-t border-dashed border-ink/60"
-              style={{ top: FOLD_PX }}
-            >
-              <span className="absolute right-1 top-0.5 rounded-xs bg-surface/85 px-1 text-caption text-muted">
-                {c.preview.foldLine}
-              </span>
-            </div>
-          </div>
-        </PhoneFrame>
-      ) : null}
+      {/* The one phone: the live email, which scrolls all the way down. */}
+      {preview === undefined ? (
+        <p className="text-caption text-muted">{c.preview.loading}</p>
+      ) : preview ? (
+        <EmailPreviewFrame
+          html={preview.html}
+          subject={preview.subject}
+          width={FRAME_W * 0.86}
+          images={images}
+        />
+      ) : (
+        <p className="text-caption text-bad">{c.preview.failed}</p>
+      )}
       {!view && current && !busy ? (
         <p className="text-caption text-muted">{c.render.none}</p>
       ) : null}
+      {view && !busy ? <p className="text-caption text-muted">{c.render.rendered}</p> : null}
       {busy ? (
         <p role="status" className="text-caption text-muted">
           {c.render.rendering}

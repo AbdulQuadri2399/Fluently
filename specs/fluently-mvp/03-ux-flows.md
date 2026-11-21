@@ -715,8 +715,8 @@ Format: user action → system response → resulting state (ACs).
 | email.parts.aboveFold / email.parts.belowFold | "Above the fold" / "Below the fold" (shown in the preview once the email is laid out) |
 | email.preview.foldLine | "Fold" (label on the dashed line that scrolls with the email, drawn at about 580 px) |
 | email.frame.inbox / email.frame.sender / email.frame.to | "Inbox" / "Sender" / "To: Me" (the generic mail app around the email; the subject line is the email's own) *(2026-11-21: please confirm)* |
-| email.render.title / email.render.button / email.render.again / email.render.rendering | "Phone view" / "Render phone view" / "Render again" / "Rendering…" *(Phase 1, 2026-11-20: please confirm)* |
-| email.render.none / email.render.failed | "Not rendered yet. The audit uses this picture, so render it first." / "Couldn't render this email. Try again." |
+| email.render.title / email.render.button / email.render.again / email.render.rendering | "Phone view" / "Render for the audit" / "Render again" / "Rendering…" *(Phase 1, 2026-11-20: please confirm)* |
+| email.render.none / email.render.rendered / email.render.failed | "Not rendered yet. The audit uses a render of this email, so render it first." / "Rendered for the audit. The measured facts below come from that render." / "Couldn't render this email. Try again." |
 | email.render.imagesLabel / imagesOn / imagesOff | "Load this email's images" / "The picture and the audit will include them. Loading images can count as an open for the sender." / "Images are off, so the email is shown without them." |
 | email.render.measured | "Measured" (heading over the facts the code worked out itself) |
 | email.render.fits / email.render.shrunk | "Fits a phone." / "Wider than a phone (608 px), so it's shrunk to fit. Text and buttons end up smaller." |

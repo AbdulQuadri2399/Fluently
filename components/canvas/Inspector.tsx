@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import type { ActionResult } from "@/lib/actions/result";
 import { canvasCopy as c, typeNames } from "./copy";
+import type { EmailPreviewData } from "@/lib/email/service";
 import { EmailPartsSection, RemoveEmailSection } from "@/components/email/EmailPartsSection";
 import { EmailRenderSection, type EmailRenderFns } from "@/components/email/EmailRenderSection";
 import type { EmailDetail } from "@/lib/email/service";
@@ -130,6 +131,7 @@ export function Inspector({
   loadEmail,
   onRemoveEmail,
   emailRender,
+  loadEmailPreview,
 }: {
   node: TreeNode;
   nodes: TreeNode[];
@@ -160,6 +162,7 @@ export function Inspector({
   onRemoveEmail?: (emailId: string) => Promise<boolean>;
   /** Phase 1: render the email at phone width and show what was measured (AC31.4, AC31.5). */
   emailRender?: EmailRenderFns;
+  loadEmailPreview?: (nodeId: string) => Promise<EmailPreviewData | null>;
 }) {
   const [email, setEmail] = useState<{ nodeId: string; detail: EmailDetail | null } | null>(null);
   useEffect(() => {
@@ -390,13 +393,13 @@ export function Inspector({
         ))}
       </dl>
       {node.type === "email" && emailDetail ? <EmailPartsSection detail={emailDetail} /> : null}
-      {node.type === "email" && emailDetail && emailRender ? (
+      {node.type === "email" && emailDetail && emailRender && loadEmailPreview ? (
         <EmailRenderSection
           emailId={emailDetail.id}
-          subject={node.title}
           parts={emailDetail.parts}
           imagesInitial={emailDetail.imagesLoaded}
           fns={emailRender}
+          loadPreview={() => loadEmailPreview(node.id)}
         />
       ) : null}
       {onTrace ? (

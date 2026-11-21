@@ -24,7 +24,7 @@ const frame = () =>
   screen.getByTitle(c.preview.frameTitle("Welcome to Examplebank")) as HTMLIFrameElement;
 
 describe("expanded email card", () => {
-  it("shows the preheader and buttons, then a sandboxed phone-width preview", async () => {
+  it("shows the preheader and buttons only; the one phone is in the details panel", async () => {
     render(<EmailExpanded load={async () => data()} />);
     expect(screen.getByText(c.preview.loading)).toBeInTheDocument();
     expect(
@@ -32,23 +32,8 @@ describe("expanded email card", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("Verify my identity")).toBeInTheDocument();
     expect(screen.getByText(c.parts.primary, { exact: false })).toBeInTheDocument();
-    const f = frame();
-    expect(f.getAttribute("sandbox")).toBe("allow-same-origin");
-    expect(f.getAttribute("srcdoc")).toContain("Welcome to Examplebank");
-    expect(f.getAttribute("srcdoc")).toContain("default-src 'none'");
-    expect(f.style.width).toBe("375px");
-    expect(screen.getByText(c.preview.note)).toBeInTheDocument();
-  });
-
-  it("images are off, and the switch lets https images in (with a warning)", async () => {
-    render(<EmailExpanded load={async () => data()} />);
-    await screen.findByText(c.preview.imagesOff);
-    expect(frame().getAttribute("srcdoc")).toContain("img-src data:;");
-    await userEvent.click(screen.getByLabelText(new RegExp(c.preview.loadImages)));
-    expect(frame().getAttribute("srcdoc")).toContain("img-src data: https:");
-    expect(screen.getByText(c.preview.loadImagesHint)).toBeInTheDocument();
-    await userEvent.click(screen.getByLabelText(new RegExp(c.preview.loadImages)));
-    expect(frame().getAttribute("srcdoc")).toContain("img-src data:;");
+    expect(screen.queryByTestId("phone-frame")).not.toBeInTheDocument();
+    expect(screen.queryByTitle(c.preview.frameTitle("Welcome to Examplebank"))).toBeNull();
   });
 
   it("says when there is no preheader or button", async () => {
@@ -63,6 +48,28 @@ describe("expanded email card", () => {
     expect(await screen.findByText(c.preview.failed)).toBeInTheDocument();
     render(<EmailExpanded load={vi.fn().mockRejectedValue(new Error("x"))} />);
     await waitFor(() => expect(screen.getAllByText(c.preview.failed)).toHaveLength(2));
+  });
+});
+
+describe("the phone preview", () => {
+  it("is sandboxed, phone-width and scrolls inside the phone", async () => {
+    render(<EmailPreviewBody data={data()} width={375} />);
+    const f = frame();
+    expect(f.getAttribute("sandbox")).toBe("allow-same-origin");
+    expect(f.getAttribute("srcdoc")).toContain("Welcome to Examplebank");
+    expect(f.getAttribute("srcdoc")).toContain("default-src 'none'");
+    expect(f.style.width).toBe("375px");
+    expect(screen.getByText(c.preview.note)).toBeInTheDocument();
+  });
+
+  it("images are off, and the switch lets https images in (with a warning)", async () => {
+    render(<EmailPreviewBody data={data()} width={375} />);
+    expect(frame().getAttribute("srcdoc")).toContain("img-src data:;");
+    await userEvent.click(screen.getByLabelText(new RegExp(c.preview.loadImages)));
+    expect(frame().getAttribute("srcdoc")).toContain("img-src data: https:");
+    expect(screen.getByText(c.preview.loadImagesHint)).toBeInTheDocument();
+    await userEvent.click(screen.getByLabelText(new RegExp(c.preview.loadImages)));
+    expect(frame().getAttribute("srcdoc")).toContain("img-src data:;");
   });
 });
 
