@@ -18,7 +18,7 @@ const measured = (over: Partial<Measured> = {}): Measured => ({
   responsive: false,
   zoom: 0.6,
   fullHeight: 1300,
-  foldPx: 650,
+  foldPx: 580,
   links: [
     {
       text: "Verify my identity",
@@ -80,6 +80,8 @@ describe("email phone view", () => {
     show(fns(view()));
     const img = await screen.findByAltText(c.render.pictureAlt("Welcome to Examplebank"));
     expect(img).toHaveAttribute("src", "https://signed.test/pic.png");
+    expect(screen.getByTestId("phone-frame")).toContainElement(img);
+    expect(screen.getByTestId("fold-line")).toBeInTheDocument();
     expect(screen.getByText(c.render.shrunk(608))).toBeInTheDocument();
     expect(screen.getByText(c.render.contrastOk(10))).toBeInTheDocument();
     expect(screen.getByText(c.render.preheaderPresent(52))).toBeInTheDocument();

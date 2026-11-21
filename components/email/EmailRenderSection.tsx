@@ -8,6 +8,7 @@ import type { EmailParts } from "@/lib/email/parts";
 import type { EmailRenderView } from "@/lib/email/renderService";
 import { emailCopy as c } from "./copy";
 import { LinkList } from "./LinkList";
+import { PhoneFrame } from "./PhoneFrame";
 
 export type EmailRenderFns = {
   load: (emailId: string, images: boolean) => Promise<EmailRenderView | null>;
@@ -143,12 +144,26 @@ export function EmailRenderSection({
         </span>
       </label>
       {view?.url ? (
-        // eslint-disable-next-line @next/next/no-img-element -- a private, signed picture
-        <img
-          src={view.url}
-          alt={c.render.pictureAlt(subject)}
-          className="w-full max-w-[336px] rounded-sm border border-line"
-        />
+        <PhoneFrame subject={subject} scale={0.86}>
+          <div className="relative h-full overflow-y-auto overflow-x-hidden bg-white">
+            {/* eslint-disable-next-line @next/next/no-img-element -- a private, signed picture */}
+            <img
+              src={view.url}
+              alt={c.render.pictureAlt(subject)}
+              style={{ width: 375, display: "block" }}
+            />
+            <div
+              aria-hidden="true"
+              data-testid="fold-line"
+              className="pointer-events-none absolute inset-x-0 border-t border-dashed border-ink/60"
+              style={{ top: FOLD_PX }}
+            >
+              <span className="absolute right-1 top-0.5 rounded-xs bg-surface/85 px-1 text-caption text-muted">
+                {c.preview.foldLine}
+              </span>
+            </div>
+          </div>
+        </PhoneFrame>
       ) : null}
       {!view && current && !busy ? (
         <p className="text-caption text-muted">{c.render.none}</p>

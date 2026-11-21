@@ -39,6 +39,8 @@ test("Phone view: render an email, see the picture and what was measured, switch
   ).toBeVisible({
     timeout: 60_000,
   });
+  await expect(panel.getByTestId("phone-frame")).toBeVisible();
+  await expect(panel.getByTestId("fold-line")).toBeAttached();
   await expect(panel.getByText(/Preheader: \d+ characters/)).toBeVisible();
   await expect(panel.getByText(/Wider than a phone|Fits a phone/)).toBeVisible();
   await expect(panel.getByText("Verify my identity")).toBeVisible();

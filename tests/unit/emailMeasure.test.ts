@@ -122,13 +122,13 @@ describe("computeMeasured", () => {
     expect(m.textContrast.lowest!.snippet).toBe("Pale grey words");
   });
 
-  it("the fold is 650 phone pixels", () => {
+  it("the fold is 580 phone pixels", () => {
     const m = run([
-      link({ top: 649 }),
-      link({ text: "remind me later", href: "https://example.org/later", top: 650 }),
+      link({ top: 579 }),
+      link({ text: "remind me later", href: "https://example.org/later", top: 580 }),
     ]);
     expect(m.links.map((l) => l.aboveFold)).toEqual([true, false]);
-    expect(m.foldPx).toBe(650);
+    expect(m.foldPx).toBe(580);
   });
 
   it("an email wider than a phone is shrunk to fit: positions and sizes shrink with it", () => {

@@ -59,7 +59,7 @@ describe.skipIf(!have)("renderEmail (local browser)", () => {
     expect(r.height).toBeGreaterThanOrEqual(800);
     const top = (text: string, href: string) =>
       r.links.find((l) => l.key === linkKey(text, href))!.top;
-    expect(top("Verify my identity", "https://example.org/verify")).toBeLessThan(650);
+    expect(top("Verify my identity", "https://example.org/verify")).toBeLessThan(580);
     expect(r.links.some((l) => l.text === "Unsubscribe")).toBe(true);
     expect(r.ms.total).toBeGreaterThan(0);
   }, 60_000);

@@ -1,9 +1,11 @@
 /**
- * The fold (AC31.3b): the first phone screen of an email, taken as the first 650 px at phone width.
+ * The fold (AC31.3b): the first phone screen of an email, taken as the first 580 px at phone width.
+ * That is the email area of an iPhone-style mail app once its status bar, top bar, message header
+ * and bottom bar are counted (04 D45).
  * Positions come from the browser's own layout of the email (the preview now; the audit's render
  * later, P1.5). With images off, blocked images take no space, so this is an estimate.
  */
-export const FOLD_PX = 650;
+export const FOLD_PX = 580;
 export const PHONE_WIDTH = 375;
 
 export type LinkPosition = { top: number };

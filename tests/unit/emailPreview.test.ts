@@ -62,4 +62,20 @@ describe("previewDocument", () => {
         'name="viewport" content="width=device-width',
       );
   });
+
+  it("draws a fold line that scrolls with the email, only when asked", () => {
+    const plain = previewDocument("<p>Hi</p>", { images: false });
+    expect(plain).not.toContain("data-fold");
+    const withFold = previewDocument("<html><body><p>Hi</p></body></html>", {
+      images: false,
+      foldAt: 580,
+      foldLabel: "Fold",
+    });
+    expect(withFold).toContain("data-fold");
+    expect(withFold).toContain("top:580px");
+    expect(withFold).toContain(">Fold</span>");
+    // Still no scripts, and the network is still blocked.
+    expect(withFold).not.toContain("<script");
+    expect(meta(withFold)).toContain("default-src 'none'");
+  });
 });

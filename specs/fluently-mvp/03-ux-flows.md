@@ -713,7 +713,8 @@ Format: user action → system response → resulting state (ACs).
 | email.parts.buttons / email.parts.plainLinks | "Buttons and links" / "Other links" *(2026-11-20: please confirm)* |
 | email.parts.kindButton / email.parts.kindLink | "Button" (designed as a button) / "Link" (a plain link, or a text link standing in when the email has no styled button) |
 | email.parts.aboveFold / email.parts.belowFold | "Above the fold" / "Below the fold" (shown in the preview once the email is laid out) |
-| email.preview.foldLine | "Fold" (label on the dashed line drawn at about 650 px) |
+| email.preview.foldLine | "Fold" (label on the dashed line that scrolls with the email, drawn at about 580 px) |
+| email.frame.inbox / email.frame.sender / email.frame.to | "Inbox" / "Sender" / "To: Me" (the generic mail app around the email; the subject line is the email's own) *(2026-11-21: please confirm)* |
 | email.render.title / email.render.button / email.render.again / email.render.rendering | "Phone view" / "Render phone view" / "Render again" / "Rendering…" *(Phase 1, 2026-11-20: please confirm)* |
 | email.render.none / email.render.failed | "Not rendered yet. The audit uses this picture, so render it first." / "Couldn't render this email. Try again." |
 | email.render.imagesLabel / imagesOn / imagesOff | "Load this email's images" / "The picture and the audit will include them. Loading images can count as an open for the sender." / "Images are off, so the email is shown without them." |
@@ -724,7 +725,7 @@ Format: user action → system response → resulting state (ACs).
 | email.render.preheaderPresent / preheaderMissing | "Preheader: 52 characters." / "No preheader." |
 | email.render.colours / colourText / colourBackground | "Main colours" / "Text" / "Background" |
 | email.render.smallTap / email.render.lowContrast | "Small to tap" (a button under 44 px on a phone) / "Low contrast" (a button label hard to read) |
-| email.preview.foldNote / email.preview.foldNoteOn | "The fold is the first phone screen, about 650 px. With images off it is an estimate, because blocked images take no space." / "The fold is the first phone screen, about 650 px." |
+| email.preview.foldNote / email.preview.foldNoteOn | "The fold is the end of the first phone screen, about 580 px of email below the app's top bar. With images off it is an estimate, because blocked images take no space." / "The fold is the end of the first phone screen, about 580 px of email below the app's top bar." |
 | project.modeNewSoon | "Create something new" with the hint "Coming soon" (disabled on New project; Optimise something that exists is the default) |
 | email.parts.* | "Email parts" · "Subject line" · "Preheader" ("None. The inbox will show the start of the email instead.") · "Hero" · "Buttons" ("main" beside the first) · "Body" ("{n} words") · "Footer" ("Unsubscribe link found" / "No unsubscribe link found") · "Images" ("{n} images, {m} without a description") |
 | email.card | "{n} buttons · preheader" / "{n} buttons · no preheader" (status line on the email card) |

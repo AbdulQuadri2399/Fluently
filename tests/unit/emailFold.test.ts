@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { FOLD_PX, isAboveFold, linkKey, measureLinks } from "@/lib/email/fold";
 
-// The fold (AC31.3b): the first 650 px at phone width.
+// The fold (AC31.3b): the first 580 px at phone width.
 describe("fold", () => {
-  it("a link above 650 px is above the fold; at or below is not", () => {
-    expect(FOLD_PX).toBe(650);
+  it("a link above 580 px is above the fold; at or below is not", () => {
+    expect(FOLD_PX).toBe(580);
     expect(isAboveFold(0)).toBe(true);
-    expect(isAboveFold(649)).toBe(true);
-    expect(isAboveFold(650)).toBe(false);
+    expect(isAboveFold(579)).toBe(true);
+    expect(isAboveFold(580)).toBe(false);
     expect(isAboveFold(1200)).toBe(false);
   });
 

@@ -7,6 +7,7 @@ import {
   EmailPreviewDialog,
 } from "@/components/email/EmailPreview";
 import { emailCopy as c } from "@/components/email/copy";
+import { FOLD_PX } from "@/lib/email/fold";
 import { splitEmail } from "@/lib/email/parts";
 import type { EmailPreviewData } from "@/lib/email/service";
 import { readFileSync } from "node:fs";
@@ -69,8 +70,11 @@ describe("preview dialog (the brief)", () => {
   it("opens the email at full phone width with its subject", async () => {
     render(<EmailPreviewDialog open onOpenChange={() => undefined} load={async () => data()} />);
     expect(await screen.findByRole("dialog", { name: c.preview.title })).toBeInTheDocument();
-    expect(screen.getByText("Welcome to Examplebank", { selector: "p" })).toBeInTheDocument();
+    // The subject shows above the preview and again as the phone's mail header.
+    expect(screen.getAllByText("Welcome to Examplebank", { selector: "p" })).toHaveLength(2);
+    expect(screen.getByTestId("phone-frame")).toBeInTheDocument();
     expect(frame().style.width).toBe("375px");
+    expect(frame().style.height).toBe("580px");
   });
 });
 
@@ -104,7 +108,9 @@ describe("buttons, links and the fold (AC31.3b)", () => {
       c.parts.aboveFold,
     );
     expect(screen.getByText("remind me later").closest("li")).toHaveTextContent(c.parts.belowFold);
-    expect(screen.getByTestId("fold-line")).toBeInTheDocument();
+    // The fold line is drawn inside the email document, so it scrolls with the email.
+    expect(frame().getAttribute("srcdoc")).toContain("data-fold");
+    expect(frame().getAttribute("srcdoc")).toContain(`top:${FOLD_PX}px`);
     expect(screen.getByText(c.preview.foldNote)).toBeInTheDocument();
   });
 

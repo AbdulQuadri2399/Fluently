@@ -48,7 +48,10 @@ test("Email preview: safe by default, shows preheader and buttons, on the brief 
   await expect(linkRow).toContainText("Link");
   await expect(linkRow).not.toContainText("Button");
   await expect(linkRow).toContainText("Below the fold");
-  await expect(dialog.getByTestId("fold-line")).toBeVisible();
+  await expect(dialog.getByTestId("phone-frame")).toBeVisible();
+  await expect(
+    page.frameLocator("iframe[title^='Preview of']").locator("[data-fold]"),
+  ).toBeAttached();
   await expect(
     page.frameLocator("iframe[title^='Preview of']").getByText("Welcome to Examplebank"),
   ).toBeVisible();

@@ -43,8 +43,9 @@ export const emailCopy = {
     note: "Shown at phone width. Your mail program may look slightly different.",
     foldLine: "Fold",
     foldNote:
-      "The fold is the first phone screen, about 650 px. With images off it is an estimate, because blocked images take no space.",
-    foldNoteOn: "The fold is the first phone screen, about 650 px.",
+      "The fold is the end of the first phone screen, about 580 px of email below the app's top bar. With images off it is an estimate, because blocked images take no space.",
+    foldNoteOn:
+      "The fold is the end of the first phone screen, about 580 px of email below the app's top bar.",
     imagesOff: "Images are off.",
     loadImages: "Load this email's images",
     loadImagesHint: "Loading images can count as an open for the sender.",
@@ -73,6 +74,11 @@ export const emailCopy = {
     images: "Images",
     imagesCount: (n: number, missing: number) =>
       `${n} ${n === 1 ? "image" : "images"}${missing ? `, ${missing} without a description` : ""}`,
+  },
+  frame: {
+    inbox: "Inbox",
+    sender: "Sender",
+    to: "To: Me",
   },
   render: {
     title: "Phone view",

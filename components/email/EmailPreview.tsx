@@ -6,15 +6,16 @@ import type { EmailPreviewData } from "@/lib/email/service";
 import { previewDocument } from "@/lib/email/preview";
 import { FOLD_PX, measureLinks, PHONE_WIDTH, type LinkPosition } from "@/lib/email/fold";
 import { LinkList } from "./LinkList";
+import { EMAIL_VIEW_H, FRAME_W, PhoneFrame } from "./PhoneFrame";
 import { emailCopy as c } from "./copy";
 
 const PHONE_W = PHONE_WIDTH;
-const FRAME_H = 800;
 
 /**
- * The email at phone width in a sandboxed frame: no scripts, no network (04 D38). The frame shares
- * its origin with the page only so the page can read where each link sits (the fold, AC31.3b);
- * with no scripts allowed, nothing inside it can run or reach out.
+ * The email in a phone, as a mail app shows it: sandboxed, no scripts, no network (04 D38). The
+ * frame shares its origin with the page only so the page can read where each link sits (the fold,
+ * AC31.3b); with no scripts allowed, nothing inside it can run or reach out. The email scrolls
+ * inside the phone, and a dashed line scrolls with it at the end of the first screen.
  */
 export function EmailPreviewFrame({
   html,
@@ -25,45 +26,30 @@ export function EmailPreviewFrame({
 }: {
   html: string;
   subject: string;
-  /** The space available; the phone-width page is scaled down to fit it. */
+  /** The space available; the whole phone is scaled down to fit it. */
   width: number;
   images: boolean;
   /** Called once the email has been laid out (and again after images load, when they are on). */
   onMeasure?: (doc: Document) => void;
 }) {
-  const scale = Math.min(1, width / PHONE_W);
+  const scale = Math.min(1, width / FRAME_W);
   return (
-    <div
-      className="relative overflow-hidden rounded-sm border border-line bg-surface"
-      style={{ width: PHONE_W * scale, height: FRAME_H * scale }}
-    >
+    <PhoneFrame subject={subject} scale={scale}>
       <iframe
         title={c.preview.frameTitle(subject)}
         sandbox="allow-same-origin"
-        srcDoc={previewDocument(html, { images })}
+        srcDoc={previewDocument(html, {
+          images,
+          foldAt: FOLD_PX,
+          foldLabel: c.preview.foldLine,
+        })}
         onLoad={(e) => {
           const doc = e.currentTarget.contentDocument;
           if (doc) onMeasure?.(doc);
         }}
-        style={{
-          width: PHONE_W,
-          height: FRAME_H,
-          border: 0,
-          transform: `scale(${scale})`,
-          transformOrigin: "top left",
-        }}
+        style={{ width: PHONE_W, height: EMAIL_VIEW_H, border: 0, display: "block" }}
       />
-      <div
-        aria-hidden="true"
-        data-testid="fold-line"
-        className="pointer-events-none absolute inset-x-0 border-t border-dashed border-ink/60"
-        style={{ top: FOLD_PX * scale }}
-      >
-        <span className="absolute right-1 -top-4 rounded-xs bg-surface px-1 text-caption text-muted">
-          {c.preview.foldLine}
-        </span>
-      </div>
-    </div>
+    </PhoneFrame>
   );
 }
 
@@ -194,7 +180,7 @@ export function EmailPreviewDialog({
         {state.status === "ready" ? (
           <>
             <p className="text-small font-medium">{state.data.subject}</p>
-            <EmailPreviewBody data={state.data} width={PHONE_W} />
+            <EmailPreviewBody data={state.data} width={FRAME_W} />
           </>
         ) : null}
       </DialogContent>
