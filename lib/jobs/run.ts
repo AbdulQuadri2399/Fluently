@@ -3,6 +3,7 @@ import { after } from "next/server";
 import { getAiClient } from "@/lib/ai";
 import { adminClient } from "@/lib/supabase/admin";
 import { ethicsGate } from "./ethics";
+import { runEmailAudit } from "./emailAudit";
 import { searchPapers } from "@/lib/retrieval/papers";
 import { fakeResearchDeps, runResearch, type ResearchDeps } from "./research";
 
@@ -52,6 +53,22 @@ export function startResearch(stageRunId: string) {
         .from("stage_runs")
         .update({ status: "failed", error_code: "crashed", finished_at: new Date().toISOString() })
         .eq("id", stageRunId);
+    }
+  });
+}
+
+/** Starts the quick audit of one email in the background (D30). */
+export function startEmailAudit(emailId: string, startedBy: string | null) {
+  after(async () => {
+    try {
+      await runEmailAudit(adminClient(), getAiClient(), { emailId, startedBy });
+    } catch (e) {
+      console.error("emailAudit crashed", emailId, e);
+      await adminClient()
+        .from("email_audits")
+        .update({ status: "failed", error_code: "crashed", finished_at: new Date().toISOString() })
+        .eq("email_id", emailId)
+        .eq("depth", "quick");
     }
   });
 }

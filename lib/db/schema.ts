@@ -955,3 +955,96 @@ export const emailRenders = pgTable(
     memberRead("email_renders"),
   ],
 ).enableRLS();
+
+// ---------- Phase 1: the quick audit of each email (AC31.6–AC31.8, 04 D46) ----------
+
+export const emailAudits = pgTable(
+  "email_audits",
+  {
+    id: id(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "restrict" }),
+    projectId: uuid("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    emailId: uuid("email_id")
+      .notNull()
+      .references(() => emails.id, { onDelete: "cascade" }),
+    // 'quick' (toolkit only) now; 'full' adds research later (AC31.10).
+    depth: text("depth").notNull().default("quick"),
+    status: text("status").notNull().default("running"),
+    // The principles this email was audited against: [{ key, name, extra }].
+    shortlist: jsonb("shortlist").notNull().default([]),
+    // What code threw away and why (made-up quotes, unknown principles): [{ reason, ... }].
+    dropped: jsonb("dropped").notNull().default([]),
+    // Whether the phone picture was available for the visual lens, and which render it was.
+    usedImage: boolean("used_image").notNull().default(false),
+    usedMeasured: boolean("used_measured").notNull().default(false),
+    errorCode: text("error_code"),
+    startedBy: uuid("started_by").references(() => members.id, { onDelete: "set null" }),
+    finishedAt: timestamp("finished_at", { withTimezone: true }),
+    ...timestamps(),
+  },
+  (t) => [
+    check("email_audits_depth_valid", sql`${t.depth} in ('quick','full')`),
+    check("email_audits_status_valid", sql`${t.status} in ('running','done','failed')`),
+    // One audit per email and depth; running it again replaces the findings.
+    uniqueIndex("email_audits_email_depth_unique").on(t.emailId, t.depth),
+    index("email_audits_project_idx").on(t.projectId),
+    // Written only by the audit job (service role); members read.
+    memberRead("email_audits"),
+  ],
+).enableRLS();
+
+export const emailFindings = pgTable(
+  "email_findings",
+  {
+    id: id(),
+    workspaceId: uuid("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "restrict" }),
+    projectId: uuid("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    emailId: uuid("email_id")
+      .notNull()
+      .references(() => emails.id, { onDelete: "cascade" }),
+    auditId: uuid("audit_id")
+      .notNull()
+      .references(() => emailAudits.id, { onDelete: "cascade" }),
+    position: integer("position").notNull().default(0),
+    part: text("part").notNull(),
+    lens: text("lens").notNull(),
+    verdict: text("verdict").notNull(),
+    principleKey: text("principle_key"),
+    principleName: text("principle_name"),
+    // Outside the shortlist (at most a few), shown as such.
+    extra: boolean("extra").notNull().default(false),
+    // A real problem the toolkit has no principle for: shown apart, never a toolkit finding.
+    outsideToolkit: boolean("outside_toolkit").notNull().default(false),
+    // How strong the evidence behind the principle is (AC31.7). Null for outside-toolkit findings.
+    strength: text("strength"),
+    // What the finding rests on: a quote, a named part read from the image, or a measured fact.
+    proofKind: text("proof_kind").notNull(),
+    proofText: text("proof_text").notNull(),
+    explanation: text("explanation").notNull(),
+    ...timestamps(),
+  },
+  (t) => [
+    check(
+      "email_findings_part_valid",
+      sql`${t.part} in ('subject','preheader','hero','body','ctas','footer')`,
+    ),
+    check("email_findings_lens_valid", sql`${t.lens} in ('structure','content','visual')`),
+    check("email_findings_verdict_valid", sql`${t.verdict} in ('friction','working')`),
+    check(
+      "email_findings_strength_valid",
+      sql`${t.strength} is null or ${t.strength} in ('High','Med','Low')`,
+    ),
+    check("email_findings_proof_valid", sql`${t.proofKind} in ('quote','image','measured')`),
+    index("email_findings_email_idx").on(t.emailId, t.position),
+    index("email_findings_project_idx").on(t.projectId),
+    memberRead("email_findings"),
+  ],
+).enableRLS();

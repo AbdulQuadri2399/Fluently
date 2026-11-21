@@ -145,6 +145,82 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"email_audits": {
+                  Row: {
+                    "created_at": string,"depth": string,"dropped": NonNullable<Json>,"email_id": string,"error_code": string | null,"finished_at": string | null,"id": string,"project_id": string,"shortlist": NonNullable<Json>,"started_by": string | null,"status": string,"updated_at": string,"used_image": boolean,"used_measured": boolean,"workspace_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"depth"?: string,"dropped"?: NonNullable<Json>,"email_id": string,"error_code"?: string | null,"finished_at"?: string | null,"id"?: string,"project_id": string,"shortlist"?: NonNullable<Json>,"started_by"?: string | null,"status"?: string,"updated_at"?: string,"used_image"?: boolean,"used_measured"?: boolean,"workspace_id": string
+                  }
+                  Update: {
+                    "created_at"?: string,"depth"?: string,"dropped"?: NonNullable<Json>,"email_id"?: string,"error_code"?: string | null,"finished_at"?: string | null,"id"?: string,"project_id"?: string,"shortlist"?: NonNullable<Json>,"started_by"?: string | null,"status"?: string,"updated_at"?: string,"used_image"?: boolean,"used_measured"?: boolean,"workspace_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "email_audits_email_id_emails_id_fk"
+      columns: ["email_id"]
+isOneToOne: false
+      referencedRelation: "emails"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "email_audits_project_id_projects_id_fk"
+      columns: ["project_id"]
+isOneToOne: false
+      referencedRelation: "projects"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "email_audits_started_by_members_id_fk"
+      columns: ["started_by"]
+isOneToOne: false
+      referencedRelation: "members"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "email_audits_workspace_id_workspaces_id_fk"
+      columns: ["workspace_id"]
+isOneToOne: false
+      referencedRelation: "workspaces"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"email_findings": {
+                  Row: {
+                    "audit_id": string,"created_at": string,"email_id": string,"explanation": string,"extra": boolean,"id": string,"lens": string,"outside_toolkit": boolean,"part": string,"position": number,"principle_key": string | null,"principle_name": string | null,"project_id": string,"proof_kind": string,"proof_text": string,"strength": string | null,"updated_at": string,"verdict": string,"workspace_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "audit_id": string,"created_at"?: string,"email_id": string,"explanation": string,"extra"?: boolean,"id"?: string,"lens": string,"outside_toolkit"?: boolean,"part": string,"position"?: number,"principle_key"?: string | null,"principle_name"?: string | null,"project_id": string,"proof_kind": string,"proof_text": string,"strength"?: string | null,"updated_at"?: string,"verdict": string,"workspace_id": string
+                  }
+                  Update: {
+                    "audit_id"?: string,"created_at"?: string,"email_id"?: string,"explanation"?: string,"extra"?: boolean,"id"?: string,"lens"?: string,"outside_toolkit"?: boolean,"part"?: string,"position"?: number,"principle_key"?: string | null,"principle_name"?: string | null,"project_id"?: string,"proof_kind"?: string,"proof_text"?: string,"strength"?: string | null,"updated_at"?: string,"verdict"?: string,"workspace_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "email_findings_audit_id_email_audits_id_fk"
+      columns: ["audit_id"]
+isOneToOne: false
+      referencedRelation: "email_audits"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "email_findings_email_id_emails_id_fk"
+      columns: ["email_id"]
+isOneToOne: false
+      referencedRelation: "emails"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "email_findings_project_id_projects_id_fk"
+      columns: ["project_id"]
+isOneToOne: false
+      referencedRelation: "projects"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "email_findings_workspace_id_workspaces_id_fk"
+      columns: ["workspace_id"]
+isOneToOne: false
+      referencedRelation: "workspaces"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"email_renders": {
                   Row: {
                     "created_at": string,"email_id": string,"height": number,"id": string,"images": boolean,"measured": NonNullable<Json>,"project_id": string,"rendered_by": string | null,"storage_path": string,"updated_at": string,"width": number,"workspace_id": string

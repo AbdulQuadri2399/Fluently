@@ -1,6 +1,7 @@
 "use client";
 
 import * as canvasActions from "@/lib/actions/canvas";
+import * as auditActions from "@/lib/actions/audit";
 import * as emailActions from "@/lib/actions/email";
 import * as intakeActions from "@/lib/actions/intake";
 import type { ProjectTree } from "@/lib/canvas/load";
@@ -30,6 +31,10 @@ export function ProjectCanvasScreen({ tree, budget }: { tree: ProjectTree; budge
             if (!res) return { ok: false as const, code: "unavailable" as const };
             return (await res.json().catch(() => ({ ok: false, code: "unavailable" }))) as never;
           },
+        },
+        emailAudit: {
+          load: auditActions.getEmailAudit,
+          start: (emailId: string) => auditActions.startQuickAudit(projectId, emailId),
         },
         removeEmail: (emailId: string) => emailActions.removeEmail(projectId, emailId),
         addEmail: {

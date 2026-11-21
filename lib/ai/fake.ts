@@ -9,6 +9,7 @@ import {
 import {
   ETHICS_RULES,
   type CoachOutput,
+  type EmailAuditOutput,
   type EthicsOutput,
   type FindingsOutput,
   type QuestionsOutput,
@@ -165,6 +166,15 @@ export const defaultResponders: Record<string, Responder> = {
     if (str(call.input?.text).includes(FAKE_FAIL_MARKER)) throw new AiError("unavailable");
     return fakeCoach(str(call.input?.field), str(call.input?.text));
   },
+  email_audit: (call) =>
+    fakeEmailAudit({
+      subject: str(call.input?.subject),
+      ctas: (call.input?.ctas as string[] | undefined) ?? [],
+      links: (call.input?.links as string[] | undefined) ?? [],
+      bodyWords: str(call.input?.bodyStart),
+      shortlist: (call.input?.shortlist as string[] | undefined) ?? [],
+      hasImage: Boolean(call.input?.hasImage),
+    }),
   ethics: (call) =>
     fakeEthics(
       str(call.input?.brief),
@@ -301,4 +311,67 @@ export function fakeSynthesis(
       ? [{ name: "Endowed progress", mechanism: "Motivation", sourceHandle: externalHandle }]
       : [],
   };
+}
+
+/**
+ * Made-up email findings (J8, fake mode). Every quote is taken from the email's own words, so the
+ * quote check passes; the toolkit principles are the first ones on the shortlist.
+ */
+export function fakeEmailAudit(input: {
+  subject: string;
+  ctas: string[];
+  links?: string[];
+  bodyWords: string;
+  shortlist: string[];
+  hasImage: boolean;
+}): EmailAuditOutput {
+  const [a, b, c] = input.shortlist;
+  const findings: EmailAuditOutput["findings"] = [];
+  if (input.subject && a)
+    findings.push({
+      part: "subject",
+      lens: "content",
+      verdict: "working",
+      principleKey: a,
+      proof: { kind: "quote", text: input.subject },
+      explanation: "The subject line says plainly what the email is about.",
+    });
+  if (input.ctas[0] && b)
+    findings.push({
+      part: "ctas",
+      lens: "content",
+      verdict: "working",
+      principleKey: b,
+      proof: { kind: "quote", text: input.ctas[0] },
+      explanation: "The button names the action in the person's own terms.",
+    });
+  if (input.bodyWords && c)
+    findings.push({
+      part: "body",
+      lens: "structure",
+      verdict: "friction",
+      principleKey: c,
+      proof: { kind: "quote", text: input.bodyWords },
+      explanation: "The opening asks the reader to take in a lot before they see the next step.",
+    });
+  const rival = input.ctas[1] ?? input.links?.[0];
+  if (rival)
+    findings.push({
+      part: "ctas",
+      lens: "content",
+      verdict: "friction",
+      principleKey: null,
+      proof: { kind: "quote", text: rival },
+      explanation: "A second link competes with the main button; no toolkit principle covers it.",
+    });
+  if (input.hasImage && a)
+    findings.push({
+      part: "hero",
+      lens: "visual",
+      verdict: "working",
+      principleKey: a,
+      proof: { kind: "image", text: "the hero image" },
+      explanation: "The main picture draws the eye towards the headline.",
+    });
+  return { findings };
 }

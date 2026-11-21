@@ -86,3 +86,33 @@ export const questionsSchema = z.object({
   questions: z.array(z.string().min(5).max(240)).min(3).max(6),
 });
 export type QuestionsOutput = z.infer<typeof questionsSchema>;
+
+export const EMAIL_PARTS = ["subject", "preheader", "hero", "body", "ctas", "footer"] as const;
+export const EMAIL_LENSES = ["structure", "content", "visual"] as const;
+export type EmailPart = (typeof EMAIL_PARTS)[number];
+export type EmailLens = (typeof EMAIL_LENSES)[number];
+
+/**
+ * J8 email audit (AC31.7, 04 D39): findings for one email. Each rests on a quote from the email,
+ * or, for the visual lens, a named part read from the picture. Code checks every quote and the
+ * principle key; the model never sets evidence strength.
+ */
+export const emailAuditSchema = z.object({
+  findings: z
+    .array(
+      z.object({
+        part: z.enum(EMAIL_PARTS),
+        lens: z.enum(EMAIL_LENSES),
+        verdict: z.enum(["friction", "working"]),
+        // A toolkit principle key, or null for a real problem the toolkit has no principle for.
+        principleKey: z.string().max(40).nullable(),
+        proof: z.object({
+          kind: z.enum(["quote", "image"]),
+          text: z.string().min(2).max(300),
+        }),
+        explanation: z.string().min(1).max(400),
+      }),
+    )
+    .max(40),
+});
+export type EmailAuditOutput = z.infer<typeof emailAuditSchema>;

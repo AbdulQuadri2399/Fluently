@@ -718,6 +718,16 @@ Format: user action → system response → resulting state (ACs).
 | canvas.attachment.open / canvas.attachment.showing | "Open" (button-look chip with a side-panel icon) / "Showing in the side panel" (replaces the hint while that card is the open one; the strip and chip turn dark) *(2026-11-21: please confirm)* |
 | canvas.attachment.assets | "Screens attached" / "Screens and details in the side panel" (strip on a Current assets card that has screens) |
 | canvas.attachment.sources | "Sources attached" / "Where each source came from, in the side panel" (strip on an Evidence card once it has sources) |
+| email.audit.title / email.audit.help | "Quick audit" / "Checks this email against the toolkit, by part and by lens. Every quote comes from the email." *(Phase 1, 2026-11-21: please confirm)* |
+| email.audit.run / email.audit.again / email.audit.running / email.audit.notRun | "Run quick audit" / "Run again" / "Auditing this email…" / "Not audited yet." |
+| email.audit.summary / email.audit.usedPrinciples | "3 friction points, 5 working well" / "Audited against 20 toolkit principles" (opens to list them; any outside the shortlist are marked "outside the shortlist") |
+| email.audit.parts.* | "Subject line", "Preheader", "Hero", "Body", "Buttons", "Footer" |
+| email.audit.lens.* / email.audit.friction / email.audit.working | "Structure", "Content", "Visual" / "Friction" / "Working well" |
+| email.audit.proofQuote / proofImage / proofMeasured | "From the email" / "Read from the image" / "Measured" |
+| email.audit.outsideTitle / email.audit.outsideHelp | "Not in the toolkit" / "Real problems the toolkit has no principle for. They aren't counted as toolkit findings." |
+| email.audit.dropped | "2 findings were left out because their quote wasn't found in the email." (1: "1 finding was left out because its quote wasn't found in the email.") |
+| email.audit.noImage / email.audit.noMeasured | "No phone picture was used, so the visual lens had nothing to look at. Render the email for the audit first, then run this again." / "No measured facts yet. Render the email for the audit to add them." |
+| email.audit.failed / email.audit.noToolkit / email.audit.noFindings | "The audit couldn't finish. Try again." / "There's no toolkit to audit against. Ask your Fluently admin to upload it." / "No findings." |
 | email.frame.inbox / email.frame.sender / email.frame.to | "Inbox" / "Sender" / "To: Me" (the generic mail app around the email; the subject line is the email's own) *(2026-11-21: please confirm)* |
 | email.render.title / email.render.button / email.render.again / email.render.rendering | "Phone view" / "Render for the audit" / "Render again" / "Rendering…" *(Phase 1, 2026-11-20: please confirm)* |
 | email.render.none / email.render.rendered / email.render.failed | "Not rendered yet. The audit uses a render of this email, so render it first." / "Rendered for the audit. The measured facts below come from that render." / "Couldn't render this email. Try again." |

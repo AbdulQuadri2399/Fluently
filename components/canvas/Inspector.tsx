@@ -14,6 +14,7 @@ import type { ActionResult } from "@/lib/actions/result";
 import { canvasCopy as c, typeNames } from "./copy";
 import type { EmailPreviewData } from "@/lib/email/service";
 import { EmailPartsSection, RemoveEmailSection } from "@/components/email/EmailPartsSection";
+import { EmailAuditSection, type EmailAuditFns } from "@/components/email/EmailAuditSection";
 import { EmailRenderSection, type EmailRenderFns } from "@/components/email/EmailRenderSection";
 import type { EmailDetail } from "@/lib/email/service";
 import { ConnectionsSection, DeleteCardSection } from "./CardActions";
@@ -132,6 +133,7 @@ export function Inspector({
   onRemoveEmail,
   emailRender,
   loadEmailPreview,
+  emailAudit,
 }: {
   node: TreeNode;
   nodes: TreeNode[];
@@ -163,6 +165,8 @@ export function Inspector({
   /** Phase 1: render the email at phone width and show what was measured (AC31.4, AC31.5). */
   emailRender?: EmailRenderFns;
   loadEmailPreview?: (nodeId: string) => Promise<EmailPreviewData | null>;
+  /** Phase 1: the quick audit of this email (AC31.6–AC31.8). */
+  emailAudit?: EmailAuditFns;
 }) {
   const [email, setEmail] = useState<{ nodeId: string; detail: EmailDetail | null } | null>(null);
   useEffect(() => {
@@ -401,6 +405,9 @@ export function Inspector({
           fns={emailRender}
           loadPreview={() => loadEmailPreview(node.id)}
         />
+      ) : null}
+      {node.type === "email" && emailDetail && emailAudit ? (
+        <EmailAuditSection emailId={emailDetail.id} fns={emailAudit} />
       ) : null}
       {onTrace ? (
         <div className="grid gap-2">

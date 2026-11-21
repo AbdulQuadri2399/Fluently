@@ -75,6 +75,44 @@ export const emailCopy = {
     imagesCount: (n: number, missing: number) =>
       `${n} ${n === 1 ? "image" : "images"}${missing ? `, ${missing} without a description` : ""}`,
   },
+  audit: {
+    title: "Quick audit",
+    help: "Checks this email against the toolkit, by part and by lens. Every quote comes from the email.",
+    run: "Run quick audit",
+    again: "Run again",
+    running: "Auditing this email…",
+    notRun: "Not audited yet.",
+    failed: "The audit couldn't finish. Try again.",
+    noToolkit: "There's no toolkit to audit against. Ask your Fluently admin to upload it.",
+    summary: (friction: number, working: number) =>
+      `${friction} ${friction === 1 ? "friction point" : "friction points"}, ${working} working well`,
+    usedPrinciples: (n: number) =>
+      `Audited against ${n} toolkit ${n === 1 ? "principle" : "principles"}`,
+    extraMarker: "outside the shortlist",
+    parts: {
+      subject: "Subject line",
+      preheader: "Preheader",
+      hero: "Hero",
+      body: "Body",
+      ctas: "Buttons",
+      footer: "Footer",
+    },
+    lens: { structure: "Structure", content: "Content", visual: "Visual" },
+    friction: "Friction",
+    working: "Working well",
+    proofQuote: "From the email",
+    proofImage: "Read from the image",
+    proofMeasured: "Measured",
+    outsideTitle: "Not in the toolkit",
+    outsideHelp:
+      "Real problems the toolkit has no principle for. They aren't counted as toolkit findings.",
+    dropped: (n: number) =>
+      `${n} ${n === 1 ? "finding was" : "findings were"} left out because its quote wasn't found in the email.`,
+    noImage:
+      "No phone picture was used, so the visual lens had nothing to look at. Render the email for the audit first, then run this again.",
+    noMeasured: "No measured facts yet. Render the email for the audit to add them.",
+    noFindings: "No findings.",
+  },
   frame: {
     inbox: "Inbox",
     sender: "Sender",

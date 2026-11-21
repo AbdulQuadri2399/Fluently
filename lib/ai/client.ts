@@ -12,6 +12,8 @@ export type AiCall<T> = {
   prompt: string;
   schema: z.ZodType<T>;
   settings: { stageModels: StageModels; modelPrices: ModelPrices };
+  /** Pictures sent with the prompt (the email's phone render, for the visual lens). */
+  images?: { mediaType: "image/png" | "image/jpeg"; base64: string }[];
   /** Fake mode only: the inputs the made-up answer is built from. */
   input?: Record<string, unknown>;
   maxTokens?: number;

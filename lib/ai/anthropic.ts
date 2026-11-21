@@ -35,7 +35,24 @@ export class AnthropicAiClient implements AiClient {
           model,
           max_tokens: call.maxTokens ?? 16000,
           system: call.system,
-          messages: [{ role: "user" as const, content: call.prompt }],
+          messages: [
+            {
+              role: "user" as const,
+              content: call.images?.length
+                ? [
+                    ...call.images.map((img) => ({
+                      type: "image" as const,
+                      source: {
+                        type: "base64" as const,
+                        media_type: img.mediaType,
+                        data: img.base64,
+                      },
+                    })),
+                    { type: "text" as const, text: call.prompt },
+                  ]
+                : call.prompt,
+            },
+          ],
           output_config: { effort, format: zodOutputFormat(call.schema) },
           ...(model === "claude-haiku-5-5"
             ? {}
