@@ -18,7 +18,6 @@ import {
   PuzzlePieceIcon,
   QuestionIcon,
   ShieldCheckIcon,
-  SidebarSimpleIcon,
   StackIcon,
   TargetIcon,
   WarningCircleIcon,
@@ -31,6 +30,7 @@ import { CARD_W } from "@/lib/canvas/layout";
 import type { TreeNode } from "@/lib/canvas/load";
 import { mi } from "@/lib/motion";
 import { cn } from "@/lib/utils";
+import { AttachmentStrip } from "./AttachmentStrip";
 import { StrengthTag } from "./StrengthTag";
 import { canvasCopy as c } from "./copy";
 import { ASSET_MIME, AssetsExpanded, type AssetThumb } from "./AssetsExpanded";
@@ -156,6 +156,23 @@ function Expanded({
   return <div className="grid gap-2 border-t border-line pt-2.5 text-caption text-ink">{rows}</div>;
 }
 
+/** What is behind a card, when something is: an email, uploaded screens, or gathered sources. */
+function attachment(node: TreeNode) {
+  const d = node.data as { count?: number; groups?: { count?: number }[] };
+  if (node.type === "email")
+    return {
+      Icon: DeviceMobileIcon,
+      phone: true,
+      title: ec.card.attached,
+      hint: ec.card.attachedHint,
+    };
+  if (node.type === "asset_set" && (d.count ?? 0) > 0)
+    return { Icon: ImagesIcon, phone: false, ...c.attachment.assets };
+  if (node.type === "source" && (d.groups ?? []).some((g) => (g.count ?? 0) > 0))
+    return { Icon: BookOpenIcon, phone: false, ...c.attachment.sources };
+  return null;
+}
+
 /** The card body, shared by the canvas and the list view (03b Tree card, T6–T8). */
 export function CardBody({
   node,
@@ -178,6 +195,7 @@ export function CardBody({
 }) {
   const v = cardView(node, running);
   const Icon = ICONS[node.type] ?? BookOpenIcon;
+  const attached = attachment(node);
   const stale = v.markers.find((m) => m.kind === "stale");
   const others = v.markers.filter((m) => m.kind !== "stale");
   return (
@@ -261,38 +279,14 @@ export function CardBody({
           ) : null}
         </span>
       </div>
-      {node.type === "email" ? (
-        // Says there is an email behind this card, and where to see it (the click bubbles to the card).
-        <div
-          data-testid="attachment-strip"
-          className={cn(
-            "flex cursor-pointer items-center gap-2.5 border-t border-line pt-2.5 text-caption",
-            selected && "text-ink",
-          )}
-        >
-          <span
-            aria-hidden="true"
-            className={cn(
-              "grid h-8 w-[22px] shrink-0 place-items-center rounded-[5px] border-2 bg-soft text-muted",
-              selected ? "border-ink text-ink" : "border-line-strong",
-            )}
-          >
-            <DeviceMobileIcon className="size-3" />
-          </span>
-          <span className="grid min-w-0 flex-1 leading-tight">
-            <span className="font-medium">{ec.card.attached}</span>
-            <span className="text-muted">{selected ? ec.card.showing : ec.card.attachedHint}</span>
-          </span>
-          <span
-            className={cn(
-              "inline-flex shrink-0 items-center gap-1 rounded-full border px-2 py-0.5 font-medium",
-              selected ? "border-ink bg-ink text-surface" : "border-line-strong text-muted",
-            )}
-          >
-            {ec.card.open}
-            <SidebarSimpleIcon aria-hidden="true" className="size-3" />
-          </span>
-        </div>
+      {attached ? (
+        <AttachmentStrip
+          Icon={attached.Icon}
+          phone={attached.phone}
+          title={attached.title}
+          hint={attached.hint}
+          selected={selected}
+        />
       ) : null}
       {expanded ? (
         <div className="animate-in fade-in-0 duration-base">

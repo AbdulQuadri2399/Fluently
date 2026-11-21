@@ -29,6 +29,14 @@ export const typeNames: Record<string, string> = {
 };
 
 export const canvasCopy = {
+  // The strip on a card that has something behind it (screens, an email, sources): says so, and
+  // that the side panel shows it.
+  attachment: {
+    open: "Open",
+    showing: "Showing in the side panel",
+    assets: { title: "Screens attached", hint: "Screens and details in the side panel" },
+    sources: { title: "Sources attached", hint: "Where each source came from, in the side panel" },
+  },
   tabs: { canvas: "Canvas", brief: "Brief", report: "Report" },
   cost: (spent: string, cap: string) => `${spent} of ${cap} AI budget`,
   strengthLabel: (level: string) => `${level} strength`,

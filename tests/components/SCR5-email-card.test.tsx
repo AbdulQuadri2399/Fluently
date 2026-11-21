@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { CardBody } from "@/components/canvas/NodeCard";
+import { canvasCopy as c } from "@/components/canvas/copy";
 import { emailCopy as ec } from "@/components/email/copy";
 import type { TreeNode } from "@/lib/canvas/load";
 
@@ -30,16 +31,40 @@ describe("email card attachment strip", () => {
     const strip = screen.getByTestId("attachment-strip");
     expect(strip).toHaveTextContent(ec.card.attached);
     expect(strip).toHaveTextContent(ec.card.attachedHint);
-    expect(strip).toHaveTextContent(ec.card.open);
+    expect(strip).toHaveTextContent(c.attachment.open);
   });
 
   it("says so when the card is the one showing in the panel", () => {
     render(<CardBody node={node("email")} running={false} selected />);
-    expect(screen.getByTestId("attachment-strip")).toHaveTextContent(ec.card.showing);
+    expect(screen.getByTestId("attachment-strip")).toHaveTextContent(c.attachment.showing);
   });
 
-  it("other cards have no strip", () => {
-    render(<CardBody node={node("objective")} running={false} />);
+  it("a screens card with screens, and an evidence card with sources, have one too", () => {
+    const { unmount } = render(
+      <CardBody node={{ ...node("asset_set"), data: { count: 3 } }} running={false} />,
+    );
+    expect(screen.getByTestId("attachment-strip")).toHaveTextContent(c.attachment.assets.title);
+    unmount();
+    render(
+      <CardBody
+        node={{ ...node("source"), data: { groups: [{ count: 0 }, { count: 4 }] } }}
+        running={false}
+      />,
+    );
+    expect(screen.getByTestId("attachment-strip")).toHaveTextContent(c.attachment.sources.title);
+    expect(screen.getByTestId("attachment-strip")).toHaveTextContent(c.attachment.sources.hint);
+  });
+
+  it("cards with nothing behind them have no strip", () => {
+    const { unmount } = render(<CardBody node={node("objective")} running={false} />);
+    expect(screen.queryByTestId("attachment-strip")).not.toBeInTheDocument();
+    unmount();
+    render(<CardBody node={{ ...node("asset_set"), data: { count: 0 } }} running={false} />);
+    expect(screen.queryByTestId("attachment-strip")).not.toBeInTheDocument();
+    unmount();
+    render(
+      <CardBody node={{ ...node("source"), data: { groups: [{ count: 0 }] } }} running={false} />,
+    );
     expect(screen.queryByTestId("attachment-strip")).not.toBeInTheDocument();
   });
 });

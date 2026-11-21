@@ -117,7 +117,5 @@ export const emailCopy = {
     noPreheader: "no preheader",
     attached: "Email attached",
     attachedHint: "Phone preview and details in the side panel",
-    open: "Open",
-    showing: "Showing in the side panel",
   },
 } as const;
